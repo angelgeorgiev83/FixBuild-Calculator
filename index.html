@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ФИКСБИЛД ГРУП – Калкулатор за оферти</title>
+<meta name="theme-color" content="#0f172a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Оферти">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-512.png">
+<style>
+  :root {
+    --bg: #f1f5f9;
+    --card: #ffffff;
+    --text: #0f172a;
+    --muted: #64748b;
+    --border: #cbd5e1;
+    --primary: #ea580c;
+    --primary-dark: #c2410c;
+    --navy: #0f172a;
+    --navy-light: #1e293b;
+    --success: #16a34a;
+    --danger: #dc2626;
+    --soft: #f8fafc;
+    --accent-bg: #fff7ed;
+    --accent-border: #fed7aa;
+  }
+  body.dark {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --border: #334155;
+    --soft: #0f172a;
+    --accent-bg: #2a1810;
+    --accent-border: #7c2d12;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 15px; line-height: 1.4;
+    min-height: 100vh;
+  }
+  body { padding-bottom: 140px; }
+
+  /* Header */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: var(--navy); color: #ffffff;
+    padding: 12px 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-badge {
+    width: 36px; height: 36px; border-radius: 9px;
+    background: var(--primary); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 16px; letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+  .brand-title { font-weight: 800; font-size: 15px; letter-spacing: 0.3px; }
+  .brand-sub { font-size: 11px; color: #cbd5e1; }
+  .icon-btn {
+    background: rgba(255,255,255,0.12); color: #fff;
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 8px; padding: 8px 11px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+
+  /* Tabs */
+  .tabs {
+    position: sticky; top: 60px; z-index: 45;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    background: var(--card); border-bottom: 1px solid var(--border);
+  }
+  .tab-btn {
+    padding: 11px 4px; border: none; background: transparent;
+    color: var(--muted); font-weight: 700; font-size: 13px;
+    border-bottom: 3px solid transparent; cursor: pointer;
+    text-align: center;
+  }
+  .tab-btn.active {
+    color: var(--primary); border-bottom-color: var(--primary);
+    background: var(--accent-bg);
+  }
+
+  /* Layout */
+  .container { max-width: 720px; margin: 0 auto; padding: 12px; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px; margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .card-title {
+    font-size: 14px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.4px; color: var(--primary);
+    margin: 0 0 10px 0; display: flex; justify-content: space-between; align-items: center;
+  }
+
+  /* Form controls */
+  label { display: block; font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 4px; }
+  input, select, textarea {
+    width: 100%; min-height: 42px; padding: 9px 11px;
+    border: 1px solid var(--border); border-radius: 8px;
+    background: var(--soft); color: var(--text);
+    font-size: 16px; font-family: inherit; outline: none;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .row-gap { margin-bottom: 10px; }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    min-height: 44px; padding: 10px 14px; border-radius: 9px;
+    border: none; font-size: 14px; font-weight: 700; cursor: pointer;
+    text-decoration: none;
+  }
+  .btn-primary { background: var(--primary); color: #fff; width: 100%; }
+  .btn-primary:active { background: var(--primary-dark); }
+  .btn-navy { background: var(--navy); color: #fff; }
+  .btn-success { background: var(--success); color: #fff; }
+  .btn-outline {
+    background: transparent; color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-danger-sm {
+    background: #fee2e2; color: var(--danger); border: none;
+    border-radius: 7px; padding: 6px 10px; font-weight: 700; font-size: 13px; cursor: pointer;
+  }
+  body.dark .btn-danger-sm { background: #450a0a; color: #fca5a5; }
+  .btn-sm { min-height: 34px; padding: 6px 10px; font-size: 13px; border-radius: 7px; }
+
+  /* Room pills */
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .chip {
+    padding: 7px 12px; border-radius: 20px; border: 1px solid var(--border);
+    background: var(--soft); color: var(--text); font-size: 13px; font-weight: 700;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .chip-add { border-style: dashed; color: var(--primary); border-color: var(--primary); background: var(--accent-bg); }
+
+  /* Type toggle */
+  .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
+  .seg button {
+    min-height: 40px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--soft); color: var(--text); font-weight: 700; font-size: 14px; cursor: pointer;
+  }
+  .seg button.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+  body.dark .seg button.active { background: var(--primary); border-color: var(--primary); }
+
+  /* Dimensions box */
+  .dim-box {
+    background: var(--accent-bg); border: 1px solid var(--accent-border);
+    border-radius: 10px; padding: 10px; margin-bottom: 10px;
+  }
+  .dim-results { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; }
+  .dim-pill {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 6px; text-align: center; cursor: pointer;
+  }
+  .dim-pill:active { border-color: var(--primary); }
+  .dim-pill .lbl { font-size: 11px; color: var(--muted); font-weight: 700; }
+  .dim-pill .val { font-size: 15px; font-weight: 800; color: var(--primary); margin: 2px 0; }
+  .dim-pill .hint { font-size: 10px; color: var(--muted); }
+
+  /* Item list */
+  .item-row {
+    display: flex; justify-content: space-between; align-items: center; gap: 8px;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+  }
+  .item-row:last-child { border-bottom: none; }
+  .item-name { font-weight: 700; font-size: 14px; }
+  .item-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .badge-type {
+    display: inline-block; font-size: 10px; font-weight: 800; padding: 2px 6px;
+    border-radius: 5px; text-transform: uppercase; margin-right: 5px;
+  }
+  .badge-labor { background: #dbeafe; color: #1d4ed8; }
+  .badge-mat { background: #dcfce7; color: #15803d; }
+  .item-right { text-align: right; flex-shrink: 0; }
+  .item-sum { font-weight: 800; font-size: 15px; margin-bottom: 4px; }
+
+  /* Sticky footer totals */
+  .bottom-bar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+    background: var(--navy); color: #fff;
+    padding: 10px 14px;
+    box-shadow: 0 -3px 12px rgba(0,0,0,0.22);
+  }
+  .bottom-inner {
+    max-width: 720px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .totals-mini { font-size: 12px; color: #cbd5e1; }
+  .totals-grand { font-size: 20px; font-weight: 900; color: #fb923c; }
+
+  /* Quote preview sheet (always white paper) */
+  .quote-sheet {
+    background: #ffffff; color: #0f172a;
+    border: 1px solid #cbd5e1; border-radius: 10px;
+    padding: 18px; margin-bottom: 12px;
+  }
+  .q-head {
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
+    border-bottom: 3px solid #ea580c; padding-bottom: 12px; margin-bottom: 12px;
+  }
+  .q-firm { font-size: 18px; font-weight: 900; color: #0f172a; }
+  .q-sub { font-size: 12px; color: #475569; margin-top: 2px; }
+  .q-tag { text-align: right; }
+  .q-tag-title { font-size: 16px; font-weight: 900; color: #ea580c; }
+  .q-client {
+    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
+    padding: 10px; font-size: 13px; margin-bottom: 14px;
+  }
+  .q-room-title {
+    background: #0f172a; color: #ffffff; padding: 6px 10px;
+    font-size: 13px; font-weight: 800; border-radius: 6px; margin: 12px 0 6px 0;
+  }
+  table.q-table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-bottom: 8px; }
+  table.q-table th {
+    text-align: left; border-bottom: 2px solid #cbd5e1; padding: 6px 4px;
+    color: #475569; font-size: 11px; text-transform: uppercase;
+  }
+  table.q-table td { padding: 6px 4px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+  table.q-table .num { text-align: right; white-space: nowrap; }
+  .q-summary {
+    margin-top: 14px; border-top: 2px solid #0f172a; padding-top: 10px;
+    font-size: 14px;
+  }
+  .q-sum-row { display: flex; justify-content: space-between; padding: 3px 0; }
+  .q-sum-grand {
+    display: flex; justify-content: space-between; padding: 8px 10px;
+    background: #fff7ed; border: 1px solid #fdba74; border-radius: 8px;
+    font-size: 17px; font-weight: 900; color: #c2410c; margin-top: 6px;
+  }
+  .q-note { font-size: 11.5px; color: #64748b; margin-top: 12px; border-top: 1px dashed #cbd5e1; padding-top: 8px; }
+
+  .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+
+  /* Modal for PNG preview */
+  .modal-bg {
+    display: none; position: fixed; inset: 0; z-index: 100;
+    background: rgba(0,0,0,0.78); padding: 14px; overflow-y: auto;
+  }
+  .modal-bg.open { display: block; }
+  .modal-box {
+    max-width: 680px; margin: 10px auto; background: var(--card);
+    border-radius: 12px; padding: 14px;
+  }
+  .modal-box img { width: 100%; border-radius: 8px; border: 1px solid var(--border); display: block; margin: 10px 0; }
+
+  /* Toast */
+  .toast {
+    position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
+    background: #0f172a; color: #fff; padding: 10px 16px; border-radius: 99px;
+    font-size: 13px; font-weight: 700; z-index: 120; display: none;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3); border: 1px solid #ea580c;
+  }
+
+  /* Materials waste results */
+  .mat-res-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px;
+  }
+  .mat-res-row:last-child { border-bottom: none; }
+
+  /* Print styles for native Android/PC Save as PDF */
+  @media print {
+    body { background: #fff !important; color: #000 !important; padding: 0 !important; }
+    .topbar, .tabs, .bottom-bar, .action-grid, .no-print, .modal-bg, .toast { display: none !important; }
+    .container { max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+    .panel { display: none !important; }
+    #panel-quote { display: block !important; }
+    .quote-sheet { border: none !important; padding: 0 !important; box-shadow: none !important; }
+    .q-room-title { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .q-sum-grand { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-badge">АГ</div>
+    <div>
+      <div class="brand-title" id="hdrFirm">ФИКСБИЛД ГРУП ЕООД</div>
+      <div class="brand-sub">Калкулатор за оферти и ремонти (€)</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:6px;align-items:center;"><button class="icon-btn" id="installBtn" style="display:none;background:#ea580c;border-color:#fb923c;" onclick="installPWA()">📲 Инсталирай</button><button class="icon-btn" id="themeBtn" onclick="toggleTheme()">🌙 Тъмна</button></div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="project" onclick="switchTab('project')">1. Обект</button>
+  <button class="tab-btn" data-tab="quote" onclick="switchTab('quote')">2. Оферта</button>
+  <button class="tab-btn" data-tab="waste" onclick="switchTab('waste')">3. Фира</button>
+  <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">4. Цени</button>
+</div>
+
+<div class="container">
+
+  <!-- TAB 1: PROJECT -->
+  <div class="panel active" id="panel-project">
+
+    <div class="card">
+      <div class="card-title">
+        <span>Данни за клиента и обекта</span>
+        <button class="btn btn-outline btn-sm" onclick="newQuoteConfirm()">+ Нова оферта</button>
+      </div>
+      <div class="grid-2 row-gap">
+        <div>
+          <label>Име на клиент</label>
+          <input type="text" id="clientName" placeholder="напр. Иван Петров" oninput="syncProjectMeta()">
+        </div>
+        <div>
+          <label>Телефон на клиент</label>
+          <input type="tel" id="clientPhone" placeholder="088..." oninput="syncProjectMeta()">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div>
+          <label>Адрес / Обект</label>
+          <input type="text" id="clientAddress" placeholder="гр. Пловдив, ж.к. Тракия" oninput="syncProjectMeta()">
+        </div>
+        <div>
+          <label>Оферта № / Дата</label>
+          <input type="text" id="quoteNumber" oninput="syncProjectMeta()">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>Помещения</span>
+        <span style="font-size:11px;color:var(--muted);text-transform:none;">Избери стая</span>
+      </div>
+      <div class="chips" id="roomChips"></div>
+      <div class="chips" style="margin-bottom:0;">
+        <button class="chip chip-add" onclick="quickAddRoom('Баня')">+ Баня</button>
+        <button class="chip chip-add" onclick="quickAddRoom('Кухня')">+ Кухня</button>
+        <button class="chip chip-add" onclick="quickAddRoom('Хол')">+ Хол</button>
+        <button class="chip chip-add" onclick="quickAddRoom('Спалня')">+ Спалня</button>
+        <button class="chip chip-add" onclick="quickAddRoom('Коридор')">+ Коридор</button>
+        <button class="chip chip-add" onclick="promptAddRoom()">+ Друга...</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span id="activeRoomHeading">Стая: Обект</span>
+        <div>
+          <button class="btn btn-outline btn-sm" onclick="toggleDimBox()" id="dimToggleBtn">📐 Размери</button>
+          <button class="btn-danger-sm" onclick="deleteActiveRoom()" title="Изтрий стаята">✕</button>
+        </div>
+      </div>
+
+      <div class="dim-box" id="dimBox" style="display:none;">
+        <div class="grid-3 row-gap">
+          <div>
+            <label>Дължина (м)</label>
+            <input type="number" step="0.05" id="dimL" placeholder="4.0" oninput="calcDims()">
+          </div>
+          <div>
+            <label>Ширина (м)</label>
+            <input type="number" step="0.05" id="dimW" placeholder="3.5" oninput="calcDims()">
+          </div>
+          <div>
+            <label>Височина (м)</label>
+            <input type="number" step="0.05" id="dimH" value="2.6" oninput="calcDims()">
+          </div>
+        </div>
+        <div class="grid-2">
+          <div>
+            <label>Брой врати (-1.8 м²)</label>
+            <input type="number" step="1" min="0" id="dimDoors" value="1" oninput="calcDims()">
+          </div>
+          <div>
+            <label>Брой прозорци (-2.0 м²)</label>
+            <input type="number" step="1" min="0" id="dimWins" value="1" oninput="calcDims()">
+          </div>
+        </div>
+        <div class="dim-results">
+          <div class="dim-pill" onclick="useDim('floor')">
+            <div class="lbl">Под / Таван</div>
+            <div class="val" id="resFloor">0.00 м²</div>
+            <div class="hint">Натисни за вмъкване</div>
+          </div>
+          <div class="dim-pill" onclick="useDim('walls')">
+            <div class="lbl">Стени нето</div>
+            <div class="val" id="resWalls">0.00 м²</div>
+            <div class="hint">Натисни за вмъкване</div>
+          </div>
+          <div class="dim-pill" onclick="useDim('perim')">
+            <div class="lbl">Обиколка</div>
+            <div class="val" id="resPerim">0.00 л.м</div>
+            <div class="hint">Натисни за вмъкване</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="seg">
+        <button id="typeLaborBtn" class="active" onclick="setItemType('labor')">🔨 Труд</button>
+        <button id="typeMatBtn" onclick="setItemType('material')">🧱 Материал</button>
+      </div>
+
+      <div class="row-gap" id="presetWrap">
+        <label>Бърз избор от ценоразписа</label>
+        <select id="presetSelect" onchange="applyPreset()"></select>
+      </div>
+
+      <div class="row-gap">
+        <label>Описание на дейност / материал</label>
+        <input type="text" id="itemName" placeholder="напр. Шпакловка 2 ръце + шкурене">
+      </div>
+
+      <div class="grid-3 row-gap">
+        <div>
+          <label>Количество</label>
+          <input type="number" step="0.01" id="itemQty" placeholder="0">
+        </div>
+        <div>
+          <label>Мярка</label>
+          <select id="itemUnit">
+            <option value="кв.м">кв.м</option>
+            <option value="л.м">л.м</option>
+            <option value="бр.">бр.</option>
+            <option value="точка">точка</option>
+            <option value="торба">торба</option>
+            <option value="кофа">кофа</option>
+            <option value="лист">лист</option>
+            <option value="пакет">пакет</option>
+            <option value="компл.">компл.</option>
+          </select>
+        </div>
+        <div>
+          <label>Ед. цена (€)</label>
+          <input type="number" step="0.01" id="itemPrice" placeholder="0.00">
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="addItem()">+ Добави към стаята</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>Добавени позиции в стаята</span>
+        <span id="roomSubtotalLbl" style="color:var(--text);">0.00 €</span>
+      </div>
+      <div id="roomItemsList"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>Отстъпка и бележки</span></div>
+      <div class="grid-2 row-gap">
+        <div>
+          <label>Отстъпка</label>
+          <input type="number" step="0.5" min="0" id="discountVal" value="0" oninput="syncDiscount()">
+        </div>
+        <div>
+          <label>Вид отстъпка</label>
+          <select id="discountType" onchange="syncDiscount()">
+            <option value="percent">% Процент</option>
+            <option value="eur">€ Евро</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label>Бележка към офертата</label>
+        <textarea id="quoteNotes" rows="2" oninput="syncProjectMeta()"></textarea>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TAB 2: QUOTE PREVIEW & EXPORT -->
+  <div class="panel" id="panel-quote">
+
+    <div class="action-grid no-print">
+      <button class="btn btn-primary" onclick="generatePNG()">🖼️ Снимка (PNG)</button>
+      <button class="btn btn-navy" onclick="printPDF()">📄 PDF / Печат</button>
+      <button class="btn btn-success" onclick="copyForViber()">💬 Копирай за Viber</button>
+      <button class="btn btn-outline" onclick="saveCurrentQuote()">💾 Запази оферта</button>
+    </div>
+
+    <div class="quote-sheet" id="quoteSheet"></div>
+
+  </div>
+
+  <!-- TAB 3: MATERIALS WASTE CALCULATOR -->
+  <div class="panel" id="panel-waste">
+    <div class="card">
+      <div class="card-title"><span>Калкулатор за материали с фира</span></div>
+      <div class="row-gap">
+        <label>Вид ремонтна дейност</label>
+        <select id="wType" onchange="calcWaste()">
+          <option value="putty">Шпакловка (2 ръце, 1.8 кг/м² + 10% фира)</option>
+          <option value="latex">Латекс (2 ръце, 0.16 л/м² + 10% фира)</option>
+          <option value="primer">Грунд (0.12 л/м² + 5% фира)</option>
+          <option value="drywall">Гипсокартон (листи 120×200 = 2.4 м² + 10% фира)</option>
+          <option value="tiles_straight">Плочки право редене (+10% фира + лепило + фуга)</option>
+          <option value="tiles_diag">Плочки диагонал (+15% фира + лепило + фуга)</option>
+          <option value="laminate">Ламинат (+7% фира + подложка)</option>
+        </select>
+      </div>
+      <div class="grid-2 row-gap">
+        <div>
+          <label>Чиста площ (кв.м)</label>
+          <input type="number" step="0.1" id="wArea" value="25" oninput="calcWaste()">
+        </div>
+        <div>
+          <label>Цена на опаковка/м² (€) - по избор</label>
+          <input type="number" step="0.1" id="wPrice" placeholder="0.00" oninput="calcWaste()">
+        </div>
+      </div>
+      <div id="wasteOutput" style="margin-top:10px;"></div>
+      <div style="margin-top:12px;" class="grid-2">
+        <button class="btn btn-success btn-sm" onclick="copyWasteList()">💬 Копирай списъка</button>
+        <button class="btn btn-primary btn-sm" onclick="addWasteToRoom()">+ Вкарай като материал</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: PRICE LIST, COMPANY & SAVED -->
+  <div class="panel" id="panel-settings">
+
+    <div class="card">
+      <div class="card-title"><span>Запазени оферти</span></div>
+      <div id="savedQuotesList"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>Моите фирмени данни</span></div>
+      <div class="row-gap">
+        <label>Име на фирма</label>
+        <input type="text" id="setFirmName" oninput="saveCompanySettings()">
+      </div>
+      <div class="grid-2 row-gap">
+        <div>
+          <label>Град</label>
+          <input type="text" id="setFirmCity" oninput="saveCompanySettings()">
+        </div>
+        <div>
+          <label>Телефон</label>
+          <input type="text" id="setFirmPhone" oninput="saveCompanySettings()">
+        </div>
+      </div>
+      <div>
+        <label>ЕИК / Имейл / Допълнително (по избор)</label>
+        <input type="text" id="setFirmExtra" placeholder="напр. ЕИК / Viber" oninput="saveCompanySettings()">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>Ценоразпис труд (€)</span></div>
+      <div id="priceListEditor"></div>
+      <div style="margin-top:12px; border-top:1px solid var(--border); padding-top:10px;">
+        <label>Добави нова дейност в ценоразписа</label>
+        <div class="row-gap">
+          <input type="text" id="newPName" placeholder="Име на дейност">
+        </div>
+        <div class="grid-2 row-gap">
+          <select id="newPUnit">
+            <option value="кв.м">кв.м</option>
+            <option value="л.м">л.м</option>
+            <option value="бр.">бр.</option>
+            <option value="точка">точка</option>
+            <option value="компл.">компл.</option>
+          </select>
+          <input type="number" step="0.1" id="newPPrice" placeholder="Цена (€)">
+        </div>
+        <button class="btn btn-primary" onclick="addPriceListItem()">+ Добави в ценоразписа</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span>Архив / Възстановяване</span></div>
+      <div class="grid-2">
+        <button class="btn btn-outline btn-sm" onclick="exportBackup()">⬇ Изтегли архив</button>
+        <button class="btn btn-outline btn-sm" onclick="document.getElementById('importFile').click()">⬆ Зареди архив</button>
+      </div>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)">
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Sticky bottom totals bar -->
+<div class="bottom-bar">
+  <div class="bottom-inner">
+    <div>
+      <div class="totals-mini">
+        Труд: <strong id="barLabor">0.00 €</strong> | Материали: <strong id="barMat">0.00 €</strong>
+      </div>
+      <div class="totals-grand">ОБЩО: <span id="barTotal">0.00 €</span></div>
+    </div>
+    <button class="btn btn-primary" style="width:auto; padding:10px 16px;" onclick="switchTab('quote')">Оферта →</button>
+  </div>
+</div>
+
+<!-- PNG Preview Modal -->
+<div class="modal-bg" id="pngModal">
+  <div class="modal-box">
+    <div class="card-title">
+      <span>Готова снимка на офертата</span>
+      <button class="btn-danger-sm" onclick="closePngModal()">Затвори ✕</button>
+    </div>
+    <p style="font-size:12.5px;color:var(--muted);margin:0 0 8px 0;">
+      Натисни бутона за изтегляне/споделяне, или <strong>задръж пръст върху снимката</strong> и избери „Изтегли“ / „Сподели“.
+    </p>
+    <div class="grid-2">
+      <button class="btn btn-primary btn-sm" onclick="downloadPngFile()">⬇ Изтегли PNG</button>
+      <button class="btn btn-success btn-sm" onclick="sharePngFile()">📤 Сподели (Viber)</button>
+    </div>
+    <img id="pngPreviewImg" alt="Оферта PNG">
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+
+  var STORAGE_KEY = 'fixbuild_app_v3';
+
+  var DEFAULT_PRICES = [
+    { id: 'p1', name: 'Грундиране преди шпакловка или боя', unit: 'кв.м', price: 1.50 },
+    { id: 'p2', name: 'Шпакловка (2 ръце + шкурене)', unit: 'кв.м', price: 8.50 },
+    { id: 'p3', name: 'Шпакловка с армираща мрежа', unit: 'кв.м', price: 11.00 },
+    { id: 'p4', name: 'Монтаж на ъглохранители', unit: 'л.м', price: 3.50 },
+    { id: 'p5', name: 'Боядисване с латекс (2 ръце)', unit: 'кв.м', price: 5.00 },
+    { id: 'p6', name: 'Гипсокартон (таван / предстенна)', unit: 'кв.м', price: 18.00 },
+    { id: 'p7', name: 'Преградна стена гипсокартон (с вата)', unit: 'кв.м', price: 24.00 },
+    { id: 'p8', name: 'Хидроизолация (течна мембрана + ленти)', unit: 'кв.м', price: 8.00 },
+    { id: 'p9', name: 'Полагане на плочки (фаянс / гранитогрес)', unit: 'кв.м', price: 24.00 },
+    { id: 'p10', name: 'Редене на ламинат с подложка', unit: 'кв.м', price: 4.50 },
+    { id: 'p11', name: 'Монтаж на первази за ламинат', unit: 'л.м', price: 2.50 },
+    { id: 'p12', name: 'Ел. услуги (ключове, контакти, осветителни тела)', unit: 'бр.', price: 6.00 },
+    { id: 'p13', name: 'ВиК услуги (изводи и монтаж на санитария)', unit: 'точка', price: 25.00 }
+  ];
+
+  function todayStr() {
+    var d = new Date();
+    var dd = String(d.getDate()).padStart(2, '0');
+    var mm = String(d.getMonth() + 1).padStart(2, '0');
+    var yyyy = d.getFullYear();
+    return dd + '.' + mm + '.' + yyyy;
+  }
+
+  function makeBlankQuote() {
+    return {
+      id: 'q_' + Date.now(),
+      number: '№ ' + String(Math.floor(100 + Math.random() * 900)) + ' / ' + todayStr(),
+      clientName: '',
+      clientPhone: '',
+      clientAddress: '',
+      discountVal: 0,
+      discountType: 'percent',
+      notes: 'Валидност на офертата: 14 дни. Посочените цени са в евро (€).',
+      rooms: [
+        { id: 'r1', name: 'Хол', items: [] }
+      ]
+    };
+  }
+
+  function defaultState() {
+    return {
+      theme: 'light',
+      company: {
+        name: 'ФИКСБИЛД ГРУП ЕООД',
+        city: 'гр. Пловдив',
+        phone: '0886 321 665',
+        extra: 'Вътрешни и довършителни ремонти'
+      },
+      prices: JSON.parse(JSON.stringify(DEFAULT_PRICES)),
+      current: makeBlankQuote(),
+      saved: []
+    };
+  }
+
+  var state = defaultState();
+  var activeRoomId = 'r1';
+  var itemType = 'labor';
+  var lastDims = { floor: 0, walls: 0, perim: 0 };
+  var lastPngDataUrl = '';
+  var lastWasteSummary = { text: '', label: '', qty: 0, unit: 'компл.', price: 0 };
+
+  function loadState() {
+    try {
+      var raw = window.localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (parsed && parsed.company && parsed.current && Array.isArray(parsed.prices)) {
+          state = parsed;
+        }
+      }
+    } catch (e) {}
+    if (!state.current.rooms || !state.current.rooms.length) {
+      state.current.rooms = [{ id: 'r1', name: 'Хол', items: [] }];
+    }
+    activeRoomId = state.current.rooms[0].id;
+  }
+
+  function persistState() {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) {}
+  }
+
+  function fmt(num) {
+    var n = Number(num) || 0;
+    return n.toFixed(2);
+  }
+
+  function esc(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function toast(msg) {
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.style.display = 'block';
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(function() {
+      el.style.display = 'none';
+    }, 2400);
+  }
+
+  function getActiveRoom() {
+    for (var i = 0; i < state.current.rooms.length; i++) {
+      if (state.current.rooms[i].id === activeRoomId) return state.current.rooms[i];
+    }
+    activeRoomId = state.current.rooms[0].id;
+    return state.current.rooms[0];
+  }
+
+  function computeTotals(q) {
+    var labor = 0;
+    var mat = 0;
+    for (var i = 0; i < q.rooms.length; i++) {
+      var items = q.rooms[i].items || [];
+      for (var j = 0; j < items.length; j++) {
+        var line = (Number(items[j].qty) || 0) * (Number(items[j].price) || 0);
+        if (items[j].type === 'material') mat += line;
+        else labor += line;
+      }
+    }
+    var sub = labor + mat;
+    var dVal = Number(q.discountVal) || 0;
+    var discount = 0;
+    if (dVal > 0) {
+      discount = q.discountType === 'percent' ? (sub * dVal / 100) : dVal;
+      if (discount > sub) discount = sub;
+    }
+    var grand = sub - discount;
+    return { labor: labor, mat: mat, sub: sub, discount: discount, grand: grand };
+  }
+
+  window.toggleTheme = function() {
+    state.theme = state.theme === 'dark' ? 'light' : 'dark';
+    applyTheme();
+    persistState();
+  };
+
+  function applyTheme() {
+    var btn = document.getElementById('themeBtn');
+    if (state.theme === 'dark') {
+      document.body.classList.add('dark');
+      btn.textContent = '☀️ Светла';
+    } else {
+      document.body.classList.remove('dark');
+      btn.textContent = '🌙 Тъмна';
+    }
+  }
+
+  window.switchTab = function(tabName) {
+    var btns = document.querySelectorAll('.tab-btn');
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].classList.toggle('active', btns[i].getAttribute('data-tab') === tabName);
+    }
+    var panels = document.querySelectorAll('.panel');
+    for (var j = 0; j < panels.length; j++) {
+      panels[j].classList.remove('active');
+    }
+    document.getElementById('panel-' + tabName).classList.add('active');
+    if (tabName === 'quote') renderQuoteSheet();
+    if (tabName === 'waste') calcWaste();
+    if (tabName === 'settings') {
+      renderPriceListEditor();
+      renderSavedQuotes();
+    }
+    window.scrollTo(0, 0);
+  };
+
+  window.syncProjectMeta = function() {
+    state.current.clientName = document.getElementById('clientName').value;
+    state.current.clientPhone = document.getElementById('clientPhone').value;
+    state.current.clientAddress = document.getElementById('clientAddress').value;
+    state.current.number = document.getElementById('quoteNumber').value;
+    state.current.notes = document.getElementById('quoteNotes').value;
+    persistState();
+  };
+
+  window.syncDiscount = function() {
+    state.current.discountVal = parseFloat(document.getElementById('discountVal').value) || 0;
+    state.current.discountType = document.getElementById('discountType').value;
+    persistState();
+    updateBottomBar();
+  };
+
+  window.quickAddRoom = function(name) {
+    var count = 0;
+    for (var i = 0; i < state.current.rooms.length; i++) {
+      if (state.current.rooms[i].name.indexOf(name) === 0) count++;
+    }
+    var finalName = count > 0 ? (name + ' ' + (count + 1)) : name;
+    var r = { id: 'r_' + Date.now() + Math.floor(Math.random() * 99), name: finalName, items: [] };
+    state.current.rooms.push(r);
+    activeRoomId = r.id;
+    persistState();
+    renderRooms();
+    toast('Добавена стая: ' + finalName);
+  };
+
+  window.promptAddRoom = function() {
+    var name = window.prompt('Име на помещението (напр. Тераса, Тоалетна, Детска):');
+    if (name && name.trim()) {
+      window.quickAddRoom(name.trim());
+    }
+  };
+
+  window.selectRoom = function(id) {
+    activeRoomId = id;
+    renderRooms();
+  };
+
+  window.deleteActiveRoom = function() {
+    if (state.current.rooms.length <= 1) {
+      toast('Трябва да има поне 1 помещение.');
+      return;
+    }
+    var r = getActiveRoom();
+    if (!window.confirm('Изтриване на помещение "' + r.name + '" и всички позиции в него?')) return;
+    state.current.rooms = state.current.rooms.filter(function(x) { return x.id !== r.id; });
+    activeRoomId = state.current.rooms[0].id;
+    persistState();
+    renderRooms();
+    updateBottomBar();
+  };
+
+  window.toggleDimBox = function() {
+    var box = document.getElementById('dimBox');
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    calcDims();
+  };
+
+  window.calcDims = function() {
+    var l = parseFloat(document.getElementById('dimL').value) || 0;
+    var w = parseFloat(document.getElementById('dimW').value) || 0;
+    var h = parseFloat(document.getElementById('dimH').value) || 0;
+    var doors = parseFloat(document.getElementById('dimDoors').value) || 0;
+    var wins = parseFloat(document.getElementById('dimWins').value) || 0;
+
+    var floor = l * w;
+    var walls = Math.max(0, 2 * (l + w) * h - (doors * 1.8) - (wins * 2.0));
+    var perim = Math.max(0, 2 * (l + w) - (doors * 0.9));
+
+    lastDims = {
+      floor: Math.round(floor * 100) / 100,
+      walls: Math.round(walls * 100) / 100,
+      perim: Math.round(perim * 100) / 100
+    };
+    document.getElementById('resFloor').textContent = fmt(lastDims.floor) + ' м²';
+    document.getElementById('resWalls').textContent = fmt(lastDims.walls) + ' м²';
+    document.getElementById('resPerim').textContent = fmt(lastDims.perim) + ' л.м';
+  };
+
+  window.useDim = function(kind) {
+    var val = lastDims[kind] || 0;
+    if (val <= 0) {
+      toast('Въведи първо Дължина и Ширина.');
+      return;
+    }
+    document.getElementById('itemQty').value = val;
+    document.getElementById('itemUnit').value = (kind === 'perim') ? 'л.м' : 'кв.м';
+    toast('Поставено количество: ' + val);
+  };
+
+  window.setItemType = function(t) {
+    itemType = t;
+    document.getElementById('typeLaborBtn').classList.toggle('active', t === 'labor');
+    document.getElementById('typeMatBtn').classList.toggle('active', t === 'material');
+    document.getElementById('presetWrap').style.display = (t === 'labor') ? 'block' : 'none';
+    if (t === 'material') {
+      document.getElementById('itemName').placeholder = 'напр. Лепило за плочки 25 кг / Латекс';
+    } else {
+      document.getElementById('itemName').placeholder = 'напр. Шпакловка 2 ръце + шкурене';
+    }
+  };
+
+  function populatePresetSelect() {
+    var sel = document.getElementById('presetSelect');
+    var html = '<option value="">-- Избери дейност --</option>';
+    for (var i = 0; i < state.prices.length; i++) {
+      var p = state.prices[i];
+      html += '<option value="' + esc(p.id) + '">' + esc(p.name) + ' (' + fmt(p.price) + ' €/' + esc(p.unit) + ')</option>';
+    }
+    sel.innerHTML = html;
+  }
+
+  window.applyPreset = function() {
+    var id = document.getElementById('presetSelect').value;
+    if (!id) return;
+    for (var i = 0; i < state.prices.length; i++) {
+      if (state.prices[i].id === id) {
+        document.getElementById('itemName').value = state.prices[i].name;
+        document.getElementById('itemUnit').value = state.prices[i].unit;
+        document.getElementById('itemPrice').value = state.prices[i].price;
+        break;
+      }
+    }
+  };
+
+  window.addItem = function() {
+    var name = document.getElementById('itemName').value.trim();
+    var qty = parseFloat(document.getElementById('itemQty').value);
+    var unit = document.getElementById('itemUnit').value;
+    var price = parseFloat(document.getElementById('itemPrice').value);
+
+    if (!name) { toast('Напиши име на дейност или материал.'); return; }
+    if (!qty || qty <= 0) { toast('Въведи количество по-голямо от 0.'); return; }
+    if (isNaN(price) || price < 0) { toast('Въведи единична цена.'); return; }
+
+    var r = getActiveRoom();
+    r.items.push({
+      id: 'it_' + Date.now() + Math.floor(Math.random() * 999),
+      type: itemType,
+      name: name,
+      qty: qty,
+      unit: unit,
+      price: price
+    });
+
+    document.getElementById('presetSelect').value = '';
+    document.getElementById('itemName').value = '';
+    document.getElementById('itemQty').value = '';
+    document.getElementById('itemPrice').value = '';
+
+    persistState();
+    renderRooms();
+    updateBottomBar();
+    toast('Добавено в ' + r.name);
+  };
+
+  window.deleteItem = function(itemId) {
+    var r = getActiveRoom();
+    r.items = r.items.filter(function(it) { return it.id !== itemId; });
+    persistState();
+    renderRooms();
+    updateBottomBar();
+  };
+
+  function renderRooms() {
+    var chips = document.getElementById('roomChips');
+    var html = '';
+    for (var i = 0; i < state.current.rooms.length; i++) {
+      var r = state.current.rooms[i];
+      var cls = r.id === activeRoomId ? 'chip active' : 'chip';
+      html += '<button class="' + cls + '" onclick="selectRoom(\'' + esc(r.id) + '\')">' +
+              esc(r.name) + ' (' + r.items.length + ')</button>';
+    }
+    chips.innerHTML = html;
+
+    var active = getActiveRoom();
+    document.getElementById('activeRoomHeading').textContent = 'Стая: ' + active.name;
+
+    var listEl = document.getElementById('roomItemsList');
+    var roomSum = 0;
+    if (!active.items.length) {
+      listEl.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0;">Няма добавени позиции в тази стая.</div>';
+    } else {
+      var ih = '';
+      for (var j = 0; j < active.items.length; j++) {
+        var it = active.items[j];
+        var sum = (Number(it.qty) || 0) * (Number(it.price) || 0);
+        roomSum += sum;
+        var badge = it.type === 'material'
+          ? '<span class="badge-type badge-mat">Материал</span>'
+          : '<span class="badge-type badge-labor">Труд</span>';
+        ih += '<div class="item-row">' +
+          '<div>' +
+            '<div class="item-name">' + badge + esc(it.name) + '</div>' +
+            '<div class="item-meta">' + it.qty + ' ' + esc(it.unit) + ' × ' + fmt(it.price) + ' €</div>' +
+          '</div>' +
+          '<div class="item-right">' +
+            '<div class="item-sum">' + fmt(sum) + ' €</div>' +
+            '<button class="btn-danger-sm" onclick="deleteItem(\'' + esc(it.id) + '\')">Изтрий</button>' +
+          '</div>' +
+        '</div>';
+      }
+      listEl.innerHTML = ih;
+    }
+    document.getElementById('roomSubtotalLbl').textContent = fmt(roomSum) + ' €';
+  }
+
+  function updateBottomBar() {
+    var t = computeTotals(state.current);
+    document.getElementById('barLabor').textContent = fmt(t.labor) + ' €';
+    document.getElementById('barMat').textContent = fmt(t.mat) + ' €';
+    document.getElementById('barTotal').textContent = fmt(t.grand) + ' €';
+  }
+
+  function renderQuoteSheet() {
+    var q = state.current;
+    var c = state.company;
+    var t = computeTotals(q);
+
+    var html = '';
+    html += '<div class="q-head">' +
+      '<div>' +
+        '<div class="q-firm">' + esc(c.name) + '</div>' +
+        '<div class="q-sub">' + esc(c.extra) + '</div>' +
+        '<div class="q-sub">' + esc(c.city) + ' | Тел.: ' + esc(c.phone) + '</div>' +
+      '</div>' +
+      '<div class="q-tag">' +
+        '<div class="q-tag-title">ОФЕРТА</div>' +
+        '<div class="q-sub">' + esc(q.number) + '</div>' +
+      '</div>' +
+    '</div>';
+
+    html += '<div class="q-client">' +
+      '<strong>Клиент:</strong> ' + esc(q.clientName || '—') +
+      (q.clientPhone ? (' &nbsp;|&nbsp; <strong>Тел.:</strong> ' + esc(q.clientPhone)) : '') + '<br>' +
+      '<strong>Обект:</strong> ' + esc(q.clientAddress || '—') +
+    '</div>';
+
+    var hasAny = false;
+    for (var i = 0; i < q.rooms.length; i++) {
+      var r = q.rooms[i];
+      if (!r.items || !r.items.length) continue;
+      hasAny = true;
+      var rSum = 0;
+      html += '<div class="q-room-title">' + esc(r.name) + '</div>';
+      html += '<table class="q-table"><thead><tr>' +
+        '<th>Дейност / Материал</th><th class="num">Кол.</th><th class="num">Ед. цена</th><th class="num">Общо</th>' +
+      '</tr></thead><tbody>';
+      for (var j = 0; j < r.items.length; j++) {
+        var it = r.items[j];
+        var s = (Number(it.qty) || 0) * (Number(it.price) || 0);
+        rSum += s;
+        var prefix = it.type === 'material' ? '[Мат.] ' : '';
+        html += '<tr>' +
+          '<td>' + prefix + esc(it.name) + '</td>' +
+          '<td class="num">' + it.qty + ' ' + esc(it.unit) + '</td>' +
+          '<td class="num">' + fmt(it.price) + ' €</td>' +
+          '<td class="num"><strong>' + fmt(s) + ' €</strong></td>' +
+        '</tr>';
+      }
+      html += '</tbody></table>';
+      html += '<div style="text-align:right;font-size:12.5px;font-weight:800;color:#475569;margin-bottom:8px;">Общо за ' + esc(r.name) + ': ' + fmt(rSum) + ' €</div>';
+    }
+
+    if (!hasAny) {
+      html += '<div style="padding:20px;text-align:center;color:#64748b;">Все още няма добавени дейности. Върни се в таб „1. Обект“ и добави позиции.</div>';
+    }
+
+    html += '<div class="q-summary">' +
+      '<div class="q-sum-row"><span>Общо ТРУД:</span><strong>' + fmt(t.labor) + ' €</strong></div>' +
+      '<div class="q-sum-row"><span>Общо МАТЕРИАЛИ:</span><strong>' + fmt(t.mat) + ' €</strong></div>';
+    if (t.discount > 0) {
+      var dLbl = q.discountType === 'percent' ? (' (' + q.discountVal + '%)') : '';
+      html += '<div class="q-sum-row" style="color:#16a34a;"><span>Отстъпка' + dLbl + ':</span><strong>-' + fmt(t.discount) + ' €</strong></div>';
+    }
+    html += '<div class="q-sum-grand"><span>КРАЙНА СУМА:</span><span>' + fmt(t.grand) + ' €</span></div>' +
+    '</div>';
+
+    if (q.notes && q.notes.trim()) {
+      html += '<div class="q-note">' + esc(q.notes) + '</div>';
+    }
+
+    document.getElementById('quoteSheet').innerHTML = html;
+  }
+
+  /* Native Canvas PNG Generator - 100% Offline, Crisp Cyrillic */
+  function wrapCanvasText(ctx, text, maxWidth) {
+    var words = String(text || '').split(' ');
+    var lines = [];
+    var current = '';
+    for (var i = 0; i < words.length; i++) {
+      var test = current ? (current + ' ' + words[i]) : words[i];
+      if (ctx.measureText(test).width > maxWidth && current) {
+        lines.push(current);
+        current = words[i];
+      } else {
+        current = test;
+      }
+    }
+    if (current) lines.push(current);
+    return lines.length ? lines : [''];
+  }
+
+  window.generatePNG = function() {
+    var q = state.current;
+    var c = state.company;
+    var t = computeTotals(q);
+
+    var W = 1080;
+    var pad = 54;
+    var contentW = W - pad * 2;
+
+    // Temporary canvas for height measurement
+    var tmp = document.createElement('canvas');
+    var tctx = tmp.getContext('2d');
+
+    var y = 60;
+    y += 110; // Header
+    y += 105; // Client box
+
+    var roomBlocks = [];
+    tctx.font = '24px Arial, sans-serif';
+    for (var i = 0; i < q.rooms.length; i++) {
+      var r = q.rooms[i];
+      if (!r.items || !r.items.length) continue;
+      y += 58; // Room bar + table header
+      y += 38;
+      var rows = [];
+      for (var j = 0; j < r.items.length; j++) {
+        var it = r.items[j];
+        var label = (it.type === 'material' ? '[Мат.] ' : '') + it.name;
+        var lines = wrapCanvasText(tctx, label, 510);
+        var rowH = Math.max(44, lines.length * 30 + 16);
+        rows.push({ it: it, lines: lines, rowH: rowH });
+        y += rowH;
+      }
+      y += 36; // Room subtotal
+      roomBlocks.push({ room: r, rows: rows });
+    }
+
+    if (!roomBlocks.length) {
+      toast('Първо добави поне една дейност.');
+      return;
+    }
+
+    y += 220; // Summary
+    if (q.notes && q.notes.trim()) {
+      tctx.font = '21px Arial, sans-serif';
+      var noteLines = wrapCanvasText(tctx, q.notes, contentW);
+      y += noteLines.length * 28 + 40;
+    }
+    y += 40;
+
+    var canvas = document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = Math.max(900, y);
+    var ctx = canvas.getContext('2d');
+
+    // Background
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Top accent bar
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, 0, W, 16);
+
+    var cy = 62;
+    // Firm header
+    ctx.fillStyle = '#0f172a';
+    ctx.font = 'bold 34px Arial, sans-serif';
+    ctx.fillText(c.name, pad, cy);
+
+    ctx.fillStyle = '#ea580c';
+    ctx.font = 'bold 34px Arial, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText('ОФЕРТА', W - pad, cy);
+
+    cy += 34;
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#475569';
+    ctx.font = '22px Arial, sans-serif';
+    ctx.fillText(c.extra || '', pad, cy);
+
+    ctx.textAlign = 'right';
+    ctx.fillText(q.number || '', W - pad, cy);
+
+    cy += 30;
+    ctx.textAlign = 'left';
+    ctx.font = 'bold 22px Arial, sans-serif';
+    ctx.fillStyle = '#0f172a';
+    ctx.fillText((c.city || '') + '  |  Тел.: ' + (c.phone || ''), pad, cy);
+
+    cy += 22;
+    ctx.fillStyle = '#ea580c';
+    ctx.fillRect(pad, cy, contentW, 5);
+    cy += 26;
+
+    // Client info box
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillRect(pad, cy, contentW, 86);
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(pad, cy, contentW, 86);
+
+    ctx.fillStyle = '#0f172a';
+    ctx.font = 'bold 23px Arial, sans-serif';
+    var cLine1 = 'Клиент: ' + (q.clientName || '—') + (q.clientPhone ? ('   |   Тел.: ' + q.clientPhone) : '');
+    var cLine2 = 'Обект: ' + (q.clientAddress || '—');
+    ctx.fillText(cLine1, pad + 18, cy + 34);
+    ctx.font = '22px Arial, sans-serif';
+    ctx.fillStyle = '#334155';
+    ctx.fillText(cLine2, pad + 18, cy + 68);
+    cy += 110;
+
+    // Rooms
+    for (var b = 0; b < roomBlocks.length; b++) {
+      var blk = roomBlocks[b];
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(pad, cy, contentW, 44);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 24px Arial, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(blk.room.name.toUpperCase(), pad + 16, cy + 30);
+      cy += 52;
+
+      // Table headers
+      ctx.fillStyle = '#64748b';
+      ctx.font = 'bold 19px Arial, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('ДЕЙНОСТ / МАТЕРИАЛ', pad + 6, cy + 20);
+      ctx.textAlign = 'right';
+      ctx.fillText('КОЛ.', pad + 660, cy + 20);
+      ctx.fillText('ЕД. ЦЕНА', pad + 815, cy + 20);
+      ctx.fillText('ОБЩО', W - pad - 6, cy + 20);
+      cy += 30;
+      ctx.fillStyle = '#cbd5e1';
+      ctx.fillRect(pad, cy, contentW, 2);
+      cy += 8;
+
+      var roomSum = 0;
+      for (var rIdx = 0; rIdx < blk.rows.length; rIdx++) {
+        var row = blk.rows[rIdx];
+        var it = row.it;
+        var sum = (Number(it.qty) || 0) * (Number(it.price) || 0);
+        roomSum += sum;
+
+        if (rIdx % 2 === 1) {
+          ctx.fillStyle = '#f8fafc';
+          ctx.fillRect(pad, cy, contentW, row.rowH);
+        }
+
+        ctx.fillStyle = '#0f172a';
+        ctx.font = '23px Arial, sans-serif';
+        ctx.textAlign = 'left';
+        for (var lIdx = 0; lIdx < row.lines.length; lIdx++) {
+          ctx.fillText(row.lines[lIdx], pad + 6, cy + 30 + lIdx * 30);
+        }
+
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#334155';
+        ctx.fillText(it.qty + ' ' + it.unit, pad + 660, cy + 30);
+        ctx.fillText(fmt(it.price) + ' €', pad + 815, cy + 30);
+        ctx.fillStyle = '#0f172a';
+        ctx.font = 'bold 23px Arial, sans-serif';
+        ctx.fillText(fmt(sum) + ' €', W - pad - 6, cy + 30);
+
+        cy += row.rowH;
+        ctx.fillStyle = '#e2e8f0';
+        ctx.fillRect(pad, cy, contentW, 1);
+      }
+
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#475569';
+      ctx.font = 'bold 21px Arial, sans-serif';
+      ctx.fillText('Общо за ' + blk.room.name + ': ' + fmt(roomSum) + ' €', W - pad - 6, cy + 26);
+      cy += 42;
+    }
+
+    // Summary block
+    cy += 12;
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(pad, cy, contentW, 3);
+    cy += 34;
+
+    ctx.font = '25px Arial, sans-serif';
+    ctx.fillStyle = '#334155';
+    ctx.textAlign = 'left';
+    ctx.fillText('Общо ТРУД:', pad + 8, cy);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#0f172a';
+    ctx.font = 'bold 25px Arial, sans-serif';
+    ctx.fillText(fmt(t.labor) + ' €', W - pad - 8, cy);
+    cy += 36;
+
+    ctx.font = '25px Arial, sans-serif';
+    ctx.fillStyle = '#334155';
+    ctx.textAlign = 'left';
+    ctx.fillText('Общо МАТЕРИАЛИ:', pad + 8, cy);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#0f172a';
+    ctx.font = 'bold 25px Arial, sans-serif';
+    ctx.fillText(fmt(t.mat) + ' €', W - pad - 8, cy);
+    cy += 36;
+
+    if (t.discount > 0) {
+      var dLbl = q.discountType === 'percent' ? (' (' + q.discountVal + '%)') : '';
+      ctx.font = '25px Arial, sans-serif';
+      ctx.fillStyle = '#16a34a';
+      ctx.textAlign = 'left';
+      ctx.fillText('Отстъпка' + dLbl + ':', pad + 8, cy);
+      ctx.textAlign = 'right';
+      ctx.font = 'bold 25px Arial, sans-serif';
+      ctx.fillText('-' + fmt(t.discount) + ' €', W - pad - 8, cy);
+      cy += 36;
+    }
+
+    // Grand total box
+    cy += 8;
+    ctx.fillStyle = '#fff7ed';
+    ctx.fillRect(pad, cy, contentW, 66);
+    ctx.strokeStyle = '#ea580c';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(pad, cy, contentW, 66);
+
+    ctx.fillStyle = '#c2410c';
+    ctx.font = 'bold 32px Arial, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('КРАЙНА СУМА:', pad + 20, cy + 44);
+    ctx.textAlign = 'right';
+    ctx.fillText(fmt(t.grand) + ' €', W - pad - 20, cy + 44);
+    cy += 94;
+
+    if (q.notes && q.notes.trim()) {
+      ctx.fillStyle = '#64748b';
+      ctx.font = '21px Arial, sans-serif';
+      ctx.textAlign = 'left';
+      var nLines = wrapCanvasText(ctx, q.notes, contentW);
+      for (var ni = 0; ni < nLines.length; ni++) {
+        ctx.fillText(nLines[ni], pad, cy + ni * 28);
+      }
+    }
+
+    lastPngDataUrl = canvas.toDataURL('image/png');
+    document.getElementById('pngPreviewImg').src = lastPngDataUrl;
+    document.getElementById('pngModal').classList.add('open');
+  };
+
+  window.closePngModal = function() {
+    document.getElementById('pngModal').classList.remove('open');
+  };
+
+  window.downloadPngFile = function() {
+    if (!lastPngDataUrl) return;
+    var a = document.createElement('a');
+    var safeName = (state.current.clientName || 'oferta').replace(/[^a-zA-Z0-9а-яА-Я_-]/g, '_');
+    a.href = lastPngDataUrl;
+    a.download = 'Oferta_' + safeName + '.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    toast('Снимката се изтегля...');
+  };
+
+  window.sharePngFile = function() {
+    if (!lastPngDataUrl) return;
+    try {
+      if (navigator.share && navigator.canShare) {
+        fetch(lastPngDataUrl).then(function(res) { return res.blob(); }).then(function(blob) {
+          var file = new File([blob], 'Oferta_Fixbuild.png', { type: 'image/png' });
+          if (navigator.canShare({ files: [file] })) {
+            navigator.share({ files: [file], title: 'Оферта за ремонт' }).catch(function() {});
+          } else {
+            window.downloadPngFile();
+          }
+        }).catch(function() { window.downloadPngFile(); });
+      } else {
+        window.downloadPngFile();
+      }
+    } catch (e) {
+      window.downloadPngFile();
+    }
+  };
+
+  window.printPDF = function() {
+    renderQuoteSheet();
+    window.print();
+  };
+
+  function copyTextRobust(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        toast('Копирано! Постави във Viber.');
+      }).catch(function() {
+        fallbackCopy(text);
+      });
+    } else {
+      fallbackCopy(text);
+    }
+  }
+
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try {
+      document.execCommand('copy');
+      toast('Копирано! Постави във Viber.');
+    } catch (e) {
+      toast('Не успя автоматичното копиране.');
+    }
+    document.body.removeChild(ta);
+  }
+
+  window.copyForViber = function() {
+    var q = state.current;
+    var c = state.company;
+    var t = computeTotals(q);
+
+    var lines = [];
+    lines.push('📋 ОФЕРТА ЗА РЕМОНТ ' + (q.number || ''));
+    if (q.clientName) lines.push('👤 Клиент: ' + q.clientName);
+    if (q.clientAddress) lines.push('📍 Обект: ' + q.clientAddress);
+    lines.push('');
+
+    for (var i = 0; i < q.rooms.length; i++) {
+      var r = q.rooms[i];
+      if (!r.items || !r.items.length) continue;
+      lines.push('🔹 ' + r.name.toUpperCase() + ':');
+      for (var j = 0; j < r.items.length; j++) {
+        var it = r.items[j];
+        var s = (Number(it.qty) || 0) * (Number(it.price) || 0);
+        var tag = it.type === 'material' ? '[Мат.] ' : '';
+        lines.push('• ' + tag + it.name + ' — ' + it.qty + ' ' + it.unit + ' × ' + fmt(it.price) + ' € = ' + fmt(s) + ' €');
+      }
+      lines.push('');
+    }
+
+    lines.push('🔨 Общо ТРУД: ' + fmt(t.labor) + ' €');
+    if (t.mat > 0) lines.push('🧱 Общо МАТЕРИАЛИ: ' + fmt(t.mat) + ' €');
+    if (t.discount > 0) lines.push('🎁 Отстъпка: -' + fmt(t.discount) + ' €');
+    lines.push('💶 КРАЙНА СУМА: ' + fmt(t.grand) + ' €');
+    lines.push('');
+    if (q.notes) lines.push('ℹ️ ' + q.notes);
+    lines.push('— ' + c.name + ', ' + c.city + ', тел. ' + c.phone);
+
+    copyTextRobust(lines.join('\n'));
+  };
+
+  /* Materials Waste Calculator */
+  window.calcWaste = function() {
+    var type = document.getElementById('wType').value;
+    var area = parseFloat(document.getElementById('wArea').value) || 0;
+    var price = parseFloat(document.getElementById('wPrice').value) || 0;
+    var out = document.getElementById('wasteOutput');
+
+    if (area <= 0) {
+      out.innerHTML = '<div style="color:var(--muted);">Въведи квадратура.</div>';
+      return;
+    }
+
+    var rows = [];
+    var txtLines = ['🧱 МАТЕРИАЛИ С ФИРА (за ' + area + ' кв.м):'];
+
+    if (type === 'putty') {
+      var kg = area * 1.8 * 1.10;
+      var bags20 = Math.ceil(kg / 20);
+      var bags25 = Math.ceil(kg / 25);
+      rows.push(['Общо шпакловка (+10% фира)', fmt(kg) + ' кг']);
+      rows.push(['В торби по 20 кг', bags20 + ' торби']);
+      rows.push(['В торби по 25 кг', bags25 + ' торби']);
+      lastWasteSummary = { label: 'Шпакловка (торби 20 кг)', qty: bags20, unit: 'торба', price: price };
+    } else if (type === 'latex') {
+      var lit = area * 0.16 * 1.10;
+      var buckets15 = Math.ceil(lit / 15);
+      var buckets5 = Math.ceil(lit / 5);
+      rows.push(['Общо латекс за 2 ръце (+10% фира)', fmt(lit) + ' л']);
+      rows.push(['В кофи по 15 л', buckets15 + ' кофи']);
+      rows.push(['В кофи по 5 л', buckets5 + ' кофи']);
+      lastWasteSummary = { label: 'Латекс (кофи 15 л)', qty: buckets15, unit: 'кофа', price: price };
+    } else if (type === 'primer') {
+      var glit = area * 0.12 * 1.05;
+      var cans5 = Math.ceil(glit / 5);
+      rows.push(['Общо грунд (+5% фира)', fmt(glit) + ' л']);
+      rows.push(['В туби по 5 л', cans5 + ' туби']);
+      lastWasteSummary = { label: 'Грунд (туби 5 л)', qty: cans5, unit: 'бр.', price: price };
+    } else if (type === 'drywall') {
+      var dArea = area * 1.10;
+      var sheets = Math.ceil(dArea / 2.4);
+      rows.push(['Площ с 10% фира', fmt(dArea) + ' кв.м']);
+      rows.push(['Листи гипсокартон (120×200)', sheets + ' листа']);
+      rows.push(['Ориент. фугираща смес', Math.ceil(area * 0.35 / 5) + ' торби (5 кг)']);
+      lastWasteSummary = { label: 'Гипсокартон (листи 120×200)', qty: sheets, unit: 'лист', price: price };
+    } else if (type === 'tiles_straight' || type === 'tiles_diag') {
+      var pct = type === 'tiles_diag' ? 1.15 : 1.10;
+      var tArea = Math.ceil(area * pct * 10) / 10;
+      var glueBags = Math.ceil((area * 5.0) / 25);
+      var groutKg = Math.ceil(area * 0.35);
+      rows.push(['Плочки (+' + (type === 'tiles_diag' ? '15%' : '10%') + ' фира)', fmt(tArea) + ' кв.м']);
+      rows.push(['Лепило за плочки (торби 25 кг)', glueBags + ' торби']);
+      rows.push(['Фугираща смес', groutKg + ' кг']);
+      lastWasteSummary = { label: 'Плочки (с фира)', qty: tArea, unit: 'кв.м', price: price };
+    } else if (type === 'laminate') {
+      var lArea = Math.ceil(area * 1.07 * 10) / 10;
+      rows.push(['Ламинат (+7% фира)', fmt(lArea) + ' кв.м']);
+      rows.push(['Подложка за ламинат', Math.ceil(lArea) + ' кв.м']);
+      lastWasteSummary = { label: 'Ламинат (с 7% фира)', qty: lArea, unit: 'кв.м', price: price };
+    }
+
+    if (price > 0) {
+      rows.push(['Ориентировъчна сума', fmt(lastWasteSummary.qty * price) + ' €']);
+    }
+
+    var h = '';
+    for (var i = 0; i < rows.length; i++) {
+      h += '<div class="mat-res-row"><span>' + esc(rows[i][0]) + '</span><strong>' + esc(rows[i][1]) + '</strong></div>';
+      txtLines.push('• ' + rows[i][0] + ': ' + rows[i][1]);
+    }
+    out.innerHTML = h;
+    lastWasteSummary.text = txtLines.join('\n');
+  };
+
+  window.copyWasteList = function() {
+    calcWaste();
+    if (lastWasteSummary.text) copyTextRobust(lastWasteSummary.text);
+  };
+
+  window.addWasteToRoom = function() {
+    calcWaste();
+    if (!lastWasteSummary.qty) return;
+    var r = getActiveRoom();
+    r.items.push({
+      id: 'it_' + Date.now(),
+      type: 'material',
+      name: lastWasteSummary.label,
+      qty: lastWasteSummary.qty,
+      unit: lastWasteSummary.unit,
+      price: lastWasteSummary.price || 0
+    });
+    persistState();
+    renderRooms();
+    updateBottomBar();
+    toast('Добавено като материал в ' + r.name);
+    switchTab('project');
+  };
+
+  /* Saved quotes */
+  window.saveCurrentQuote = function() {
+    var copy = JSON.parse(JSON.stringify(state.current));
+    copy.savedAt = todayStr();
+    var idx = -1;
+    for (var i = 0; i < state.saved.length; i++) {
+      if (state.saved[i].id === copy.id) { idx = i; break; }
+    }
+    if (idx >= 0) state.saved[idx] = copy;
+    else state.saved.unshift(copy);
+    persistState();
+    toast('Офертата е запазена!');
+  };
+
+  window.newQuoteConfirm = function() {
+    if (!window.confirm('Да започнем нова празна оферта? (Запази текущата първо, ако ти трябва.)')) return;
+    state.current = makeBlankQuote();
+    activeRoomId = state.current.rooms[0].id;
+    persistState();
+    syncInputsFromState();
+    renderRooms();
+    updateBottomBar();
+    toast('Нова оферта готова.');
+  };
+
+  function renderSavedQuotes() {
+    var el = document.getElementById('savedQuotesList');
+    if (!state.saved.length) {
+      el.innerHTML = '<div style="color:var(--muted);font-size:13px;">Няма запазени оферти. Натисни „Запази оферта“ в таб 2.</div>';
+      return;
+    }
+    var h = '';
+    for (var i = 0; i < state.saved.length; i++) {
+      var q = state.saved[i];
+      var t = computeTotals(q);
+      h += '<div class="item-row">' +
+        '<div>' +
+          '<div class="item-name">' + esc(q.clientName || 'Без име') + ' — ' + fmt(t.grand) + ' €</div>' +
+          '<div class="item-meta">' + esc(q.number) + (q.clientAddress ? (' | ' + esc(q.clientAddress)) : '') + '</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:6px;">' +
+          '<button class="btn btn-outline btn-sm" onclick="loadSavedQuote(\'' + esc(q.id) + '\')">Отвори</button>' +
+          '<button class="btn-danger-sm" onclick="deleteSavedQuote(\'' + esc(q.id) + '\')">✕</button>' +
+        '</div>' +
+      '</div>';
+    }
+    el.innerHTML = h;
+  }
+
+  window.loadSavedQuote = function(id) {
+    for (var i = 0; i < state.saved.length; i++) {
+      if (state.saved[i].id === id) {
+        state.current = JSON.parse(JSON.stringify(state.saved[i]));
+        activeRoomId = state.current.rooms[0].id;
+        persistState();
+        syncInputsFromState();
+        renderRooms();
+        updateBottomBar();
+        switchTab('project');
+        toast('Офертата е заредена.');
+        return;
+      }
+    }
+  };
+
+  window.deleteSavedQuote = function(id) {
+    if (!window.confirm('Изтриване на тази запазена оферта?')) return;
+    state.saved = state.saved.filter(function(q) { return q.id !== id; });
+    persistState();
+    renderSavedQuotes();
+  };
+
+  /* Settings & Price list */
+  window.saveCompanySettings = function() {
+    state.company.name = document.getElementById('setFirmName').value;
+    state.company.city = document.getElementById('setFirmCity').value;
+    state.company.phone = document.getElementById('setFirmPhone').value;
+    state.company.extra = document.getElementById('setFirmExtra').value;
+    document.getElementById('hdrFirm').textContent = state.company.name || 'ФИКСБИЛД ГРУП ЕООД';
+    persistState();
+  };
+
+  function renderPriceListEditor() {
+    var el = document.getElementById('priceListEditor');
+    var h = '';
+    for (var i = 0; i < state.prices.length; i++) {
+      var p = state.prices[i];
+      h += '<div class="item-row">' +
+        '<div style="flex:1;">' +
+          '<div class="item-name">' + esc(p.name) + '</div>' +
+          '<div class="item-meta">Мярка: ' + esc(p.unit) + '</div>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;gap:6px;">' +
+          '<input type="number" step="0.1" value="' + p.price + '" style="width:82px;min-height:36px;padding:4px 8px;" onchange="updatePriceValue(\'' + esc(p.id) + '\', this.value)">' +
+          '<button class="btn-danger-sm" onclick="deletePriceItem(\'' + esc(p.id) + '\')">✕</button>' +
+        '</div>' +
+      '</div>';
+    }
+    el.innerHTML = h;
+  }
+
+  window.updatePriceValue = function(id, val) {
+    var num = parseFloat(val);
+    if (isNaN(num) || num < 0) return;
+    for (var i = 0; i < state.prices.length; i++) {
+      if (state.prices[i].id === id) {
+        state.prices[i].price = num;
+        break;
+      }
+    }
+    persistState();
+    populatePresetSelect();
+    toast('Цената е обновена.');
+  };
+
+  window.deletePriceItem = function(id) {
+    state.prices = state.prices.filter(function(p) { return p.id !== id; });
+    persistState();
+    renderPriceListEditor();
+    populatePresetSelect();
+  };
+
+  window.addPriceListItem = function() {
+    var name = document.getElementById('newPName').value.trim();
+    var unit = document.getElementById('newPUnit').value;
+    var price = parseFloat(document.getElementById('newPPrice').value);
+    if (!name || isNaN(price)) { toast('Попълни име и цена.'); return; }
+    state.prices.push({ id: 'p_' + Date.now(), name: name, unit: unit, price: price });
+    document.getElementById('newPName').value = '';
+    document.getElementById('newPPrice').value = '';
+    persistState();
+    renderPriceListEditor();
+    populatePresetSelect();
+    toast('Дейността е добавена.');
+  };
+
+  /* JSON Backup / Restore */
+  window.exportBackup = function() {
+    var blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'Fixbuild_Arhiv_' + todayStr().replace(/\./g, '-') + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('Архивът е изтеглен.');
+  };
+
+  window.importBackup = function(ev) {
+    var file = ev.target.files && ev.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function() {
+      try {
+        var parsed = JSON.parse(reader.result);
+        if (parsed && parsed.company && parsed.current && Array.isArray(parsed.prices)) {
+          state = parsed;
+          activeRoomId = state.current.rooms[0].id;
+          persistState();
+          initUI();
+          toast('Архивът е възстановен!');
+        } else {
+          toast('Невалиден архивен файл.');
+        }
+      } catch (e) {
+        toast('Грешка при четене на файла.');
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  function syncInputsFromState() {
+    document.getElementById('hdrFirm').textContent = state.company.name;
+    document.getElementById('setFirmName').value = state.company.name;
+    document.getElementById('setFirmCity').value = state.company.city;
+    document.getElementById('setFirmPhone').value = state.company.phone;
+    document.getElementById('setFirmExtra').value = state.company.extra || '';
+
+    document.getElementById('clientName').value = state.current.clientName || '';
+    document.getElementById('clientPhone').value = state.current.clientPhone || '';
+    document.getElementById('clientAddress').value = state.current.clientAddress || '';
+    document.getElementById('quoteNumber').value = state.current.number || '';
+    document.getElementById('quoteNotes').value = state.current.notes || '';
+    document.getElementById('discountVal').value = state.current.discountVal || 0;
+    document.getElementById('discountType').value = state.current.discountType || 'percent';
+  }
+
+  function initUI() {
+    applyTheme();
+    syncInputsFromState();
+    populatePresetSelect();
+    renderRooms();
+    updateBottomBar();
+    calcWaste();
+  }
+
+
+  /* PWA Install & Offline Service Worker */
+  var deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    var ib = document.getElementById('installBtn');
+    if (ib) ib.style.display = 'inline-block';
+  });
+
+  window.installPWA = function() {
+    if (!deferredPrompt) {
+      toast('Отвори менюто на Chrome (⋮) → Добави на началния екран.');
+      return;
+    }
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function() {
+      deferredPrompt = null;
+      var ib = document.getElementById('installBtn');
+      if (ib) ib.style.display = 'none';
+    }).catch(function() {});
+  };
+
+  window.addEventListener('appinstalled', function() {
+    var ib = document.getElementById('installBtn');
+    if (ib) ib.style.display = 'none';
+    toast('Приложението е инсталирано на екрана!');
+  });
+
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('./sw.js').catch(function() {});
+    });
+  }
+
+  loadState();
+  initUI();
+})();
+</script>
+</body>
+</html>
