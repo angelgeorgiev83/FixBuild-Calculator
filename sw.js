@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fixbuild-pwa-v2';
+const CACHE_NAME = 'fixbuild-pwa-v3';
 const ASSETS = [
   './',
   './index.html',
