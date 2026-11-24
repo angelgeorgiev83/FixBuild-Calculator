@@ -297,7 +297,7 @@
     <div class="brand-badge">АГ</div>
     <div>
       <div class="brand-title" id="hdrFirm">ФИКСБИЛД ГРУП ЕООД</div>
-      <div class="brand-sub">Калкулатор за оферти и ремонти (€) · v4.1</div>
+      <div class="brand-sub">Калкулатор за оферти и ремонти (€) · v4.3</div>
     </div>
   </div>
   <div style="display:flex;gap:6px;align-items:center;"><button class="icon-btn" id="installBtn" style="display:none;background:#ea580c;border-color:#fb923c;" onclick="installPWA()">📲 Инсталирай</button><button class="icon-btn" id="themeBtn" onclick="toggleTheme()">🌙 Тъмна</button></div>
@@ -516,11 +516,11 @@
       <div style="background:var(--soft);border:1px solid var(--border);border-radius:9px;padding:10px;margin-bottom:10px;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 0;">
           <label style="display:flex;align-items:center;gap:9px;margin:0;color:var(--text);font-size:14px;cursor:pointer;">
-            <input type="checkbox" id="chkContingency" onchange="syncExtras()" style="width:20px;height:20px;min-height:20px;accent-color:var(--primary);cursor:pointer;">
-            <span>Непредвидени разходи</span>
+            <input type="checkbox" id="chkWeekend" onchange="syncExtras()" style="width:20px;height:20px;min-height:20px;accent-color:var(--primary);cursor:pointer;">
+            <span>Работа събота / неделя <span style="font-size:12px;color:var(--muted);">(само труд)</span></span>
           </label>
           <div style="display:flex;align-items:center;gap:4px;">
-            <input type="number" step="1" min="1" max="50" id="contingencyPct" value="10" oninput="syncExtras()" style="width:62px;min-height:34px;padding:4px 6px;text-align:center;font-weight:700;">
+            <input type="number" step="1" min="1" max="200" id="weekendPct" value="20" oninput="onWeekendPctInput(this.value)" style="width:68px;min-height:34px;padding:4px 6px;text-align:center;font-weight:700;">
             <span style="font-weight:700;font-size:13px;color:var(--muted);">%</span>
           </div>
         </div>
@@ -543,6 +543,19 @@
         <div style="font-size:11.5px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:6px;">
           🔒 Скрито разпределение само в труда (не се вижда в офертата)
         </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 0;">
+          <label style="display:flex;align-items:center;gap:9px;margin:0;color:var(--text);font-size:14px;cursor:pointer;">
+            <input type="checkbox" id="chkContingency" onchange="syncExtras()" style="width:20px;height:20px;min-height:20px;accent-color:var(--primary);cursor:pointer;">
+            <span>Непредвидени разходи</span>
+          </label>
+          <div style="display:flex;align-items:center;gap:4px;">
+            <input type="number" step="1" min="1" max="100" id="contingencyPct" value="10" oninput="onContingencyInput(this.value)" style="width:68px;min-height:34px;padding:4px 6px;text-align:center;font-weight:700;">
+            <span style="font-weight:700;font-size:13px;color:var(--muted);">%</span>
+          </div>
+        </div>
+
+        <div style="border-top:1px solid var(--border);margin:6px 0;"></div>
 
         <div style="padding:4px 0;">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
@@ -583,6 +596,14 @@
       </div>
     </div>
 
+    <div class="card" id="smartInspectorTab1Card" style="border-left:4px solid var(--primary);">
+      <div class="card-title" style="margin-bottom:6px;">
+        <span>🧠 Умен контрольор (Проверка)</span>
+        <span id="smartBadgeTab1" style="font-size:12px;text-transform:none;"></span>
+      </div>
+      <div id="smartListTab1" style="font-size:13px;"></div>
+    </div>
+
   </div>
 
   <!-- TAB 2: QUOTE PREVIEW & EXPORT -->
@@ -595,14 +616,42 @@
       <button class="btn btn-outline" onclick="saveCurrentQuote()">💾 Запази оферта</button>
     </div>
 
+    <div class="card no-print" id="smartInspectorTab2Card" style="border-left:4px solid var(--primary);">
+      <div class="card-title" style="margin-bottom:6px;">
+        <span>🧠 Умен контрольор (Вижда се само от теб)</span>
+        <span id="smartBadgeTab2" style="font-size:12px;text-transform:none;"></span>
+      </div>
+      <div id="smartListTab2" style="font-size:13px;"></div>
+    </div>
+
     <div class="quote-sheet" id="quoteSheet"></div>
 
   </div>
 
 
 
-  <!-- TAB 4: PRICE LIST, COMPANY & SAVED -->
+  <!-- TAB 3: PRICE LIST, COMPANY & SAVED -->
   <div class="panel" id="panel-settings">
+
+    <div class="card" style="border-left:4px solid var(--primary);">
+      <div class="card-title">
+        <span>🔄 Онлайн обновяване на цени</span>
+        <span id="catalogVerBadge" style="font-size:12px;color:var(--muted);text-transform:none;">v2026.11</span>
+      </div>
+      <div style="font-size:12.5px;color:var(--muted);margin-bottom:10px;">
+        Проверява одобрения ценоразпис (<code>prices.json</code>) в GitHub при наличен интернет. Твоите запазени оферти и ръчно добавени позиции не се трият.
+      </div>
+      <label style="display:flex;align-items:center;gap:9px;margin:0 0 10px 0;color:var(--text);font-size:13.5px;cursor:pointer;">
+        <input type="checkbox" id="chkProtectHigherPrices" checked style="width:20px;height:20px;min-height:20px;accent-color:var(--primary);cursor:pointer;">
+        <span>🛡️ <strong>Защита:</strong> Не намалявай цени, които вече съм вдигнал</span>
+      </label>
+      <div class="grid-2">
+        <button class="btn btn-primary btn-sm" id="btnCheckOnlinePrices" onclick="checkOnlinePrices()">🔄 Провери и обнови</button>
+        <button class="btn btn-outline btn-sm" id="btnRevertPrices" onclick="revertOldPrices()" disabled>↩ Върни старите цени</button>
+      </div>
+      <div id="backupInfoLine" style="font-size:11.5px;color:var(--muted);margin-top:6px;"></div>
+      <div id="priceUpdateReport" style="display:none;margin-top:10px;border:1px solid var(--border);border-radius:8px;padding:10px;background:var(--soft);font-size:13px;"></div>
+    </div>
 
     <div class="card">
       <div class="card-title"><span>Запазени оферти</span></div>
@@ -2199,6 +2248,8 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
       clientAddress: '',
       discountVal: 0,
       discountType: 'percent',
+      useWeekend: false,
+      weekendPct: 20,
       useContingency: false,
       contingencyPct: 10,
       useVat: false,
@@ -2218,6 +2269,8 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
     return {
       theme: 'light',
       pricesVersion: 5,
+      catalogVersion: '2026.11',
+      priceBackup: null,
       company: {
         name: 'ФИКСБИЛД ГРУП ЕООД',
         city: 'гр. Пловдив',
@@ -2259,6 +2312,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
       state.materials = JSON.parse(JSON.stringify(DEFAULT_MATERIALS));
       persistState();
     }
+    if (!state.catalogVersion) state.catalogVersion = '2026.11';
     if (!state.current.rooms || !state.current.rooms.length) {
       state.current.rooms = [{ id: 'r1', name: 'Хол', items: [] }];
     }
@@ -2313,9 +2367,12 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
         else rawLabor += line;
       }
     }
+    var cPct = Number(q.contingencyPct);
+    if (isNaN(cPct) || cPct <= 0) cPct = 10;
+    var hiddenContingency = (q.useContingency && rawLabor > 0) ? (rawLabor * cPct / 100) : 0;
     var genVal = q.useGeneralLabor ? Math.max(0, Number(q.generalLaborVal) || 0) : 0;
     var fuelVal = q.useFuel ? Math.max(0, Number(q.fuelVal) || 0) : 0;
-    var hiddenOverhead = genVal + fuelVal;
+    var hiddenOverhead = hiddenContingency + genVal + fuelVal;
     var laborMult = (hiddenOverhead > 0 && rawLabor > 0) ? ((rawLabor + hiddenOverhead) / rawLabor) : 1;
 
     var effRooms = [];
@@ -2362,19 +2419,20 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
     var eff = getEffectiveRooms(q);
     var labor = eff.labor;
     var mat = eff.mat;
-    var sub = labor + mat;
+    var wPct = Number(q.weekendPct);
+    if (isNaN(wPct) || wPct <= 0) wPct = 20;
+    if (wPct > 200) wPct = 200;
+    var weekend = (q.useWeekend && labor > 0) ? (Math.round(labor * (wPct / 100) * 100) / 100) : 0;
+
+    var sub = labor + mat + weekend;
     var dVal = Number(q.discountVal) || 0;
     var discount = 0;
     if (dVal > 0) {
-      discount = q.discountType === 'percent' ? (sub * dVal / 100) : dVal;
+      discount = q.discountType === 'percent' ? (Math.round((sub * dVal / 100) * 100) / 100) : dVal;
       if (discount > sub) discount = sub;
     }
-    var afterDiscount = sub - discount;
-    var cPct = Number(q.contingencyPct);
-    if (isNaN(cPct) || cPct <= 0) cPct = 10;
-    var contingency = q.useContingency ? (afterDiscount * cPct / 100) : 0;
-    var taxBase = afterDiscount + contingency;
-    var vat = q.useVat ? (taxBase * 0.20) : 0;
+    var taxBase = sub - discount;
+    var vat = q.useVat ? (Math.round(taxBase * 0.20 * 100) / 100) : 0;
     var grand = taxBase + vat;
     return {
       labor: labor,
@@ -2382,10 +2440,10 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
       rawLabor: eff.rawLabor,
       hiddenOverhead: eff.hiddenOverhead,
       laborMult: eff.laborMult,
+      weekend: weekend,
+      weekendPct: wPct,
       sub: sub,
       discount: discount,
-      contingency: contingency,
-      contingencyPct: cPct,
       taxBase: taxBase,
       vat: vat,
       grand: grand
@@ -2421,6 +2479,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
     document.getElementById('panel-' + tabName).classList.add('active');
     if (tabName === 'quote') renderQuoteSheet();
     if (tabName === 'settings') {
+      updateCatalogUI();
       renderPriceListEditor();
       renderMatListEditor();
       renderSavedQuotes();
@@ -2471,10 +2530,31 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
     window.syncExtras();
   };
 
+  window.onWeekendPctInput = function(val) {
+    var num = parseFloat(val);
+    if (!isNaN(num) && num > 0) {
+      document.getElementById('chkWeekend').checked = true;
+    }
+    window.syncExtras();
+  };
+
+  window.onContingencyInput = function(val) {
+    var num = parseFloat(val);
+    if (!isNaN(num) && num > 0) {
+      document.getElementById('chkContingency').checked = true;
+    }
+    window.syncExtras();
+  };
+
   window.syncExtras = function() {
+    state.current.useWeekend = document.getElementById('chkWeekend').checked;
+    var wPct = parseFloat(document.getElementById('weekendPct').value);
+    state.current.weekendPct = (!isNaN(wPct) && wPct > 0) ? Math.min(200, wPct) : 20;
+
     state.current.useContingency = document.getElementById('chkContingency').checked;
     var pct = parseFloat(document.getElementById('contingencyPct').value);
-    state.current.contingencyPct = (!isNaN(pct) && pct > 0) ? pct : 10;
+    state.current.contingencyPct = (!isNaN(pct) && pct > 0) ? Math.min(100, pct) : 10;
+
     state.current.useVat = document.getElementById('chkVat').checked;
     state.current.isPreliminary = document.getElementById('chkEstimateNote').checked;
 
@@ -2538,6 +2618,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
     state.current.rooms = state.current.rooms.filter(function(x) { return x.id !== r.id; });
     activeRoomId = state.current.rooms[0].id;
     persistState();
+    updateCatalogUI();
     renderRooms();
     updateBottomBar();
   };
@@ -2759,7 +2840,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
       var ih = '';
       for (var j = 0; j < active.items.length; j++) {
         var it = active.items[j];
-        var sum = it.sum;
+        var sum = (Number(it.qty) || 0) * (Number(it.price) || 0);
         roomSum += sum;
         var badge = it.type === 'material'
           ? '<span class="badge-type badge-mat">Материал</span>'
@@ -2785,7 +2866,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
     document.getElementById('barLabor').textContent = fmt(t.labor) + ' €';
     document.getElementById('barMat').textContent = fmt(t.mat) + ' €';
     var suffix = '';
-    if (state.current.useContingency) suffix += ' (+' + t.contingencyPct + '%)';
+    if (state.current.useWeekend && t.weekend > 0) suffix += ' (+' + t.weekendPct + '% уикенд)';
     if (state.current.useVat) suffix += ' (с ДДС)';
     document.getElementById('barTotal').textContent = fmt(t.grand) + ' €' + suffix;
 
@@ -2805,6 +2886,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
         statusEl.textContent = '';
       }
     }
+    updateSmartInspector();
   }
 
   function renderQuoteSheet() {
@@ -2865,12 +2947,12 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
     html += '<div class="q-summary">' +
       '<div class="q-sum-row"><span>Общо ТРУД:</span><strong>' + fmt(t.labor) + ' €</strong></div>' +
       '<div class="q-sum-row"><span>Общо МАТЕРИАЛИ:</span><strong>' + fmt(t.mat) + ' €</strong></div>';
+    if (t.weekend > 0) {
+      html += '<div class="q-sum-row" style="color:#b45309;"><span>Работа събота / неделя (+' + t.weekendPct + '% върху труда):</span><strong>+' + fmt(t.weekend) + ' €</strong></div>';
+    }
     if (t.discount > 0) {
       var dLbl = q.discountType === 'percent' ? (' (' + q.discountVal + '%)') : '';
       html += '<div class="q-sum-row" style="color:#16a34a;"><span>Отстъпка' + dLbl + ':</span><strong>-' + fmt(t.discount) + ' €</strong></div>';
-    }
-    if (t.contingency > 0) {
-      html += '<div class="q-sum-row" style="color:#b45309;"><span>Непредвидени разходи (+' + t.contingencyPct + '%):</span><strong>+' + fmt(t.contingency) + ' €</strong></div>';
     }
     if (q.useVat) {
       html += '<div class="q-sum-row"><span>Данъчна основа (без ДДС):</span><strong>' + fmt(t.taxBase) + ' €</strong></div>';
@@ -2954,8 +3036,8 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
     }
 
     y += 230; // Base summary
+    if (t.weekend > 0) y += 38;
     if (t.discount > 0) y += 38;
-    if (t.contingency > 0) y += 38;
     if (q.useVat) y += 76;
     var pngFullNote = (q.notes || '').trim();
     if (q.isPreliminary) {
@@ -3120,6 +3202,17 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
     ctx.fillText(fmt(t.mat) + ' €', W - pad - 8, cy);
     cy += 36;
 
+    if (t.weekend > 0) {
+      ctx.font = '25px Arial, sans-serif';
+      ctx.fillStyle = '#b45309';
+      ctx.textAlign = 'left';
+      ctx.fillText('Работа събота / неделя (+' + t.weekendPct + '% труд):', pad + 8, cy);
+      ctx.textAlign = 'right';
+      ctx.font = 'bold 25px Arial, sans-serif';
+      ctx.fillText('+' + fmt(t.weekend) + ' €', W - pad - 8, cy);
+      cy += 36;
+    }
+
     if (t.discount > 0) {
       var dLbl = q.discountType === 'percent' ? (' (' + q.discountVal + '%)') : '';
       ctx.font = '25px Arial, sans-serif';
@@ -3129,17 +3222,6 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
       ctx.textAlign = 'right';
       ctx.font = 'bold 25px Arial, sans-serif';
       ctx.fillText('-' + fmt(t.discount) + ' €', W - pad - 8, cy);
-      cy += 36;
-    }
-
-    if (t.contingency > 0) {
-      ctx.font = '25px Arial, sans-serif';
-      ctx.fillStyle = '#b45309';
-      ctx.textAlign = 'left';
-      ctx.fillText('Непредвидени разходи (+' + t.contingencyPct + '%):', pad + 8, cy);
-      ctx.textAlign = 'right';
-      ctx.font = 'bold 25px Arial, sans-serif';
-      ctx.fillText('+' + fmt(t.contingency) + ' €', W - pad - 8, cy);
       cy += 36;
     }
 
@@ -3292,8 +3374,8 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
 
     lines.push('🔨 Общо ТРУД: ' + fmt(t.labor) + ' €');
     if (t.mat > 0) lines.push('🧱 Общо МАТЕРИАЛИ: ' + fmt(t.mat) + ' €');
+    if (t.weekend > 0) lines.push('📅 Работа събота / неделя (+' + t.weekendPct + '% върху труда): +' + fmt(t.weekend) + ' €');
     if (t.discount > 0) lines.push('🎁 Отстъпка: -' + fmt(t.discount) + ' €');
-    if (t.contingency > 0) lines.push('⚠️ Непредвидени разходи (+' + t.contingencyPct + '%): +' + fmt(t.contingency) + ' €');
     if (q.useVat) {
       lines.push('📄 Данъчна основа (без ДДС): ' + fmt(t.taxBase) + ' €');
       lines.push('🏛️ ДДС (20%): +' + fmt(t.vat) + ' €');
@@ -3305,6 +3387,377 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
     lines.push('— ' + c.name + ', ' + c.city + ', тел. ' + c.phone);
 
     copyTextRobust(lines.join('\n'));
+  };
+
+  /* Smart Offline Inspector (Умен контрольор) */
+  function runSmartChecks() {
+    var q = state.current;
+    var t = computeTotals(q);
+    var alerts = [];
+
+    var totalItems = 0;
+    for (var i = 0; i < q.rooms.length; i++) {
+      var r = q.rooms[i];
+      var items = r.items || [];
+      if (!items.length) continue;
+      totalItems += items.length;
+
+      var hasPuttyOrPaint = false;
+      var hasPrimer = false;
+      var hasTiles = false;
+      var hasHydro = false;
+      var hasDrywall = false;
+      var hasWool = false;
+      var isBath = /баня|мокро|душ|тоалет/i.test(r.name || '');
+
+      for (var j = 0; j < items.length; j++) {
+        var it = items[j];
+        var nm = String(it.name || '').toLowerCase();
+        var qty = Number(it.qty) || 0;
+        var price = Number(it.price) || 0;
+
+        if (price <= 0) {
+          alerts.push({
+            level: 'warn',
+            text: 'Позиция „' + it.name + '“ в „' + r.name + '“ е с единична цена 0.00 €.'
+          });
+        }
+        if ((it.unit === 'кв.м' || it.unit === 'л.м') && qty > 150) {
+          alerts.push({
+            level: 'warn',
+            text: 'В „' + r.name + '“ количеството за „' + it.name + '“ е ' + qty + ' ' + it.unit + ' — провери за изпусната запетая.'
+          });
+        }
+
+        if (it.type !== 'material' && (nm.indexOf('шпакловк') !== -1 || nm.indexOf('боядисване') !== -1 || nm.indexOf('латекс') !== -1) && nm.indexOf('труд + мат') === -1) {
+          hasPuttyOrPaint = true;
+        }
+        if (nm.indexOf('грунд') !== -1 || nm.indexOf('бетонконтакт') !== -1 || nm.indexOf('бороконтакт') !== -1) {
+          hasPrimer = true;
+        }
+        if (nm.indexOf('плочк') !== -1 || nm.indexOf('фаянс') !== -1 || nm.indexOf('гранитогрес') !== -1 || nm.indexOf('теракот') !== -1) {
+          hasTiles = true;
+        }
+        if (nm.indexOf('хидроизолац') !== -1) {
+          hasHydro = true;
+        }
+        if (it.type !== 'material' && (nm.indexOf('гипсокартон') !== -1 || nm.indexOf('преградна стена') !== -1 || nm.indexOf('окачен таван') !== -1) && nm.indexOf('труд + мат') === -1) {
+          hasDrywall = true;
+        }
+        if (nm.indexOf('вата') !== -1) {
+          hasWool = true;
+        }
+      }
+
+      if (hasPuttyOrPaint && !hasPrimer) {
+        alerts.push({
+          level: 'tip',
+          text: 'В „' + r.name + '“ има шпакловка/боя, но липсва грундиране.'
+        });
+      }
+      if (isBath && hasTiles && !hasHydro) {
+        alerts.push({
+          level: 'tip',
+          text: 'В „' + r.name + '“ има плочки, но липсва хидроизолация.'
+        });
+      }
+      if (hasDrywall && !hasWool) {
+        alerts.push({
+          level: 'info',
+          text: 'В „' + r.name + '“ има гипсокартон без добавена вата (ако е по поръчка на клиента).'
+        });
+      }
+    }
+
+    if (t.hiddenOverhead > 0 && t.rawLabor > 0) {
+      var pctAdd = ((t.laborMult - 1) * 100).toFixed(1);
+      alerts.push({
+        level: 'info',
+        text: 'Активни скрити разходи в труда: +' + fmt(t.hiddenOverhead) + ' € (+' + pctAdd + '% в единичните цени за труд).'
+      });
+    }
+    if (q.useWeekend && t.weekend > 0) {
+      alerts.push({
+        level: 'info',
+        text: 'Активна надбавка „Работа събота / неделя“: +' + t.weekendPct + '% върху труда (+' + fmt(t.weekend) + ' €).'
+      });
+    }
+    if (q.useVat) {
+      alerts.push({
+        level: 'info',
+        text: 'Активно начисляване на +20% ДДС (+' + fmt(t.vat) + ' €).'
+      });
+    }
+    if (totalItems > 0 && !(q.clientName || '').trim()) {
+      alerts.push({
+        level: 'info',
+        text: 'Не е попълнено име на клиента в данните за обекта.'
+      });
+    }
+
+    return { totalItems: totalItems, alerts: alerts };
+  }
+
+  function updateSmartInspector() {
+    var res = runSmartChecks();
+    var warns = 0;
+    for (var i = 0; i < res.alerts.length; i++) {
+      if (res.alerts[i].level === 'warn' || res.alerts[i].level === 'tip') warns++;
+    }
+
+    var badgeText = '';
+    var badgeColor = 'var(--success)';
+    if (res.totalItems === 0) {
+      badgeText = 'Чака позиции';
+      badgeColor = 'var(--muted)';
+    } else if (warns > 0) {
+      badgeText = warns + ' препоръки';
+      badgeColor = '#d97706';
+    } else {
+      badgeText = '✓ Всичко е точно';
+      badgeColor = 'var(--success)';
+    }
+
+    var html = '';
+    if (res.totalItems === 0) {
+      html = '<div style="color:var(--muted);">Добави дейности или материали и контрольорът автоматично ще следи за пропуски.</div>';
+    } else if (!res.alerts.length) {
+      html = '<div style="color:var(--success);font-weight:700;">✓ Офертата е проверена — няма открити пропуски, нулеви цени или грешни количества.</div>';
+    } else {
+      for (var k = 0; k < res.alerts.length; k++) {
+        var a = res.alerts[k];
+        var icon = a.level === 'warn' ? '⚠️' : (a.level === 'tip' ? '💡' : 'ℹ️');
+        var col = a.level === 'warn' ? 'var(--danger)' : (a.level === 'tip' ? '#b45309' : 'var(--text)');
+        html += '<div style="padding:3px 0;color:' + col + ';">' + icon + ' ' + esc(a.text) + '</div>';
+      }
+    }
+
+    var ids = [
+      ['smartBadgeTab1', 'smartListTab1'],
+      ['smartBadgeTab2', 'smartListTab2']
+    ];
+    for (var m = 0; m < ids.length; m++) {
+      var bEl = document.getElementById(ids[m][0]);
+      var lEl = document.getElementById(ids[m][1]);
+      if (bEl) { bEl.textContent = badgeText; bEl.style.color = badgeColor; bEl.style.fontWeight = '700'; }
+      if (lEl) { lEl.innerHTML = html; }
+    }
+  }
+
+  /* Online Price Update & 1-Click Rollback */
+  function updateCatalogUI() {
+    var verEl = document.getElementById('catalogVerBadge');
+    if (verEl) {
+      verEl.textContent = 'База v' + (state.catalogVersion || '2026.11') + ' (' + state.prices.length + ' усл. / ' + state.materials.length + ' мат.)';
+    }
+    var revBtn = document.getElementById('btnRevertPrices');
+    var infoEl = document.getElementById('backupInfoLine');
+    if (revBtn && infoEl) {
+      if (state.priceBackup && Array.isArray(state.priceBackup.prices)) {
+        revBtn.disabled = false;
+        infoEl.textContent = 'Пази се резервно копие от: ' + state.priceBackup.savedAt + ' (База v' + (state.priceBackup.catalogVersion || '—') + ')';
+      } else {
+        revBtn.disabled = true;
+        infoEl.textContent = '';
+      }
+    }
+  }
+
+  window.checkOnlinePrices = function() {
+    var repEl = document.getElementById('priceUpdateReport');
+    var btn = document.getElementById('btnCheckOnlinePrices');
+    repEl.style.display = 'block';
+    repEl.innerHTML = '<div style="color:var(--primary);font-weight:700;">⏳ Свързване с GitHub и проверка на prices.json...</div>';
+    btn.disabled = true;
+
+    fetch('./prices.json?t=' + Date.now(), { cache: 'no-store' })
+      .then(function(res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(function(data) {
+        btn.disabled = false;
+        if (!data || !Array.isArray(data.prices) || !data.prices.length || !Array.isArray(data.materials) || !data.materials.length) {
+          repEl.innerHTML = '<div style="color:var(--danger);font-weight:700;">❌ Файлът prices.json е невалиден или празен. Старите ти цени са запазени непокътнати.</div>';
+          return;
+        }
+
+        // Validate every single row before touching state
+        var invalidCount = 0;
+        for (var v1 = 0; v1 < data.prices.length; v1++) {
+          var vp = data.prices[v1];
+          if (!vp || !vp.id || !vp.name || typeof vp.price !== 'number' || isNaN(vp.price) || vp.price <= 0) invalidCount++;
+        }
+        for (var v2 = 0; v2 < data.materials.length; v2++) {
+          var vm = data.materials[v2];
+          if (!vm || !vm.id || !vm.name || typeof vm.price !== 'number' || isNaN(vm.price) || vm.price <= 0) invalidCount++;
+        }
+        if (invalidCount > 0) {
+          repEl.innerHTML = '<div style="color:var(--danger);font-weight:700;">❌ Открити са ' + invalidCount + ' повредени реда с нулева/грешна цена в prices.json. Обновяването е спряно за безопасност!</div>';
+          return;
+        }
+
+        var protectHigher = document.getElementById('chkProtectHigherPrices').checked;
+
+        // Save full backup snapshot for 1-click rollback
+        var now = new Date();
+        var hh = String(now.getHours()).padStart(2, '0');
+        var mm = String(now.getMinutes()).padStart(2, '0');
+        state.priceBackup = {
+          savedAt: todayStr() + ' в ' + hh + ':' + mm,
+          catalogVersion: state.catalogVersion || '2026.11',
+          prices: JSON.parse(JSON.stringify(state.prices)),
+          materials: JSON.parse(JSON.stringify(state.materials))
+        };
+
+        var updatedList = [];
+        var protectedList = [];
+        var addedList = [];
+        var unchangedCount = 0;
+
+        // Helper map for existing labor prices
+        var curPriceMap = {};
+        for (var i = 0; i < state.prices.length; i++) {
+          curPriceMap[state.prices[i].id] = state.prices[i];
+        }
+        for (var j = 0; j < data.prices.length; j++) {
+          var np = data.prices[j];
+          var existingP = curPriceMap[np.id];
+          if (existingP) {
+            var oldP = Number(existingP.price) || 0;
+            var newP = Number(np.price) || 0;
+            if (Math.abs(newP - oldP) < 0.005) {
+              unchangedCount++;
+            } else if (protectHigher && newP < oldP) {
+              protectedList.push({ kind: 'Труд', name: existingP.name, unit: existingP.unit, oldPrice: oldP, newPrice: newP });
+            } else {
+              updatedList.push({ kind: 'Труд', name: existingP.name, unit: existingP.unit, oldPrice: oldP, newPrice: newP });
+              existingP.price = newP;
+              if (np.range) existingP.range = np.range;
+              if (np.cat) existingP.cat = np.cat;
+            }
+          } else {
+            state.prices.push(JSON.parse(JSON.stringify(np)));
+            addedList.push({ kind: 'Труд', name: np.name, unit: np.unit, newPrice: np.price });
+          }
+        }
+
+        // Helper map for existing materials
+        var curMatMap = {};
+        for (var mi = 0; mi < state.materials.length; mi++) {
+          curMatMap[state.materials[mi].id] = state.materials[mi];
+        }
+        for (var mj = 0; mj < data.materials.length; mj++) {
+          var nm = data.materials[mj];
+          var existingM = curMatMap[nm.id];
+          if (existingM) {
+            var oldM = Number(existingM.price) || 0;
+            var newM = Number(nm.price) || 0;
+            if (Math.abs(newM - oldM) < 0.005) {
+              unchangedCount++;
+            } else if (protectHigher && newM < oldM) {
+              protectedList.push({ kind: 'Мат.', name: existingM.name, unit: existingM.unit, oldPrice: oldM, newPrice: newM });
+            } else {
+              updatedList.push({ kind: 'Мат.', name: existingM.name, unit: existingM.unit, oldPrice: oldM, newPrice: newM });
+              existingM.price = newM;
+              if (nm.cat) existingM.cat = nm.cat;
+            }
+          } else {
+            state.materials.push(JSON.parse(JSON.stringify(nm)));
+            addedList.push({ kind: 'Мат.', name: nm.name, unit: nm.unit, newPrice: nm.price });
+          }
+        }
+
+        if (data.catalogVersion) state.catalogVersion = String(data.catalogVersion);
+        persistState();
+        updateCatalogUI();
+        renderPriceListEditor();
+        renderMatListEditor();
+        populatePresetSelect();
+        populateMatSelect();
+
+        var totalChecked = data.prices.length + data.materials.length;
+        var statusHeadline = '';
+        if (updatedList.length === 0 && addedList.length === 0) {
+          statusHeadline = '✅ Проверени 100% (' + data.prices.length + '/' + data.prices.length + ' услуги и ' + data.materials.length + '/' + data.materials.length + ' материала) — всички цени вече са актуални!';
+        } else if (updatedList.length + addedList.length === totalChecked) {
+          statusHeadline = '✅ Обновени са ВСИЧКИ цени на 100% (' + updatedList.length + ' позиции)!';
+        } else {
+          statusHeadline = '✅ Проверени 100% (' + totalChecked + ' поз.): обновени са ' + updatedList.length + ' цени' +
+            (addedList.length ? (', добавени ' + addedList.length + ' нови') : '') +
+            ', без промяна: ' + unchangedCount + '.';
+        }
+
+        var rHtml = '<div style="color:var(--success);font-weight:800;margin-bottom:6px;">' + esc(statusHeadline) + '</div>';
+
+        if (updatedList.length > 0) {
+          rHtml += '<div style="font-weight:700;margin:6px 0 4px 0;">📈 Променени цени (' + updatedList.length + '):</div>';
+          rHtml += '<div style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;padding:6px 8px;background:var(--card);">';
+          for (var u = 0; u < updatedList.length; u++) {
+            var it = updatedList[u];
+            var diffPct = it.oldPrice > 0 ? (((it.newPrice - it.oldPrice) / it.oldPrice) * 100).toFixed(1) : '0.0';
+            var sign = (it.newPrice >= it.oldPrice) ? '+' : '';
+            rHtml += '<div style="padding:3px 0;border-bottom:1px solid var(--border);font-size:12.5px;">' +
+              '<strong>[' + esc(it.kind) + ']</strong> ' + esc(it.name) + ': ' +
+              '<span style="color:var(--muted);">' + fmt(it.oldPrice) + ' €</span> → ' +
+              '<strong style="color:var(--primary);">' + fmt(it.newPrice) + ' €/' + esc(it.unit) + '</strong> ' +
+              '<span style="font-size:11px;color:var(--muted);">(' + sign + diffPct + '%)</span>' +
+            '</div>';
+          }
+          rHtml += '</div>';
+        }
+
+        if (addedList.length > 0) {
+          rHtml += '<div style="font-weight:700;margin:6px 0 4px 0;">🆕 Нови позиции (' + addedList.length + '):</div>';
+          rHtml += '<div style="max-height:140px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;padding:6px 8px;background:var(--card);">';
+          for (var aIdx = 0; aIdx < addedList.length; aIdx++) {
+            var ad = addedList[aIdx];
+            rHtml += '<div style="padding:3px 0;font-size:12.5px;"><strong>[' + esc(ad.kind) + ']</strong> ' + esc(ad.name) + ' — <strong>' + fmt(ad.newPrice) + ' €/' + esc(ad.unit) + '</strong></div>';
+          }
+          rHtml += '</div>';
+        }
+
+        if (protectedList.length > 0) {
+          rHtml += '<div style="font-weight:700;color:#b45309;margin:8px 0 4px 0;">🛡️ Защитени (запазени са твоите по-високи цени – ' + protectedList.length + '):</div>';
+          rHtml += '<div style="max-height:140px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;padding:6px 8px;background:var(--card);">';
+          for (var pIdx = 0; pIdx < protectedList.length; pIdx++) {
+            var pr = protectedList[pIdx];
+            rHtml += '<div style="padding:3px 0;font-size:12.5px;"><strong>[' + esc(pr.kind) + ']</strong> ' + esc(pr.name) + ': остава <strong>' + fmt(pr.oldPrice) + ' €</strong> (в каталога беше ' + fmt(pr.newPrice) + ' €)</div>';
+          }
+          rHtml += '</div>';
+        }
+
+        repEl.innerHTML = rHtml;
+        toast('Проверката на цените завърши!');
+      })
+      .catch(function() {
+        btn.disabled = false;
+        repEl.innerHTML = '<div style="color:var(--danger);font-weight:700;">❌ Няма интернет връзка или файлът prices.json още не е качен в GitHub. Текущите ти цени остават активни.</div>';
+      });
+  };
+
+  window.revertOldPrices = function() {
+    if (!state.priceBackup || !Array.isArray(state.priceBackup.prices)) {
+      toast('Няма налично резервно копие.');
+      return;
+    }
+    if (!window.confirm('Да върнем старите цени от ' + state.priceBackup.savedAt + '?')) return;
+    state.prices = JSON.parse(JSON.stringify(state.priceBackup.prices));
+    state.materials = JSON.parse(JSON.stringify(state.priceBackup.materials));
+    state.catalogVersion = state.priceBackup.catalogVersion || '2026.11';
+    state.priceBackup = null;
+    persistState();
+    updateCatalogUI();
+    renderPriceListEditor();
+    renderMatListEditor();
+    populatePresetSelect();
+    populateMatSelect();
+    var repEl = document.getElementById('priceUpdateReport');
+    if (repEl) {
+      repEl.style.display = 'block';
+      repEl.innerHTML = '<div style="color:var(--success);font-weight:700;">↩ Старите цени са възстановени на 100%!</div>';
+    }
+    toast('Старите цени са върнати!');
   };
 
   /* Saved quotes */
@@ -3619,6 +4072,8 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
     document.getElementById('quoteNotes').value = state.current.notes || '';
     document.getElementById('discountVal').value = state.current.discountVal || 0;
     document.getElementById('discountType').value = state.current.discountType || 'percent';
+    document.getElementById('chkWeekend').checked = !!state.current.useWeekend;
+    document.getElementById('weekendPct').value = state.current.weekendPct || 20;
     document.getElementById('chkContingency').checked = !!state.current.useContingency;
     document.getElementById('contingencyPct').value = state.current.contingencyPct || 10;
     document.getElementById('chkVat').checked = !!state.current.useVat;

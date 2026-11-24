@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fixbuild-pwa-v6';
+const CACHE_NAME = 'fixbuild-pwa-v8';
 const ASSETS = [
   './',
   './index.html',
@@ -10,7 +10,9 @@ const ASSETS = [
 self.addEventListener('install', function(event) {
   event.waitUntil(
     caches.open(CACHE_NAME).then(function(cache) {
-      return cache.addAll(ASSETS);
+      return cache.addAll(ASSETS).then(function() {
+        return cache.add('./prices.json').catch(function() {});
+      });
     }).then(function() {
       return self.skipWaiting();
     })
