@@ -297,7 +297,7 @@
     <div class="brand-badge">АГ</div>
     <div>
       <div class="brand-title" id="hdrFirm">ФИКСБИЛД ГРУП ЕООД</div>
-      <div class="brand-sub">Калкулатор за оферти и ремонти (€)</div>
+      <div class="brand-sub">Калкулатор за оферти и ремонти (€) · v3.1</div>
     </div>
   </div>
   <div style="display:flex;gap:6px;align-items:center;"><button class="icon-btn" id="installBtn" style="display:none;background:#ea580c;border-color:#fb923c;" onclick="installPWA()">📲 Инсталирай</button><button class="icon-btn" id="themeBtn" onclick="toggleTheme()">🌙 Тъмна</button></div>
@@ -2659,8 +2659,8 @@
           '<div class="item-meta">' + esc(item.cat || 'Други') + ' | Мярка: ' + esc(item.unit) + '</div>' +
         '</div>' +
         '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">' +
-          '<input type="number" step="0.01" value="' + item.price + '" style="width:82px;min-height:36px;padding:4px 8px;" onchange="updateMaterialPriceValue('' + esc(item.id) + '', this.value)">' +
-          '<button class="btn-danger-sm" onclick="deleteMaterialPriceItem('' + esc(item.id) + '')">✕</button>' +
+          '<input type="number" step="0.01" value="' + item.price + '" style="width:82px;min-height:36px;padding:4px 8px;" onchange="updateMaterialPriceValue(\'' + esc(item.id) + '\', this.value)">' +
+          '<button class="btn-danger-sm" onclick="deleteMaterialPriceItem(\'' + esc(item.id) + '\')">✕</button>' +
         '</div>' +
       '</div>';
     }
