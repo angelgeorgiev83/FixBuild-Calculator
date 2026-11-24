@@ -77,7 +77,7 @@
   /* Tabs */
   .tabs {
     position: sticky; top: 60px; z-index: 45;
-    display: grid; grid-template-columns: repeat(4, 1fr);
+    display: grid; grid-template-columns: repeat(3, 1fr);
     background: var(--card); border-bottom: 1px solid var(--border);
   }
   .tab-btn {
@@ -297,7 +297,7 @@
     <div class="brand-badge">АГ</div>
     <div>
       <div class="brand-title" id="hdrFirm">ФИКСБИЛД ГРУП ЕООД</div>
-      <div class="brand-sub">Калкулатор за оферти и ремонти (€) · v3.1</div>
+      <div class="brand-sub">Калкулатор за оферти и ремонти (€) · v4.0</div>
     </div>
   </div>
   <div style="display:flex;gap:6px;align-items:center;"><button class="icon-btn" id="installBtn" style="display:none;background:#ea580c;border-color:#fb923c;" onclick="installPWA()">📲 Инсталирай</button><button class="icon-btn" id="themeBtn" onclick="toggleTheme()">🌙 Тъмна</button></div>
@@ -306,8 +306,7 @@
 <div class="tabs">
   <button class="tab-btn active" data-tab="project" onclick="switchTab('project')">1. Обект</button>
   <button class="tab-btn" data-tab="quote" onclick="switchTab('quote')">2. Оферта</button>
-  <button class="tab-btn" data-tab="waste" onclick="switchTab('waste')">3. Фира</button>
-  <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">4. Цени</button>
+  <button class="tab-btn" data-tab="settings" onclick="switchTab('settings')">3. Цени</button>
 </div>
 
 <div class="container">
@@ -416,9 +415,21 @@
         <button id="typeMatBtn" onclick="setItemType('material')">🧱 Материал</button>
       </div>
 
-      <div class="row-gap" id="presetWrap">
-        <label>Бърз избор от ценоразписа (Труд)</label>
-        <select id="presetSelect" onchange="applyPreset()"></select>
+      <div id="presetWrap" style="background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:10px;padding:10px;margin-bottom:10px;">
+        <div class="grid-2 row-gap">
+          <div>
+            <label>Категория дейност</label>
+            <select id="laborCatFilter" onchange="populatePresetSelect()"></select>
+          </div>
+          <div>
+            <label>Търсене на услуга</label>
+            <input type="search" id="laborSearchInput" placeholder="напр. плочки, картон, шпакловка..." oninput="populatePresetSelect()">
+          </div>
+        </div>
+        <div>
+          <label>Избери дейност (<span id="laborMatchCount">0</span>)</label>
+          <select id="presetSelect" onchange="applyPreset()"></select>
+        </div>
       </div>
 
       <div id="matPresetWrap" style="display:none;background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:10px;padding:10px;margin-bottom:10px;">
@@ -446,7 +457,10 @@
       <div class="grid-3 row-gap">
         <div>
           <label>Количество</label>
-          <input type="number" step="0.01" id="itemQty" placeholder="0">
+          <div style="display:flex;gap:4px;">
+            <input type="number" step="0.01" id="itemQty" placeholder="0" style="min-width:0;">
+            <button type="button" class="btn btn-outline btn-sm" style="padding:0 7px;min-height:42px;font-size:12px;flex-shrink:0;" onclick="addTenPercentQty()" title="Добави +10% фира към количеството">+10%</button>
+          </div>
         </div>
         <div>
           <label>Мярка</label>
@@ -455,6 +469,8 @@
             <option value="л.м">л.м</option>
             <option value="бр.">бр.</option>
             <option value="точка">точка</option>
+            <option value="курс">курс</option>
+            <option value="посещение">посещение</option>
             <option value="торба">торба</option>
             <option value="кофа">кофа</option>
             <option value="лист">лист</option>
@@ -482,7 +498,7 @@
     </div>
 
     <div class="card">
-      <div class="card-title"><span>Отстъпка и бележки</span></div>
+      <div class="card-title"><span>Отстъпка, добавки и бележки</span></div>
       <div class="grid-2 row-gap">
         <div>
           <label>Отстъпка</label>
@@ -496,6 +512,34 @@
           </select>
         </div>
       </div>
+
+      <div style="background:var(--soft);border:1px solid var(--border);border-radius:9px;padding:10px;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 0;">
+          <label style="display:flex;align-items:center;gap:9px;margin:0;color:var(--text);font-size:14px;cursor:pointer;">
+            <input type="checkbox" id="chkContingency" onchange="syncExtras()" style="width:20px;height:20px;min-height:20px;accent-color:var(--primary);cursor:pointer;">
+            <span>Непредвидени разходи</span>
+          </label>
+          <div style="display:flex;align-items:center;gap:4px;">
+            <input type="number" step="1" min="1" max="50" id="contingencyPct" value="10" oninput="syncExtras()" style="width:62px;min-height:34px;padding:4px 6px;text-align:center;font-weight:700;">
+            <span style="font-weight:700;font-size:13px;color:var(--muted);">%</span>
+          </div>
+        </div>
+
+        <div style="border-top:1px solid var(--border);margin:6px 0;"></div>
+
+        <label style="display:flex;align-items:center;gap:9px;margin:0;padding:4px 0;color:var(--text);font-size:14px;cursor:pointer;">
+          <input type="checkbox" id="chkVat" onchange="syncExtras()" style="width:20px;height:20px;min-height:20px;accent-color:var(--primary);cursor:pointer;">
+          <span>Начисли <strong>+20% ДДС</strong> върху офертата</span>
+        </label>
+
+        <div style="border-top:1px solid var(--border);margin:6px 0;"></div>
+
+        <label style="display:flex;align-items:center;gap:9px;margin:0;padding:4px 0;color:var(--text);font-size:13.5px;cursor:pointer;">
+          <input type="checkbox" id="chkEstimateNote" onchange="syncExtras()" style="width:20px;height:20px;min-height:20px;accent-color:var(--primary);cursor:pointer;">
+          <span>Предварителна оферта (цени „ОТ“ – преди оглед)</span>
+        </label>
+      </div>
+
       <div>
         <label>Бележка към офертата</label>
         <textarea id="quoteNotes" rows="2" oninput="syncProjectMeta()"></textarea>
@@ -518,39 +562,7 @@
 
   </div>
 
-  <!-- TAB 3: MATERIALS WASTE CALCULATOR -->
-  <div class="panel" id="panel-waste">
-    <div class="card">
-      <div class="card-title"><span>Калкулатор за материали с фира</span></div>
-      <div class="row-gap">
-        <label>Вид ремонтна дейност</label>
-        <select id="wType" onchange="calcWaste()">
-          <option value="putty">Шпакловка (2 ръце, 1.8 кг/м² + 10% фира)</option>
-          <option value="latex">Латекс (2 ръце, 0.16 л/м² + 10% фира)</option>
-          <option value="primer">Грунд (0.12 л/м² + 5% фира)</option>
-          <option value="drywall">Гипсокартон (листи 120×200 = 2.4 м² + 10% фира)</option>
-          <option value="tiles_straight">Плочки право редене (+10% фира + лепило + фуга)</option>
-          <option value="tiles_diag">Плочки диагонал (+15% фира + лепило + фуга)</option>
-          <option value="laminate">Ламинат (+7% фира + подложка)</option>
-        </select>
-      </div>
-      <div class="grid-2 row-gap">
-        <div>
-          <label>Чиста площ (кв.м)</label>
-          <input type="number" step="0.1" id="wArea" value="25" oninput="calcWaste()">
-        </div>
-        <div>
-          <label>Цена на опаковка/м² (€) - по избор</label>
-          <input type="number" step="0.1" id="wPrice" placeholder="0.00" oninput="calcWaste()">
-        </div>
-      </div>
-      <div id="wasteOutput" style="margin-top:10px;"></div>
-      <div style="margin-top:12px;" class="grid-2">
-        <button class="btn btn-success btn-sm" onclick="copyWasteList()">💬 Копирай списъка</button>
-        <button class="btn btn-primary btn-sm" onclick="addWasteToRoom()">+ Вкарай като материал</button>
-      </div>
-    </div>
-  </div>
+
 
   <!-- TAB 4: PRICE LIST, COMPANY & SAVED -->
   <div class="panel" id="panel-settings">
@@ -583,24 +595,46 @@
     </div>
 
     <div class="card">
-      <div class="card-title"><span>Ценоразпис труд (€)</span></div>
-      <div id="priceListEditor"></div>
+      <div class="card-title">
+        <span>Ценоразпис услуги и труд (€)</span>
+        <span id="laborTotalBadge" style="font-size:12px;color:var(--muted);text-transform:none;">0 поз.</span>
+      </div>
+      <div class="grid-2 row-gap">
+        <div>
+          <label>Филтър по категория</label>
+          <select id="editLaborCat" onchange="renderPriceListEditor()"></select>
+        </div>
+        <div>
+          <label>Търси услуга</label>
+          <input type="search" id="editLaborSearch" placeholder="Търсене..." oninput="renderPriceListEditor()">
+        </div>
+      </div>
+      <div id="priceListEditor" style="max-height:380px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:0 10px;background:var(--soft);"></div>
       <div style="margin-top:12px; border-top:1px solid var(--border); padding-top:10px;">
         <label>Добави нова дейност в ценоразписа</label>
         <div class="row-gap">
+          <select id="newPCat"></select>
+        </div>
+        <div class="row-gap">
           <input type="text" id="newPName" placeholder="Име на дейност">
         </div>
-        <div class="grid-2 row-gap">
+        <div class="grid-3 row-gap">
           <select id="newPUnit">
             <option value="кв.м">кв.м</option>
             <option value="л.м">л.м</option>
             <option value="бр.">бр.</option>
             <option value="точка">точка</option>
+            <option value="курс">курс</option>
+            <option value="посещение">посещение</option>
             <option value="компл.">компл.</option>
           </select>
           <input type="number" step="0.1" id="newPPrice" placeholder="Цена (€)">
+          <input type="text" id="newPRange" placeholder="от-до (по избор)">
         </div>
-        <button class="btn btn-primary" onclick="addPriceListItem()">+ Добави в ценоразписа</button>
+        <div class="grid-2">
+          <button class="btn btn-primary btn-sm" onclick="addPriceListItem()">+ Добави услуга</button>
+          <button class="btn btn-outline btn-sm" onclick="resetDefaultPrices()">↺ Фабричен ценоразпис</button>
+        </div>
       </div>
     </div>
 
@@ -1506,20 +1540,609 @@
   ];
 
 
+var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядисване и мазилки", "Гипсокартон и тавани", "Плочки и бани", "Подови настилки и замазки", "Ел. и ВиК услуги", "Врати, къртене и контейнер", "Пакетни (Труд + Материал)"];
+
   var DEFAULT_PRICES = [
-    { id: 'p1', name: 'Грундиране преди шпакловка или боя', unit: 'кв.м', price: 1.50 },
-    { id: 'p2', name: 'Шпакловка (2 ръце + шкурене)', unit: 'кв.м', price: 8.50 },
-    { id: 'p3', name: 'Шпакловка с армираща мрежа', unit: 'кв.м', price: 11.00 },
-    { id: 'p4', name: 'Монтаж на ъглохранители', unit: 'л.м', price: 3.50 },
-    { id: 'p5', name: 'Боядисване с латекс (2 ръце)', unit: 'кв.м', price: 5.00 },
-    { id: 'p6', name: 'Гипсокартон (таван / предстенна)', unit: 'кв.м', price: 18.00 },
-    { id: 'p7', name: 'Преградна стена гипсокартон (с вата)', unit: 'кв.м', price: 24.00 },
-    { id: 'p8', name: 'Хидроизолация (течна мембрана + ленти)', unit: 'кв.м', price: 8.00 },
-    { id: 'p9', name: 'Полагане на плочки (фаянс / гранитогрес)', unit: 'кв.м', price: 24.00 },
-    { id: 'p10', name: 'Редене на ламинат с подложка', unit: 'кв.м', price: 4.50 },
-    { id: 'p11', name: 'Монтаж на первази за ламинат', unit: 'л.м', price: 2.50 },
-    { id: 'p12', name: 'Ел. услуги (ключове, контакти, осветителни тела)', unit: 'бр.', price: 6.00 },
-    { id: 'p13', name: 'ВиК услуги (изводи и монтаж на санитария)', unit: 'точка', price: 25.00 }
+      {
+          "id": "p1",
+          "cat": "Шпакловки и грундове",
+          "name": "Грундиране (стени / тавани)",
+          "unit": "кв.м",
+          "price": 1.8,
+          "range": "0.50 – 3.00 €"
+      },
+      {
+          "id": "p2",
+          "cat": "Шпакловки и грундове",
+          "name": "Облепване и защита на помещения / дограма",
+          "unit": "кв.м",
+          "price": 0.65,
+          "range": "0.50 – 0.80 €"
+      },
+      {
+          "id": "p3",
+          "cat": "Шпакловки и грундове",
+          "name": "Шпакловка на фуги на гипсокартон (с лента)",
+          "unit": "кв.м",
+          "price": 4.0,
+          "range": "3.00 – 5.35 €"
+      },
+      {
+          "id": "p4",
+          "cat": "Шпакловки и грундове",
+          "name": "Гипсова шпакловка (1–2 ръце / изправяне)",
+          "unit": "кв.м",
+          "price": 6.3,
+          "range": "3.60 – 10.00 €"
+      },
+      {
+          "id": "p5",
+          "cat": "Шпакловки и грундове",
+          "name": "Шпакловка с армираща мрежа",
+          "unit": "кв.м",
+          "price": 7.6,
+          "range": "7.25 – 8.00 €"
+      },
+      {
+          "id": "p6",
+          "cat": "Шпакловки и грундове",
+          "name": "Фина шпакловка (колор кит / Sheetrock)",
+          "unit": "кв.м",
+          "price": 8.8,
+          "range": "5.00 – 12.00 €"
+      },
+      {
+          "id": "p7",
+          "cat": "Шпакловки и грундове",
+          "name": "Цялостна шпакловка до готов вид (2 ръце + шкурене)",
+          "unit": "кв.м",
+          "price": 8.8,
+          "range": "6.00 – 13.00 €"
+      },
+      {
+          "id": "p8",
+          "cat": "Шпакловки и грундове",
+          "name": "Шлайфане (шкурене) след шпакловка",
+          "unit": "кв.м",
+          "price": 2.7,
+          "range": "1.50 – 5.00 €"
+      },
+      {
+          "id": "p9",
+          "cat": "Шпакловки и грундове",
+          "name": "Монтаж на алуминиеви ъглохранители",
+          "unit": "л.м",
+          "price": 4.0,
+          "range": "3.50 – 5.00 €"
+      },
+      {
+          "id": "p10",
+          "cat": "Шпакловки и грундове",
+          "name": "Обръщане на прозорци и врати (с лайсна)",
+          "unit": "л.м",
+          "price": 10.0,
+          "range": "10.00 – 12.00 €"
+      },
+      {
+          "id": "p11",
+          "cat": "Боядисване и мазилки",
+          "name": "Сваляне на стари тапети",
+          "unit": "кв.м",
+          "price": 3.0,
+          "range": "2.00 – 4.00 €"
+      },
+      {
+          "id": "p12",
+          "cat": "Боядисване и мазилки",
+          "name": "Боядисване с латекс – бяло (2 ръце)",
+          "unit": "кв.м",
+          "price": 4.1,
+          "range": "2.50 – 8.00 €"
+      },
+      {
+          "id": "p13",
+          "cat": "Боядисване и мазилки",
+          "name": "Боядисване с латекс – 1 цвят (2 ръце)",
+          "unit": "кв.м",
+          "price": 5.4,
+          "range": "3.00 – 10.00 €"
+      },
+      {
+          "id": "p14",
+          "cat": "Боядисване и мазилки",
+          "name": "Боядисване с латекс – 2 цвята / отсичане",
+          "unit": "кв.м",
+          "price": 6.1,
+          "range": "4.00 – 10.00 €"
+      },
+      {
+          "id": "p15",
+          "cat": "Боядисване и мазилки",
+          "name": "Лепене на тапети",
+          "unit": "кв.м",
+          "price": 8.0,
+          "range": "6.00 – 10.00 €"
+      },
+      {
+          "id": "p16",
+          "cat": "Боядисване и мазилки",
+          "name": "Боядисване – лукс / безвъздушно машинно",
+          "unit": "кв.м",
+          "price": 9.4,
+          "range": "5.00 – 14.00 €"
+      },
+      {
+          "id": "p17",
+          "cat": "Боядисване и мазилки",
+          "name": "Машинна гипсова мазилка (Турбозол / MP75)",
+          "unit": "кв.м",
+          "price": 15.4,
+          "range": "10.00 – 20.00 €"
+      },
+      {
+          "id": "p18",
+          "cat": "Боядисване и мазилки",
+          "name": "Декоративна / пясъчна мазилка",
+          "unit": "кв.м",
+          "price": 18.3,
+          "range": "12.00 – 25.00 €"
+      },
+      {
+          "id": "p19",
+          "cat": "Боядисване и мазилки",
+          "name": "Венецианска мазилка",
+          "unit": "кв.м",
+          "price": 22.5,
+          "range": "15.00 – 30.00 €"
+      },
+      {
+          "id": "p20",
+          "cat": "Гипсокартон и тавани",
+          "name": "Полагане на минерална / каменна вата (в скара)",
+          "unit": "кв.м",
+          "price": 3.8,
+          "range": "2.50 – 6.00 €"
+      },
+      {
+          "id": "p21",
+          "cat": "Гипсокартон и тавани",
+          "name": "Монтаж на гипсокартон върху готова скара",
+          "unit": "кв.м",
+          "price": 10.0,
+          "range": "9.00 – 12.00 €"
+      },
+      {
+          "id": "p22",
+          "cat": "Гипсокартон и тавани",
+          "name": "Ниши за LED осветление / куфари от картон",
+          "unit": "л.м",
+          "price": 12.0,
+          "range": "8.00 – 15.00 €"
+      },
+      {
+          "id": "p23",
+          "cat": "Гипсокартон и тавани",
+          "name": "Преградна стена от гипсокартон (с конструкция)",
+          "unit": "кв.м",
+          "price": 19.3,
+          "range": "11.00 – 28.00 €"
+      },
+      {
+          "id": "p24",
+          "cat": "Гипсокартон и тавани",
+          "name": "Лепене на гипсокартон (суха мазилка)",
+          "unit": "кв.м",
+          "price": 19.5,
+          "range": "13.00 – 25.00 €"
+      },
+      {
+          "id": "p25",
+          "cat": "Гипсокартон и тавани",
+          "name": "Предстенна обшивка от гипсокартон (с конструкция)",
+          "unit": "кв.м",
+          "price": 21.25,
+          "range": "17.00 – 25.00 €"
+      },
+      {
+          "id": "p26",
+          "cat": "Гипсокартон и тавани",
+          "name": "Окачен таван от гипсокартон (едно ниво)",
+          "unit": "кв.м",
+          "price": 22.6,
+          "range": "18.00 – 30.00 €"
+      },
+      {
+          "id": "p27",
+          "cat": "Гипсокартон и тавани",
+          "name": "Окачен таван – много нива / фигури / лукс",
+          "unit": "кв.м",
+          "price": 37.5,
+          "range": "25.00 – 52.50 €"
+      },
+      {
+          "id": "p28",
+          "cat": "Плочки и бани",
+          "name": "Фугиране на плочки (когато е отделно)",
+          "unit": "кв.м",
+          "price": 6.5,
+          "range": "5.00 – 8.00 €"
+      },
+      {
+          "id": "p29",
+          "cat": "Плочки и бани",
+          "name": "Лепене на цокъл от плочки",
+          "unit": "л.м",
+          "price": 8.0,
+          "range": "5.00 – 12.00 €"
+      },
+      {
+          "id": "p30",
+          "cat": "Плочки и бани",
+          "name": "Хидроизолация (течна мембрана + ленти)",
+          "unit": "кв.м",
+          "price": 11.0,
+          "range": "10.00 – 12.00 €"
+      },
+      {
+          "id": "p31",
+          "cat": "Плочки и бани",
+          "name": "Полагане на фаянс / теракот стандарт (до 60×60)",
+          "unit": "кв.м",
+          "price": 28.0,
+          "range": "20.00 – 40.00 €"
+      },
+      {
+          "id": "p32",
+          "cat": "Плочки и бани",
+          "name": "Изработка на герунг / 45° ръб",
+          "unit": "л.м",
+          "price": 30.0,
+          "range": "25.00 – 35.00 €"
+      },
+      {
+          "id": "p33",
+          "cat": "Плочки и бани",
+          "name": "Полагане на гранитогрес (стандартен)",
+          "unit": "кв.м",
+          "price": 34.2,
+          "range": "21.50 – 45.00 €"
+      },
+      {
+          "id": "p34",
+          "cat": "Плочки и бани",
+          "name": "Полагане на плочки голям формат (60×120)",
+          "unit": "кв.м",
+          "price": 47.0,
+          "range": "40.00 – 55.00 €"
+      },
+      {
+          "id": "p35",
+          "cat": "Плочки и бани",
+          "name": "Монтаж на санитария (мивка, моноблок, смесител, бойлер)",
+          "unit": "бр.",
+          "price": 56.0,
+          "range": "25.00 – 80.00 €"
+      },
+      {
+          "id": "p36",
+          "cat": "Плочки и бани",
+          "name": "Полагане на плочки XXL формат (120×120)",
+          "unit": "кв.м",
+          "price": 66.0,
+          "range": "49.00 – 80.00 €"
+      },
+      {
+          "id": "p37",
+          "cat": "Плочки и бани",
+          "name": "Монтаж на линеен сифон в душ зона",
+          "unit": "бр.",
+          "price": 95.0,
+          "range": "80.00 – 120.00 €"
+      },
+      {
+          "id": "p38",
+          "cat": "Плочки и бани",
+          "name": "Монтаж на душ кабина / стъклен параван",
+          "unit": "бр.",
+          "price": 105.0,
+          "range": "60.00 – 150.00 €"
+      },
+      {
+          "id": "p39",
+          "cat": "Плочки и бани",
+          "name": "Монтаж на структура / вградено казанче",
+          "unit": "бр.",
+          "price": 115.0,
+          "range": "90.00 – 140.00 €"
+      },
+      {
+          "id": "p40",
+          "cat": "Подови настилки и замазки",
+          "name": "Монтаж на первази за ламинат",
+          "unit": "л.м",
+          "price": 4.4,
+          "range": "2.75 – 6.00 €"
+      },
+      {
+          "id": "p41",
+          "cat": "Подови настилки и замазки",
+          "name": "Редене на ламинат (с подложка)",
+          "unit": "кв.м",
+          "price": 9.15,
+          "range": "3.50 – 18.00 €"
+      },
+      {
+          "id": "p42",
+          "cat": "Подови настилки и замазки",
+          "name": "Саморазливна замазка",
+          "unit": "кв.м",
+          "price": 13.5,
+          "range": "6.00 – 18.00 €"
+      },
+      {
+          "id": "p43",
+          "cat": "Подови настилки и замазки",
+          "name": "Циментова подова замазка",
+          "unit": "кв.м",
+          "price": 14.1,
+          "range": "9.50 – 22.00 €"
+      },
+      {
+          "id": "p44",
+          "cat": "Подови настилки и замазки",
+          "name": "Винилова настилка (LVT)",
+          "unit": "кв.м",
+          "price": 14.25,
+          "range": "9.00 – 22.00 €"
+      },
+      {
+          "id": "p45",
+          "cat": "Подови настилки и замазки",
+          "name": "Естествен / трислоен паркет",
+          "unit": "кв.м",
+          "price": 20.3,
+          "range": "11.00 – 30.00 €"
+      },
+      {
+          "id": "p46",
+          "cat": "Ел. и ВиК услуги",
+          "name": "Полагане на ел. кабели",
+          "unit": "л.м",
+          "price": 5.7,
+          "range": "5.00 – 7.00 €"
+      },
+      {
+          "id": "p47",
+          "cat": "Ел. и ВиК услуги",
+          "name": "Монтаж / смяна на ключ, контакт, плафон",
+          "unit": "бр.",
+          "price": 19.6,
+          "range": "6.00 – 27.50 €"
+      },
+      {
+          "id": "p48",
+          "cat": "Ел. и ВиК услуги",
+          "name": "Смяна на ВиК тръби",
+          "unit": "л.м",
+          "price": 20.75,
+          "range": "15.00 – 30.00 €"
+      },
+      {
+          "id": "p49",
+          "cat": "Ел. и ВиК услуги",
+          "name": "Изграждане на Ел. точка (конзола + кабел)",
+          "unit": "точка",
+          "price": 21.9,
+          "range": "11.50 – 35.00 €"
+      },
+      {
+          "id": "p50",
+          "cat": "Ел. и ВиК услуги",
+          "name": "Изграждане на ВиК точка (водопровод / канал)",
+          "unit": "точка",
+          "price": 38.3,
+          "range": "11.50 – 65.00 €"
+      },
+      {
+          "id": "p51",
+          "cat": "Ел. и ВиК услуги",
+          "name": "Монтаж / свързване на Ел. табло",
+          "unit": "бр.",
+          "price": 128.0,
+          "range": "105.00 – 160.00 €"
+      },
+      {
+          "id": "p52",
+          "cat": "Врати, къртене и контейнер",
+          "name": "Почистване след ремонт",
+          "unit": "кв.м",
+          "price": 4.5,
+          "range": "4.00 – 5.00 €"
+      },
+      {
+          "id": "p53",
+          "cat": "Врати, къртене и контейнер",
+          "name": "Къртене на плочки",
+          "unit": "кв.м",
+          "price": 9.0,
+          "range": "7.00 – 12.00 €"
+      },
+      {
+          "id": "p54",
+          "cat": "Врати, къртене и контейнер",
+          "name": "Къртене на бетон",
+          "unit": "кв.м",
+          "price": 18.5,
+          "range": "15.00 – 22.00 €"
+      },
+      {
+          "id": "p55",
+          "cat": "Врати, къртене и контейнер",
+          "name": "Къртене на тухлена стена",
+          "unit": "кв.м",
+          "price": 19.4,
+          "range": "11.50 – 28.00 €"
+      },
+      {
+          "id": "p56",
+          "cat": "Врати, къртене и контейнер",
+          "name": "Минимална такса посещение / дребен ремонт",
+          "unit": "посещение",
+          "price": 25.0,
+          "range": "20.00 – 30.00 €"
+      },
+      {
+          "id": "p57",
+          "cat": "Врати, къртене и контейнер",
+          "name": "Зидария с тухли / Ytong (преградни стени)",
+          "unit": "кв.м",
+          "price": 27.6,
+          "range": "12.00 – 45.00 €"
+      },
+      {
+          "id": "p58",
+          "cat": "Врати, къртене и контейнер",
+          "name": "Лепене на декоративен / естествен камък",
+          "unit": "кв.м",
+          "price": 28.75,
+          "range": "15.00 – 45.00 €"
+      },
+      {
+          "id": "p59",
+          "cat": "Врати, къртене и контейнер",
+          "name": "Демонтаж на врати / прозорци",
+          "unit": "бр.",
+          "price": 31.25,
+          "range": "25.00 – 40.00 €"
+      },
+      {
+          "id": "p60",
+          "cat": "Врати, къртене и контейнер",
+          "name": "Монтаж на ПВЦ дограма",
+          "unit": "бр.",
+          "price": 55.0,
+          "range": "40.00 – 70.00 €"
+      },
+      {
+          "id": "p61",
+          "cat": "Врати, къртене и контейнер",
+          "name": "Монтаж на интериорна врата",
+          "unit": "бр.",
+          "price": 76.0,
+          "range": "50.00 – 100.00 €"
+      },
+      {
+          "id": "p62",
+          "cat": "Врати, къртене и контейнер",
+          "name": "Извозване на строителни отпадъци (бус)",
+          "unit": "курс",
+          "price": 77.5,
+          "range": "45.00 – 105.00 €"
+      },
+      {
+          "id": "p63",
+          "cat": "Врати, къртене и контейнер",
+          "name": "Монтаж на блиндирана / входна врата",
+          "unit": "бр.",
+          "price": 121.0,
+          "range": "90.00 – 160.00 €"
+      },
+      {
+          "id": "p64",
+          "cat": "Врати, къртене и контейнер",
+          "name": "Контейнер за строителни отпадъци",
+          "unit": "бр.",
+          "price": 150.0,
+          "range": "120.00 – 180.00 €"
+      },
+      {
+          "id": "p65",
+          "cat": "Пакетни (Труд + Материал)",
+          "name": "Гипсова шпакловка (2 ръце) – труд + мат.",
+          "unit": "кв.м",
+          "price": 17.5,
+          "range": "15.00 – 20.00 €"
+      },
+      {
+          "id": "p66",
+          "cat": "Пакетни (Труд + Материал)",
+          "name": "Доставка и полагане на хидроизолация – труд + мат.",
+          "unit": "кв.м",
+          "price": 18.0,
+          "range": "16.00 – 20.00 €"
+      },
+      {
+          "id": "p67",
+          "cat": "Пакетни (Труд + Материал)",
+          "name": "Фина шпакловка (с шлайфане) – труд + мат.",
+          "unit": "кв.м",
+          "price": 18.5,
+          "range": "16.00 – 22.00 €"
+      },
+      {
+          "id": "p68",
+          "cat": "Пакетни (Труд + Материал)",
+          "name": "Гипсокартон (таван / стена) – труд + мат.",
+          "unit": "кв.м",
+          "price": 30.0,
+          "range": "25.00 – 35.00 €"
+      },
+      {
+          "id": "p69",
+          "cat": "Пакетни (Труд + Материал)",
+          "name": "Подово отопление (тръби, колектори, монтаж) – труд + мат.",
+          "unit": "кв.м",
+          "price": 30.0,
+          "range": "25.00 – 35.00 €"
+      },
+      {
+          "id": "p70",
+          "cat": "Пакетни (Труд + Материал)",
+          "name": "Топлоизолация EPS 8 см – труд + мат.",
+          "unit": "кв.м",
+          "price": 40.6,
+          "range": "28.50 – 55.00 €"
+      },
+      {
+          "id": "p71",
+          "cat": "Пакетни (Труд + Материал)",
+          "name": "Топлоизолация EPS 10 см – труд + мат.",
+          "unit": "кв.м",
+          "price": 50.3,
+          "range": "41.00 – 62.00 €"
+      },
+      {
+          "id": "p72",
+          "cat": "Пакетни (Труд + Материал)",
+          "name": "Топлоизолация EPS 12 см – труд + мат.",
+          "unit": "кв.м",
+          "price": 55.0,
+          "range": "45.00 – 68.00 €"
+      },
+      {
+          "id": "p73",
+          "cat": "Пакетни (Труд + Материал)",
+          "name": "Каменна вата 8 см фасадна – труд + мат.",
+          "unit": "кв.м",
+          "price": 59.0,
+          "range": "50.00 – 70.00 €"
+      },
+      {
+          "id": "p74",
+          "cat": "Пакетни (Труд + Материал)",
+          "name": "Ремонт на баня – стандартен (само лепене, без къртене)",
+          "unit": "бр.",
+          "price": 2500.0,
+          "range": "2500 €"
+      },
+      {
+          "id": "p75",
+          "cat": "Пакетни (Труд + Материал)",
+          "name": "Ремонт на баня – пълен (къртене, ВиК, хидроиз., плочки)",
+          "unit": "бр.",
+          "price": 4500.0,
+          "range": "3500 – 6000 €"
+      }
   ];
 
   function todayStr() {
@@ -1539,6 +2162,10 @@
       clientAddress: '',
       discountVal: 0,
       discountType: 'percent',
+      useContingency: false,
+      contingencyPct: 10,
+      useVat: false,
+      isPreliminary: false,
       notes: 'Валидност на офертата: 14 дни. Посочените цени са в евро (€).',
       rooms: [
         { id: 'r1', name: 'Хол', items: [] }
@@ -1549,6 +2176,7 @@
   function defaultState() {
     return {
       theme: 'light',
+      pricesVersion: 4,
       company: {
         name: 'ФИКСБИЛД ГРУП ЕООД',
         city: 'гр. Пловдив',
@@ -1567,7 +2195,6 @@
   var itemType = 'labor';
   var lastDims = { floor: 0, walls: 0, perim: 0 };
   var lastPngDataUrl = '';
-  var lastWasteSummary = { text: '', label: '', qty: 0, unit: 'компл.', price: 0 };
 
   function loadState() {
     try {
@@ -1579,6 +2206,14 @@
         }
       }
     } catch (e) {}
+    if (state.pricesVersion !== 4) {
+      var customPrices = (state.prices || []).filter(function(p) {
+        return String(p.id || '').indexOf('p_') === 0;
+      });
+      state.prices = customPrices.concat(JSON.parse(JSON.stringify(DEFAULT_PRICES)));
+      state.pricesVersion = 4;
+      persistState();
+    }
     if (!Array.isArray(state.materials) || !state.materials.length) {
       state.materials = JSON.parse(JSON.stringify(DEFAULT_MATERIALS));
       persistState();
@@ -1644,8 +2279,24 @@
       discount = q.discountType === 'percent' ? (sub * dVal / 100) : dVal;
       if (discount > sub) discount = sub;
     }
-    var grand = sub - discount;
-    return { labor: labor, mat: mat, sub: sub, discount: discount, grand: grand };
+    var afterDiscount = sub - discount;
+    var cPct = Number(q.contingencyPct);
+    if (isNaN(cPct) || cPct <= 0) cPct = 10;
+    var contingency = q.useContingency ? (afterDiscount * cPct / 100) : 0;
+    var taxBase = afterDiscount + contingency;
+    var vat = q.useVat ? (taxBase * 0.20) : 0;
+    var grand = taxBase + vat;
+    return {
+      labor: labor,
+      mat: mat,
+      sub: sub,
+      discount: discount,
+      contingency: contingency,
+      contingencyPct: cPct,
+      taxBase: taxBase,
+      vat: vat,
+      grand: grand
+    };
   }
 
   window.toggleTheme = function() {
@@ -1676,7 +2327,6 @@
     }
     document.getElementById('panel-' + tabName).classList.add('active');
     if (tabName === 'quote') renderQuoteSheet();
-    if (tabName === 'waste') calcWaste();
     if (tabName === 'settings') {
       renderPriceListEditor();
       renderMatListEditor();
@@ -1699,6 +2349,28 @@
     state.current.discountType = document.getElementById('discountType').value;
     persistState();
     updateBottomBar();
+  };
+
+  window.syncExtras = function() {
+    state.current.useContingency = document.getElementById('chkContingency').checked;
+    var pct = parseFloat(document.getElementById('contingencyPct').value);
+    state.current.contingencyPct = (!isNaN(pct) && pct > 0) ? pct : 10;
+    state.current.useVat = document.getElementById('chkVat').checked;
+    state.current.isPreliminary = document.getElementById('chkEstimateNote').checked;
+    persistState();
+    updateBottomBar();
+  };
+
+  window.addTenPercentQty = function() {
+    var el = document.getElementById('itemQty');
+    var v = parseFloat(el.value);
+    if (!v || v <= 0) {
+      toast('Първо въведи количество.');
+      return;
+    }
+    var boosted = Math.round(v * 1.10 * 100) / 100;
+    el.value = boosted;
+    toast('+10% добавени: ' + boosted);
   };
 
   window.quickAddRoom = function(name) {
@@ -1792,15 +2464,27 @@
     }
   };
 
-  function populatePresetSelect() {
+  window.populatePresetSelect = function() {
+    var cat = document.getElementById('laborCatFilter').value;
+    var q = (document.getElementById('laborSearchInput').value || '').trim().toLowerCase();
     var sel = document.getElementById('presetSelect');
-    var html = '<option value="">-- Избери дейност --</option>';
-    for (var i = 0; i < state.prices.length; i++) {
-      var p = state.prices[i];
-      html += '<option value="' + esc(p.id) + '">' + esc(p.name) + ' (' + fmt(p.price) + ' €/' + esc(p.unit) + ')</option>';
+    var list = state.prices || [];
+    var matched = [];
+    for (var i = 0; i < list.length; i++) {
+      var p = list[i];
+      if (cat && p.cat !== cat) continue;
+      if (q && (p.name.toLowerCase().indexOf(q) === -1 && (p.cat || '').toLowerCase().indexOf(q) === -1)) continue;
+      matched.push(p);
+    }
+    var html = '<option value="">-- Избери дейност (' + matched.length + ') --</option>';
+    for (var j = 0; j < matched.length; j++) {
+      var item = matched[j];
+      var rngTxt = item.range ? (' [от ' + item.range + ']') : '';
+      html += '<option value="' + esc(item.id) + '">' + esc(item.name) + rngTxt + ' — ' + fmt(item.price) + ' €/' + esc(item.unit) + '</option>';
     }
     sel.innerHTML = html;
-  }
+    document.getElementById('laborMatchCount').textContent = matched.length + ' бр.';
+  };
 
   window.applyPreset = function() {
     var id = document.getElementById('presetSelect').value;
@@ -1808,7 +2492,12 @@
     for (var i = 0; i < state.prices.length; i++) {
       if (state.prices[i].id === id) {
         document.getElementById('itemName').value = state.prices[i].name;
-        document.getElementById('itemUnit').value = state.prices[i].unit;
+        var unitEl = document.getElementById('itemUnit');
+        var foundU = false;
+        for (var u = 0; u < unitEl.options.length; u++) {
+          if (unitEl.options[u].value === state.prices[i].unit) { foundU = true; break; }
+        }
+        unitEl.value = foundU ? state.prices[i].unit : 'кв.м';
         document.getElementById('itemPrice').value = state.prices[i].price;
         break;
       }
@@ -1816,16 +2505,27 @@
   };
 
   function populateCategoryDropdowns() {
-    var optsAll = '<option value="">Всички категории</option>';
-    var optsOnly = '';
+    var mAll = '<option value="">Всички категории</option>';
+    var mOnly = '';
     for (var i = 0; i < MATERIAL_CATEGORIES.length; i++) {
       var cat = MATERIAL_CATEGORIES[i];
-      optsAll += '<option value="' + esc(cat) + '">' + esc(cat) + '</option>';
-      optsOnly += '<option value="' + esc(cat) + '">' + esc(cat) + '</option>';
+      mAll += '<option value="' + esc(cat) + '">' + esc(cat) + '</option>';
+      mOnly += '<option value="' + esc(cat) + '">' + esc(cat) + '</option>';
     }
-    document.getElementById('matCatFilter').innerHTML = optsAll;
-    document.getElementById('editMatCat').innerHTML = optsAll;
-    document.getElementById('newMCat').innerHTML = optsOnly;
+    document.getElementById('matCatFilter').innerHTML = mAll;
+    document.getElementById('editMatCat').innerHTML = mAll;
+    document.getElementById('newMCat').innerHTML = mOnly;
+
+    var lAll = '<option value="">Всички категории</option>';
+    var lOnly = '';
+    for (var j = 0; j < LABOR_CATEGORIES.length; j++) {
+      var lcat = LABOR_CATEGORIES[j];
+      lAll += '<option value="' + esc(lcat) + '">' + esc(lcat) + '</option>';
+      lOnly += '<option value="' + esc(lcat) + '">' + esc(lcat) + '</option>';
+    }
+    document.getElementById('laborCatFilter').innerHTML = lAll;
+    document.getElementById('editLaborCat').innerHTML = lAll;
+    document.getElementById('newPCat').innerHTML = lOnly;
   }
 
   window.populateMatSelect = function() {
@@ -1955,7 +2655,10 @@
     var t = computeTotals(state.current);
     document.getElementById('barLabor').textContent = fmt(t.labor) + ' €';
     document.getElementById('barMat').textContent = fmt(t.mat) + ' €';
-    document.getElementById('barTotal').textContent = fmt(t.grand) + ' €';
+    var suffix = '';
+    if (state.current.useContingency) suffix += ' (+' + t.contingencyPct + '%)';
+    if (state.current.useVat) suffix += ' (с ДДС)';
+    document.getElementById('barTotal').textContent = fmt(t.grand) + ' €' + suffix;
   }
 
   function renderQuoteSheet() {
@@ -2019,11 +2722,24 @@
       var dLbl = q.discountType === 'percent' ? (' (' + q.discountVal + '%)') : '';
       html += '<div class="q-sum-row" style="color:#16a34a;"><span>Отстъпка' + dLbl + ':</span><strong>-' + fmt(t.discount) + ' €</strong></div>';
     }
-    html += '<div class="q-sum-grand"><span>КРАЙНА СУМА:</span><span>' + fmt(t.grand) + ' €</span></div>' +
+    if (t.contingency > 0) {
+      html += '<div class="q-sum-row" style="color:#b45309;"><span>Непредвидени разходи (+' + t.contingencyPct + '%):</span><strong>+' + fmt(t.contingency) + ' €</strong></div>';
+    }
+    if (q.useVat) {
+      html += '<div class="q-sum-row"><span>Данъчна основа (без ДДС):</span><strong>' + fmt(t.taxBase) + ' €</strong></div>';
+      html += '<div class="q-sum-row" style="color:#0369a1;"><span>ДДС (20%):</span><strong>+' + fmt(t.vat) + ' €</strong></div>';
+    }
+    var grandLbl = q.useVat ? 'КРАЙНА СУМА (С ДДС):' : 'КРАЙНА СУМА:';
+    html += '<div class="q-sum-grand"><span>' + grandLbl + '</span><span>' + fmt(t.grand) + ' €</span></div>' +
     '</div>';
 
-    if (q.notes && q.notes.trim()) {
-      html += '<div class="q-note">' + esc(q.notes) + '</div>';
+    var fullNote = (q.notes || '').trim();
+    if (q.isPreliminary) {
+      var estTxt = 'Предварителна оферта (ориентировъчни цени „ОТ“ преди оглед на обекта).';
+      fullNote = fullNote ? (estTxt + ' ' + fullNote) : estTxt;
+    }
+    if (fullNote) {
+      html += '<div class="q-note">' + esc(fullNote) + '</div>';
     }
 
     document.getElementById('quoteSheet').innerHTML = html;
@@ -2089,10 +2805,18 @@
       return;
     }
 
-    y += 220; // Summary
-    if (q.notes && q.notes.trim()) {
+    y += 230; // Base summary
+    if (t.discount > 0) y += 38;
+    if (t.contingency > 0) y += 38;
+    if (q.useVat) y += 76;
+    var pngFullNote = (q.notes || '').trim();
+    if (q.isPreliminary) {
+      var estP = 'Предварителна оферта (ориентировъчни цени „ОТ“ преди оглед на обекта).';
+      pngFullNote = pngFullNote ? (estP + ' ' + pngFullNote) : estP;
+    }
+    if (pngFullNote) {
       tctx.font = '21px Arial, sans-serif';
-      var noteLines = wrapCanvasText(tctx, q.notes, contentW);
+      var noteLines = wrapCanvasText(tctx, pngFullNote, contentW);
       y += noteLines.length * 28 + 40;
     }
     y += 40;
@@ -2260,6 +2984,38 @@
       cy += 36;
     }
 
+    if (t.contingency > 0) {
+      ctx.font = '25px Arial, sans-serif';
+      ctx.fillStyle = '#b45309';
+      ctx.textAlign = 'left';
+      ctx.fillText('Непредвидени разходи (+' + t.contingencyPct + '%):', pad + 8, cy);
+      ctx.textAlign = 'right';
+      ctx.font = 'bold 25px Arial, sans-serif';
+      ctx.fillText('+' + fmt(t.contingency) + ' €', W - pad - 8, cy);
+      cy += 36;
+    }
+
+    if (q.useVat) {
+      ctx.font = '24px Arial, sans-serif';
+      ctx.fillStyle = '#334155';
+      ctx.textAlign = 'left';
+      ctx.fillText('Данъчна основа (без ДДС):', pad + 8, cy);
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 24px Arial, sans-serif';
+      ctx.fillText(fmt(t.taxBase) + ' €', W - pad - 8, cy);
+      cy += 36;
+
+      ctx.font = '25px Arial, sans-serif';
+      ctx.fillStyle = '#0369a1';
+      ctx.textAlign = 'left';
+      ctx.fillText('ДДС (20%):', pad + 8, cy);
+      ctx.textAlign = 'right';
+      ctx.font = 'bold 25px Arial, sans-serif';
+      ctx.fillText('+' + fmt(t.vat) + ' €', W - pad - 8, cy);
+      cy += 36;
+    }
+
     // Grand total box
     cy += 8;
     ctx.fillStyle = '#fff7ed';
@@ -2269,18 +3025,18 @@
     ctx.strokeRect(pad, cy, contentW, 66);
 
     ctx.fillStyle = '#c2410c';
-    ctx.font = 'bold 32px Arial, sans-serif';
+    ctx.font = 'bold 31px Arial, sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillText('КРАЙНА СУМА:', pad + 20, cy + 44);
+    ctx.fillText(q.useVat ? 'КРАЙНА СУМА (С ДДС):' : 'КРАЙНА СУМА:', pad + 20, cy + 44);
     ctx.textAlign = 'right';
     ctx.fillText(fmt(t.grand) + ' €', W - pad - 20, cy + 44);
     cy += 94;
 
-    if (q.notes && q.notes.trim()) {
+    if (pngFullNote) {
       ctx.fillStyle = '#64748b';
       ctx.font = '21px Arial, sans-serif';
       ctx.textAlign = 'left';
-      var nLines = wrapCanvasText(ctx, q.notes, contentW);
+      var nLines = wrapCanvasText(ctx, pngFullNote, contentW);
       for (var ni = 0; ni < nLines.length; ni++) {
         ctx.fillText(nLines[ni], pad, cy + ni * 28);
       }
@@ -2388,109 +3144,18 @@
     lines.push('🔨 Общо ТРУД: ' + fmt(t.labor) + ' €');
     if (t.mat > 0) lines.push('🧱 Общо МАТЕРИАЛИ: ' + fmt(t.mat) + ' €');
     if (t.discount > 0) lines.push('🎁 Отстъпка: -' + fmt(t.discount) + ' €');
-    lines.push('💶 КРАЙНА СУМА: ' + fmt(t.grand) + ' €');
+    if (t.contingency > 0) lines.push('⚠️ Непредвидени разходи (+' + t.contingencyPct + '%): +' + fmt(t.contingency) + ' €');
+    if (q.useVat) {
+      lines.push('📄 Данъчна основа (без ДДС): ' + fmt(t.taxBase) + ' €');
+      lines.push('🏛️ ДДС (20%): +' + fmt(t.vat) + ' €');
+    }
+    lines.push('💶 ' + (q.useVat ? 'КРАЙНА СУМА (С ДДС): ' : 'КРАЙНА СУМА: ') + fmt(t.grand) + ' €');
     lines.push('');
+    if (q.isPreliminary) lines.push('📌 Предварителна оферта (ориентировъчни цени „ОТ“ преди оглед).');
     if (q.notes) lines.push('ℹ️ ' + q.notes);
     lines.push('— ' + c.name + ', ' + c.city + ', тел. ' + c.phone);
 
     copyTextRobust(lines.join('\n'));
-  };
-
-  /* Materials Waste Calculator */
-  window.calcWaste = function() {
-    var type = document.getElementById('wType').value;
-    var area = parseFloat(document.getElementById('wArea').value) || 0;
-    var price = parseFloat(document.getElementById('wPrice').value) || 0;
-    var out = document.getElementById('wasteOutput');
-
-    if (area <= 0) {
-      out.innerHTML = '<div style="color:var(--muted);">Въведи квадратура.</div>';
-      return;
-    }
-
-    var rows = [];
-    var txtLines = ['🧱 МАТЕРИАЛИ С ФИРА (за ' + area + ' кв.м):'];
-
-    if (type === 'putty') {
-      var kg = area * 1.8 * 1.10;
-      var bags20 = Math.ceil(kg / 20);
-      var bags25 = Math.ceil(kg / 25);
-      rows.push(['Общо шпакловка (+10% фира)', fmt(kg) + ' кг']);
-      rows.push(['В торби по 20 кг', bags20 + ' торби']);
-      rows.push(['В торби по 25 кг', bags25 + ' торби']);
-      lastWasteSummary = { label: 'Шпакловка (торби 20 кг)', qty: bags20, unit: 'торба', price: price };
-    } else if (type === 'latex') {
-      var lit = area * 0.16 * 1.10;
-      var buckets15 = Math.ceil(lit / 15);
-      var buckets5 = Math.ceil(lit / 5);
-      rows.push(['Общо латекс за 2 ръце (+10% фира)', fmt(lit) + ' л']);
-      rows.push(['В кофи по 15 л', buckets15 + ' кофи']);
-      rows.push(['В кофи по 5 л', buckets5 + ' кофи']);
-      lastWasteSummary = { label: 'Латекс (кофи 15 л)', qty: buckets15, unit: 'кофа', price: price };
-    } else if (type === 'primer') {
-      var glit = area * 0.12 * 1.05;
-      var cans5 = Math.ceil(glit / 5);
-      rows.push(['Общо грунд (+5% фира)', fmt(glit) + ' л']);
-      rows.push(['В туби по 5 л', cans5 + ' туби']);
-      lastWasteSummary = { label: 'Грунд (туби 5 л)', qty: cans5, unit: 'бр.', price: price };
-    } else if (type === 'drywall') {
-      var dArea = area * 1.10;
-      var sheets = Math.ceil(dArea / 2.4);
-      rows.push(['Площ с 10% фира', fmt(dArea) + ' кв.м']);
-      rows.push(['Листи гипсокартон (120×200)', sheets + ' листа']);
-      rows.push(['Ориент. фугираща смес', Math.ceil(area * 0.35 / 5) + ' торби (5 кг)']);
-      lastWasteSummary = { label: 'Гипсокартон (листи 120×200)', qty: sheets, unit: 'лист', price: price };
-    } else if (type === 'tiles_straight' || type === 'tiles_diag') {
-      var pct = type === 'tiles_diag' ? 1.15 : 1.10;
-      var tArea = Math.ceil(area * pct * 10) / 10;
-      var glueBags = Math.ceil((area * 5.0) / 25);
-      var groutKg = Math.ceil(area * 0.35);
-      rows.push(['Плочки (+' + (type === 'tiles_diag' ? '15%' : '10%') + ' фира)', fmt(tArea) + ' кв.м']);
-      rows.push(['Лепило за плочки (торби 25 кг)', glueBags + ' торби']);
-      rows.push(['Фугираща смес', groutKg + ' кг']);
-      lastWasteSummary = { label: 'Плочки (с фира)', qty: tArea, unit: 'кв.м', price: price };
-    } else if (type === 'laminate') {
-      var lArea = Math.ceil(area * 1.07 * 10) / 10;
-      rows.push(['Ламинат (+7% фира)', fmt(lArea) + ' кв.м']);
-      rows.push(['Подложка за ламинат', Math.ceil(lArea) + ' кв.м']);
-      lastWasteSummary = { label: 'Ламинат (с 7% фира)', qty: lArea, unit: 'кв.м', price: price };
-    }
-
-    if (price > 0) {
-      rows.push(['Ориентировъчна сума', fmt(lastWasteSummary.qty * price) + ' €']);
-    }
-
-    var h = '';
-    for (var i = 0; i < rows.length; i++) {
-      h += '<div class="mat-res-row"><span>' + esc(rows[i][0]) + '</span><strong>' + esc(rows[i][1]) + '</strong></div>';
-      txtLines.push('• ' + rows[i][0] + ': ' + rows[i][1]);
-    }
-    out.innerHTML = h;
-    lastWasteSummary.text = txtLines.join('\n');
-  };
-
-  window.copyWasteList = function() {
-    calcWaste();
-    if (lastWasteSummary.text) copyTextRobust(lastWasteSummary.text);
-  };
-
-  window.addWasteToRoom = function() {
-    calcWaste();
-    if (!lastWasteSummary.qty) return;
-    var r = getActiveRoom();
-    r.items.push({
-      id: 'it_' + Date.now(),
-      type: 'material',
-      name: lastWasteSummary.label,
-      qty: lastWasteSummary.qty,
-      unit: lastWasteSummary.unit,
-      price: lastWasteSummary.price || 0
-    });
-    persistState();
-    renderRooms();
-    updateBottomBar();
-    toast('Добавено като материал в ' + r.name);
-    switchTab('project');
   };
 
   /* Saved quotes */
@@ -2575,24 +3240,43 @@
     persistState();
   };
 
-  function renderPriceListEditor() {
+  window.renderPriceListEditor = function() {
     var el = document.getElementById('priceListEditor');
+    var cat = document.getElementById('editLaborCat').value;
+    var q = (document.getElementById('editLaborSearch').value || '').trim().toLowerCase();
+    var list = state.prices || [];
+    document.getElementById('laborTotalBadge').textContent = list.length + ' поз.';
+
+    var filtered = [];
+    for (var i = 0; i < list.length; i++) {
+      var p = list[i];
+      if (cat && p.cat !== cat) continue;
+      if (q && (p.name.toLowerCase().indexOf(q) === -1 && (p.cat || '').toLowerCase().indexOf(q) === -1)) continue;
+      filtered.push(p);
+    }
+
+    if (!filtered.length) {
+      el.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:12px 0;">Няма намерени услуги по това търсене.</div>';
+      return;
+    }
+
     var h = '';
-    for (var i = 0; i < state.prices.length; i++) {
-      var p = state.prices[i];
+    for (var j = 0; j < filtered.length; j++) {
+      var item = filtered[j];
+      var rngLbl = item.range ? (' | Пазар: ' + esc(item.range)) : '';
       h += '<div class="item-row">' +
-        '<div style="flex:1;">' +
-          '<div class="item-name">' + esc(p.name) + '</div>' +
-          '<div class="item-meta">Мярка: ' + esc(p.unit) + '</div>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div class="item-name" style="font-size:13.5px;">' + esc(item.name) + '</div>' +
+          '<div class="item-meta">' + esc(item.cat || 'Услуги') + ' | Мярка: ' + esc(item.unit) + rngLbl + '</div>' +
         '</div>' +
-        '<div style="display:flex;align-items:center;gap:6px;">' +
-          '<input type="number" step="0.1" value="' + p.price + '" style="width:82px;min-height:36px;padding:4px 8px;" onchange="updatePriceValue(\'' + esc(p.id) + '\', this.value)">' +
-          '<button class="btn-danger-sm" onclick="deletePriceItem(\'' + esc(p.id) + '\')">✕</button>' +
+        '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">' +
+          '<input type="number" step="0.1" value="' + item.price + '" style="width:82px;min-height:36px;padding:4px 8px;" onchange="updatePriceValue(\'' + esc(item.id) + '\', this.value)">' +
+          '<button class="btn-danger-sm" onclick="deletePriceItem(\'' + esc(item.id) + '\')">✕</button>' +
         '</div>' +
       '</div>';
     }
     el.innerHTML = h;
-  }
+  };
 
   window.updatePriceValue = function(id, val) {
     var num = parseFloat(val);
@@ -2616,17 +3300,30 @@
   };
 
   window.addPriceListItem = function() {
+    var cat = document.getElementById('newPCat').value || LABOR_CATEGORIES[0];
     var name = document.getElementById('newPName').value.trim();
     var unit = document.getElementById('newPUnit').value;
     var price = parseFloat(document.getElementById('newPPrice').value);
+    var rng = (document.getElementById('newPRange').value || '').trim();
     if (!name || isNaN(price)) { toast('Попълни име и цена.'); return; }
-    state.prices.push({ id: 'p_' + Date.now(), name: name, unit: unit, price: price });
+    state.prices.unshift({ id: 'p_' + Date.now(), cat: cat, name: name, unit: unit, price: price, range: rng });
     document.getElementById('newPName').value = '';
     document.getElementById('newPPrice').value = '';
+    document.getElementById('newPRange').value = '';
     persistState();
     renderPriceListEditor();
     populatePresetSelect();
-    toast('Дейността е добавена.');
+    toast('Услугата е добавена.');
+  };
+
+  window.resetDefaultPrices = function() {
+    if (!window.confirm('Да възстановим целия ценоразпис от ' + DEFAULT_PRICES.length + ' услуги със средните пазарни цени? (Вашите оферти и материали няма да се променят.)')) return;
+    state.prices = JSON.parse(JSON.stringify(DEFAULT_PRICES));
+    state.pricesVersion = 4;
+    persistState();
+    renderPriceListEditor();
+    populatePresetSelect();
+    toast('Ценоразписът за услуги е възстановен.');
   };
 
   /* Materials Price List Editor */
@@ -2773,17 +3470,20 @@
     document.getElementById('quoteNotes').value = state.current.notes || '';
     document.getElementById('discountVal').value = state.current.discountVal || 0;
     document.getElementById('discountType').value = state.current.discountType || 'percent';
+    document.getElementById('chkContingency').checked = !!state.current.useContingency;
+    document.getElementById('contingencyPct').value = state.current.contingencyPct || 10;
+    document.getElementById('chkVat').checked = !!state.current.useVat;
+    document.getElementById('chkEstimateNote').checked = !!state.current.isPreliminary;
   }
 
   function initUI() {
     applyTheme();
     syncInputsFromState();
-    populatePresetSelect();
     populateCategoryDropdowns();
+    populatePresetSelect();
     populateMatSelect();
     renderRooms();
     updateBottomBar();
-    calcWaste();
   }
 
 
