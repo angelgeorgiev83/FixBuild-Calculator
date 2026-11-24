@@ -297,7 +297,7 @@
     <div class="brand-badge">АГ</div>
     <div>
       <div class="brand-title" id="hdrFirm">ФИКСБИЛД ГРУП ЕООД</div>
-      <div class="brand-sub">Калкулатор за оферти и ремонти (€) · v4.0</div>
+      <div class="brand-sub">Калкулатор за оферти и ремонти (€) · v4.1</div>
     </div>
   </div>
   <div style="display:flex;gap:6px;align-items:center;"><button class="icon-btn" id="installBtn" style="display:none;background:#ea580c;border-color:#fb923c;" onclick="installPWA()">📲 Инсталирай</button><button class="icon-btn" id="themeBtn" onclick="toggleTheme()">🌙 Тъмна</button></div>
@@ -538,6 +538,43 @@
           <input type="checkbox" id="chkEstimateNote" onchange="syncExtras()" style="width:20px;height:20px;min-height:20px;accent-color:var(--primary);cursor:pointer;">
           <span>Предварителна оферта (цени „ОТ“ – преди оглед)</span>
         </label>
+
+        <div style="border-top:1px dashed var(--border);margin:8px 0;"></div>
+        <div style="font-size:11.5px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:6px;">
+          🔒 Скрито разпределение само в труда (не се вижда в офертата)
+        </div>
+
+        <div style="padding:4px 0;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <label style="display:flex;align-items:center;gap:9px;margin:0;color:var(--text);font-size:14px;cursor:pointer;">
+              <input type="checkbox" id="chkGeneralLabor" onchange="syncExtras()" style="width:20px;height:20px;min-height:20px;accent-color:var(--primary);cursor:pointer;">
+              <span>Обща работа (50–1000 €)</span>
+            </label>
+            <div style="display:flex;align-items:center;gap:4px;">
+              <input type="number" step="5" min="50" max="1000" id="generalLaborVal" value="250" oninput="onOverheadInput('general', this.value)" style="width:76px;min-height:34px;padding:4px 6px;text-align:center;font-weight:700;">
+              <span style="font-weight:700;font-size:13px;color:var(--muted);">€</span>
+            </div>
+          </div>
+          <input type="range" min="50" max="1000" step="10" id="generalLaborRange" value="250" oninput="onOverheadSlider('general', this.value)" style="min-height:28px;padding:0;margin-top:4px;accent-color:var(--primary);cursor:pointer;">
+        </div>
+
+        <div style="border-top:1px solid var(--border);margin:6px 0;"></div>
+
+        <div style="padding:4px 0;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <label style="display:flex;align-items:center;gap:9px;margin:0;color:var(--text);font-size:14px;cursor:pointer;">
+              <input type="checkbox" id="chkFuel" onchange="syncExtras()" style="width:20px;height:20px;min-height:20px;accent-color:var(--primary);cursor:pointer;">
+              <span>Гориво / транспорт (5–1000 €)</span>
+            </label>
+            <div style="display:flex;align-items:center;gap:4px;">
+              <input type="number" step="1" min="5" max="1000" id="fuelVal" value="50" oninput="onOverheadInput('fuel', this.value)" style="width:76px;min-height:34px;padding:4px 6px;text-align:center;font-weight:700;">
+              <span style="font-weight:700;font-size:13px;color:var(--muted);">€</span>
+            </div>
+          </div>
+          <input type="range" min="5" max="1000" step="5" id="fuelRange" value="50" oninput="onOverheadSlider('fuel', this.value)" style="min-height:28px;padding:0;margin-top:4px;accent-color:var(--primary);cursor:pointer;">
+        </div>
+
+        <div id="hiddenOverheadStatus" style="font-size:12px;color:var(--muted);margin-top:6px;font-weight:600;"></div>
       </div>
 
       <div>
@@ -1548,7 +1585,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Шпакловки и грундове",
           "name": "Грундиране (стени / тавани)",
           "unit": "кв.м",
-          "price": 1.8,
+          "price": 1.75,
           "range": "0.50 – 3.00 €"
       },
       {
@@ -1564,7 +1601,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Шпакловки и грундове",
           "name": "Шпакловка на фуги на гипсокартон (с лента)",
           "unit": "кв.м",
-          "price": 4.0,
+          "price": 4.17,
           "range": "3.00 – 5.35 €"
       },
       {
@@ -1572,7 +1609,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Шпакловки и грундове",
           "name": "Гипсова шпакловка (1–2 ръце / изправяне)",
           "unit": "кв.м",
-          "price": 6.3,
+          "price": 6.8,
           "range": "3.60 – 10.00 €"
       },
       {
@@ -1580,7 +1617,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Шпакловки и грундове",
           "name": "Шпакловка с армираща мрежа",
           "unit": "кв.м",
-          "price": 7.6,
+          "price": 7.62,
           "range": "7.25 – 8.00 €"
       },
       {
@@ -1588,7 +1625,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Шпакловки и грундове",
           "name": "Фина шпакловка (колор кит / Sheetrock)",
           "unit": "кв.м",
-          "price": 8.8,
+          "price": 8.5,
           "range": "5.00 – 12.00 €"
       },
       {
@@ -1596,7 +1633,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Шпакловки и грундове",
           "name": "Цялостна шпакловка до готов вид (2 ръце + шкурене)",
           "unit": "кв.м",
-          "price": 8.8,
+          "price": 9.5,
           "range": "6.00 – 13.00 €"
       },
       {
@@ -1604,7 +1641,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Шпакловки и грундове",
           "name": "Шлайфане (шкурене) след шпакловка",
           "unit": "кв.м",
-          "price": 2.7,
+          "price": 3.25,
           "range": "1.50 – 5.00 €"
       },
       {
@@ -1612,7 +1649,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Шпакловки и грундове",
           "name": "Монтаж на алуминиеви ъглохранители",
           "unit": "л.м",
-          "price": 4.0,
+          "price": 4.25,
           "range": "3.50 – 5.00 €"
       },
       {
@@ -1620,7 +1657,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Шпакловки и грундове",
           "name": "Обръщане на прозорци и врати (с лайсна)",
           "unit": "л.м",
-          "price": 10.0,
+          "price": 11.0,
           "range": "10.00 – 12.00 €"
       },
       {
@@ -1636,7 +1673,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Боядисване и мазилки",
           "name": "Боядисване с латекс – бяло (2 ръце)",
           "unit": "кв.м",
-          "price": 4.1,
+          "price": 5.25,
           "range": "2.50 – 8.00 €"
       },
       {
@@ -1644,7 +1681,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Боядисване и мазилки",
           "name": "Боядисване с латекс – 1 цвят (2 ръце)",
           "unit": "кв.м",
-          "price": 5.4,
+          "price": 6.5,
           "range": "3.00 – 10.00 €"
       },
       {
@@ -1652,7 +1689,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Боядисване и мазилки",
           "name": "Боядисване с латекс – 2 цвята / отсичане",
           "unit": "кв.м",
-          "price": 6.1,
+          "price": 7.0,
           "range": "4.00 – 10.00 €"
       },
       {
@@ -1668,7 +1705,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Боядисване и мазилки",
           "name": "Боядисване – лукс / безвъздушно машинно",
           "unit": "кв.м",
-          "price": 9.4,
+          "price": 9.5,
           "range": "5.00 – 14.00 €"
       },
       {
@@ -1676,7 +1713,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Боядисване и мазилки",
           "name": "Машинна гипсова мазилка (Турбозол / MP75)",
           "unit": "кв.м",
-          "price": 15.4,
+          "price": 15.0,
           "range": "10.00 – 20.00 €"
       },
       {
@@ -1684,7 +1721,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Боядисване и мазилки",
           "name": "Декоративна / пясъчна мазилка",
           "unit": "кв.м",
-          "price": 18.3,
+          "price": 18.5,
           "range": "12.00 – 25.00 €"
       },
       {
@@ -1700,7 +1737,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Гипсокартон и тавани",
           "name": "Полагане на минерална / каменна вата (в скара)",
           "unit": "кв.м",
-          "price": 3.8,
+          "price": 4.25,
           "range": "2.50 – 6.00 €"
       },
       {
@@ -1708,7 +1745,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Гипсокартон и тавани",
           "name": "Монтаж на гипсокартон върху готова скара",
           "unit": "кв.м",
-          "price": 10.0,
+          "price": 10.5,
           "range": "9.00 – 12.00 €"
       },
       {
@@ -1716,7 +1753,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Гипсокартон и тавани",
           "name": "Ниши за LED осветление / куфари от картон",
           "unit": "л.м",
-          "price": 12.0,
+          "price": 11.5,
           "range": "8.00 – 15.00 €"
       },
       {
@@ -1724,7 +1761,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Гипсокартон и тавани",
           "name": "Преградна стена от гипсокартон (с конструкция)",
           "unit": "кв.м",
-          "price": 19.3,
+          "price": 19.5,
           "range": "11.00 – 28.00 €"
       },
       {
@@ -1732,7 +1769,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Гипсокартон и тавани",
           "name": "Лепене на гипсокартон (суха мазилка)",
           "unit": "кв.м",
-          "price": 19.5,
+          "price": 19.0,
           "range": "13.00 – 25.00 €"
       },
       {
@@ -1740,7 +1777,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Гипсокартон и тавани",
           "name": "Предстенна обшивка от гипсокартон (с конструкция)",
           "unit": "кв.м",
-          "price": 21.25,
+          "price": 21.0,
           "range": "17.00 – 25.00 €"
       },
       {
@@ -1748,7 +1785,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Гипсокартон и тавани",
           "name": "Окачен таван от гипсокартон (едно ниво)",
           "unit": "кв.м",
-          "price": 22.6,
+          "price": 24.0,
           "range": "18.00 – 30.00 €"
       },
       {
@@ -1756,7 +1793,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Гипсокартон и тавани",
           "name": "Окачен таван – много нива / фигури / лукс",
           "unit": "кв.м",
-          "price": 37.5,
+          "price": 38.75,
           "range": "25.00 – 52.50 €"
       },
       {
@@ -1772,7 +1809,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Плочки и бани",
           "name": "Лепене на цокъл от плочки",
           "unit": "л.м",
-          "price": 8.0,
+          "price": 8.5,
           "range": "5.00 – 12.00 €"
       },
       {
@@ -1788,7 +1825,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Плочки и бани",
           "name": "Полагане на фаянс / теракот стандарт (до 60×60)",
           "unit": "кв.м",
-          "price": 28.0,
+          "price": 30.0,
           "range": "20.00 – 40.00 €"
       },
       {
@@ -1804,7 +1841,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Плочки и бани",
           "name": "Полагане на гранитогрес (стандартен)",
           "unit": "кв.м",
-          "price": 34.2,
+          "price": 33.25,
           "range": "21.50 – 45.00 €"
       },
       {
@@ -1812,7 +1849,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Плочки и бани",
           "name": "Полагане на плочки голям формат (60×120)",
           "unit": "кв.м",
-          "price": 47.0,
+          "price": 47.5,
           "range": "40.00 – 55.00 €"
       },
       {
@@ -1820,7 +1857,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Плочки и бани",
           "name": "Монтаж на санитария (мивка, моноблок, смесител, бойлер)",
           "unit": "бр.",
-          "price": 56.0,
+          "price": 52.5,
           "range": "25.00 – 80.00 €"
       },
       {
@@ -1828,7 +1865,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Плочки и бани",
           "name": "Полагане на плочки XXL формат (120×120)",
           "unit": "кв.м",
-          "price": 66.0,
+          "price": 64.5,
           "range": "49.00 – 80.00 €"
       },
       {
@@ -1836,7 +1873,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Плочки и бани",
           "name": "Монтаж на линеен сифон в душ зона",
           "unit": "бр.",
-          "price": 95.0,
+          "price": 100.0,
           "range": "80.00 – 120.00 €"
       },
       {
@@ -1860,7 +1897,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Подови настилки и замазки",
           "name": "Монтаж на первази за ламинат",
           "unit": "л.м",
-          "price": 4.4,
+          "price": 4.38,
           "range": "2.75 – 6.00 €"
       },
       {
@@ -1868,7 +1905,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Подови настилки и замазки",
           "name": "Редене на ламинат (с подложка)",
           "unit": "кв.м",
-          "price": 9.15,
+          "price": 10.75,
           "range": "3.50 – 18.00 €"
       },
       {
@@ -1876,7 +1913,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Подови настилки и замазки",
           "name": "Саморазливна замазка",
           "unit": "кв.м",
-          "price": 13.5,
+          "price": 12.0,
           "range": "6.00 – 18.00 €"
       },
       {
@@ -1884,7 +1921,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Подови настилки и замазки",
           "name": "Циментова подова замазка",
           "unit": "кв.м",
-          "price": 14.1,
+          "price": 15.75,
           "range": "9.50 – 22.00 €"
       },
       {
@@ -1892,7 +1929,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Подови настилки и замазки",
           "name": "Винилова настилка (LVT)",
           "unit": "кв.м",
-          "price": 14.25,
+          "price": 15.5,
           "range": "9.00 – 22.00 €"
       },
       {
@@ -1900,7 +1937,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Подови настилки и замазки",
           "name": "Естествен / трислоен паркет",
           "unit": "кв.м",
-          "price": 20.3,
+          "price": 20.5,
           "range": "11.00 – 30.00 €"
       },
       {
@@ -1908,7 +1945,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Ел. и ВиК услуги",
           "name": "Полагане на ел. кабели",
           "unit": "л.м",
-          "price": 5.7,
+          "price": 6.0,
           "range": "5.00 – 7.00 €"
       },
       {
@@ -1916,7 +1953,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Ел. и ВиК услуги",
           "name": "Монтаж / смяна на ключ, контакт, плафон",
           "unit": "бр.",
-          "price": 19.6,
+          "price": 16.75,
           "range": "6.00 – 27.50 €"
       },
       {
@@ -1924,7 +1961,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Ел. и ВиК услуги",
           "name": "Смяна на ВиК тръби",
           "unit": "л.м",
-          "price": 20.75,
+          "price": 22.5,
           "range": "15.00 – 30.00 €"
       },
       {
@@ -1932,7 +1969,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Ел. и ВиК услуги",
           "name": "Изграждане на Ел. точка (конзола + кабел)",
           "unit": "точка",
-          "price": 21.9,
+          "price": 23.25,
           "range": "11.50 – 35.00 €"
       },
       {
@@ -1940,7 +1977,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Ел. и ВиК услуги",
           "name": "Изграждане на ВиК точка (водопровод / канал)",
           "unit": "точка",
-          "price": 38.3,
+          "price": 38.25,
           "range": "11.50 – 65.00 €"
       },
       {
@@ -1948,7 +1985,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Ел. и ВиК услуги",
           "name": "Монтаж / свързване на Ел. табло",
           "unit": "бр.",
-          "price": 128.0,
+          "price": 132.5,
           "range": "105.00 – 160.00 €"
       },
       {
@@ -1964,7 +2001,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Врати, къртене и контейнер",
           "name": "Къртене на плочки",
           "unit": "кв.м",
-          "price": 9.0,
+          "price": 9.5,
           "range": "7.00 – 12.00 €"
       },
       {
@@ -1980,7 +2017,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Врати, къртене и контейнер",
           "name": "Къртене на тухлена стена",
           "unit": "кв.м",
-          "price": 19.4,
+          "price": 19.75,
           "range": "11.50 – 28.00 €"
       },
       {
@@ -1996,7 +2033,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Врати, къртене и контейнер",
           "name": "Зидария с тухли / Ytong (преградни стени)",
           "unit": "кв.м",
-          "price": 27.6,
+          "price": 28.5,
           "range": "12.00 – 45.00 €"
       },
       {
@@ -2004,7 +2041,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Врати, къртене и контейнер",
           "name": "Лепене на декоративен / естествен камък",
           "unit": "кв.м",
-          "price": 28.75,
+          "price": 30.0,
           "range": "15.00 – 45.00 €"
       },
       {
@@ -2012,7 +2049,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Врати, къртене и контейнер",
           "name": "Демонтаж на врати / прозорци",
           "unit": "бр.",
-          "price": 31.25,
+          "price": 32.5,
           "range": "25.00 – 40.00 €"
       },
       {
@@ -2028,7 +2065,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Врати, къртене и контейнер",
           "name": "Монтаж на интериорна врата",
           "unit": "бр.",
-          "price": 76.0,
+          "price": 75.0,
           "range": "50.00 – 100.00 €"
       },
       {
@@ -2036,7 +2073,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Врати, къртене и контейнер",
           "name": "Извозване на строителни отпадъци (бус)",
           "unit": "курс",
-          "price": 77.5,
+          "price": 75.0,
           "range": "45.00 – 105.00 €"
       },
       {
@@ -2044,7 +2081,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Врати, къртене и контейнер",
           "name": "Монтаж на блиндирана / входна врата",
           "unit": "бр.",
-          "price": 121.0,
+          "price": 125.0,
           "range": "90.00 – 160.00 €"
       },
       {
@@ -2076,7 +2113,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Пакетни (Труд + Материал)",
           "name": "Фина шпакловка (с шлайфане) – труд + мат.",
           "unit": "кв.м",
-          "price": 18.5,
+          "price": 19.0,
           "range": "16.00 – 22.00 €"
       },
       {
@@ -2100,7 +2137,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Пакетни (Труд + Материал)",
           "name": "Топлоизолация EPS 8 см – труд + мат.",
           "unit": "кв.м",
-          "price": 40.6,
+          "price": 41.75,
           "range": "28.50 – 55.00 €"
       },
       {
@@ -2108,7 +2145,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Пакетни (Труд + Материал)",
           "name": "Топлоизолация EPS 10 см – труд + мат.",
           "unit": "кв.м",
-          "price": 50.3,
+          "price": 51.5,
           "range": "41.00 – 62.00 €"
       },
       {
@@ -2116,7 +2153,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Пакетни (Труд + Материал)",
           "name": "Топлоизолация EPS 12 см – труд + мат.",
           "unit": "кв.м",
-          "price": 55.0,
+          "price": 56.5,
           "range": "45.00 – 68.00 €"
       },
       {
@@ -2124,7 +2161,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Пакетни (Труд + Материал)",
           "name": "Каменна вата 8 см фасадна – труд + мат.",
           "unit": "кв.м",
-          "price": 59.0,
+          "price": 60.0,
           "range": "50.00 – 70.00 €"
       },
       {
@@ -2140,7 +2177,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
           "cat": "Пакетни (Труд + Материал)",
           "name": "Ремонт на баня – пълен (къртене, ВиК, хидроиз., плочки)",
           "unit": "бр.",
-          "price": 4500.0,
+          "price": 4750.0,
           "range": "3500 – 6000 €"
       }
   ];
@@ -2166,6 +2203,10 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
       contingencyPct: 10,
       useVat: false,
       isPreliminary: false,
+      useGeneralLabor: false,
+      generalLaborVal: 250,
+      useFuel: false,
+      fuelVal: 50,
       notes: 'Валидност на офертата: 14 дни. Посочените цени са в евро (€).',
       rooms: [
         { id: 'r1', name: 'Хол', items: [] }
@@ -2176,7 +2217,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
   function defaultState() {
     return {
       theme: 'light',
-      pricesVersion: 4,
+      pricesVersion: 5,
       company: {
         name: 'ФИКСБИЛД ГРУП ЕООД',
         city: 'гр. Пловдив',
@@ -2206,12 +2247,12 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
         }
       }
     } catch (e) {}
-    if (state.pricesVersion !== 4) {
+    if (state.pricesVersion !== 5) {
       var customPrices = (state.prices || []).filter(function(p) {
         return String(p.id || '').indexOf('p_') === 0;
       });
       state.prices = customPrices.concat(JSON.parse(JSON.stringify(DEFAULT_PRICES)));
-      state.pricesVersion = 4;
+      state.pricesVersion = 5;
       persistState();
     }
     if (!Array.isArray(state.materials) || !state.materials.length) {
@@ -2261,17 +2302,66 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
     return state.current.rooms[0];
   }
 
-  function computeTotals(q) {
-    var labor = 0;
-    var mat = 0;
+  function getEffectiveRooms(q) {
+    var rawLabor = 0;
+    var rawMat = 0;
     for (var i = 0; i < q.rooms.length; i++) {
       var items = q.rooms[i].items || [];
       for (var j = 0; j < items.length; j++) {
         var line = (Number(items[j].qty) || 0) * (Number(items[j].price) || 0);
-        if (items[j].type === 'material') mat += line;
-        else labor += line;
+        if (items[j].type === 'material') rawMat += line;
+        else rawLabor += line;
       }
     }
+    var genVal = q.useGeneralLabor ? Math.max(0, Number(q.generalLaborVal) || 0) : 0;
+    var fuelVal = q.useFuel ? Math.max(0, Number(q.fuelVal) || 0) : 0;
+    var hiddenOverhead = genVal + fuelVal;
+    var laborMult = (hiddenOverhead > 0 && rawLabor > 0) ? ((rawLabor + hiddenOverhead) / rawLabor) : 1;
+
+    var effRooms = [];
+    var effLabor = 0;
+    var effMat = 0;
+    for (var rIdx = 0; rIdx < q.rooms.length; rIdx++) {
+      var r = q.rooms[rIdx];
+      var effItems = [];
+      var rItems = r.items || [];
+      for (var k = 0; k < rItems.length; k++) {
+        var it = rItems[k];
+        var qty = Number(it.qty) || 0;
+        var basePrice = Number(it.price) || 0;
+        var effPrice = (it.type !== 'material' && laborMult !== 1)
+          ? (Math.round(basePrice * laborMult * 100) / 100)
+          : basePrice;
+        var effSum = Math.round(qty * effPrice * 100) / 100;
+        if (it.type === 'material') effMat += effSum;
+        else effLabor += effSum;
+        effItems.push({
+          id: it.id,
+          type: it.type,
+          name: it.name,
+          qty: qty,
+          unit: it.unit,
+          price: effPrice,
+          sum: effSum
+        });
+      }
+      effRooms.push({ id: r.id, name: r.name, items: effItems });
+    }
+    return {
+      rooms: effRooms,
+      rawLabor: rawLabor,
+      rawMat: rawMat,
+      hiddenOverhead: hiddenOverhead,
+      laborMult: laborMult,
+      labor: effLabor,
+      mat: effMat
+    };
+  }
+
+  function computeTotals(q) {
+    var eff = getEffectiveRooms(q);
+    var labor = eff.labor;
+    var mat = eff.mat;
     var sub = labor + mat;
     var dVal = Number(q.discountVal) || 0;
     var discount = 0;
@@ -2289,6 +2379,9 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
     return {
       labor: labor,
       mat: mat,
+      rawLabor: eff.rawLabor,
+      hiddenOverhead: eff.hiddenOverhead,
+      laborMult: eff.laborMult,
       sub: sub,
       discount: discount,
       contingency: contingency,
@@ -2351,12 +2444,48 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
     updateBottomBar();
   };
 
+  window.onOverheadSlider = function(kind, val) {
+    var num = parseFloat(val) || 0;
+    if (kind === 'general') {
+      document.getElementById('generalLaborVal').value = num;
+      document.getElementById('chkGeneralLabor').checked = true;
+    } else {
+      document.getElementById('fuelVal').value = num;
+      document.getElementById('chkFuel').checked = true;
+    }
+    window.syncExtras();
+  };
+
+  window.onOverheadInput = function(kind, val) {
+    var num = parseFloat(val);
+    if (isNaN(num)) return;
+    if (kind === 'general') {
+      var clampedG = Math.min(1000, Math.max(50, num));
+      document.getElementById('generalLaborRange').value = clampedG;
+      document.getElementById('chkGeneralLabor').checked = true;
+    } else {
+      var clampedF = Math.min(1000, Math.max(5, num));
+      document.getElementById('fuelRange').value = clampedF;
+      document.getElementById('chkFuel').checked = true;
+    }
+    window.syncExtras();
+  };
+
   window.syncExtras = function() {
     state.current.useContingency = document.getElementById('chkContingency').checked;
     var pct = parseFloat(document.getElementById('contingencyPct').value);
     state.current.contingencyPct = (!isNaN(pct) && pct > 0) ? pct : 10;
     state.current.useVat = document.getElementById('chkVat').checked;
     state.current.isPreliminary = document.getElementById('chkEstimateNote').checked;
+
+    state.current.useGeneralLabor = document.getElementById('chkGeneralLabor').checked;
+    var gVal = parseFloat(document.getElementById('generalLaborVal').value);
+    state.current.generalLaborVal = (!isNaN(gVal) && gVal >= 50) ? Math.min(1000, gVal) : 250;
+
+    state.current.useFuel = document.getElementById('chkFuel').checked;
+    var fVal = parseFloat(document.getElementById('fuelVal').value);
+    state.current.fuelVal = (!isNaN(fVal) && fVal >= 5) ? Math.min(1000, fVal) : 50;
+
     persistState();
     updateBottomBar();
   };
@@ -2630,7 +2759,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
       var ih = '';
       for (var j = 0; j < active.items.length; j++) {
         var it = active.items[j];
-        var sum = (Number(it.qty) || 0) * (Number(it.price) || 0);
+        var sum = it.sum;
         roomSum += sum;
         var badge = it.type === 'material'
           ? '<span class="badge-type badge-mat">Материал</span>'
@@ -2659,6 +2788,23 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
     if (state.current.useContingency) suffix += ' (+' + t.contingencyPct + '%)';
     if (state.current.useVat) suffix += ' (с ДДС)';
     document.getElementById('barTotal').textContent = fmt(t.grand) + ' €' + suffix;
+
+    var statusEl = document.getElementById('hiddenOverheadStatus');
+    if (statusEl) {
+      if (t.hiddenOverhead > 0) {
+        if (t.rawLabor > 0) {
+          var pctAdd = ((t.laborMult - 1) * 100).toFixed(1);
+          statusEl.style.color = 'var(--success)';
+          statusEl.textContent = '✓ Разпределени скрито в труда: +' + fmt(t.hiddenOverhead) + ' € (+' + pctAdd + '% върху цените за труд)';
+        } else {
+          statusEl.style.color = 'var(--primary)';
+          statusEl.textContent = '⚠️ Добави поне 1 позиция Труд, за да се разпределят +' + fmt(t.hiddenOverhead) + ' € скрито.';
+        }
+      } else {
+        statusEl.style.color = 'var(--muted)';
+        statusEl.textContent = '';
+      }
+    }
   }
 
   function renderQuoteSheet() {
@@ -2685,9 +2831,10 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
       '<strong>Обект:</strong> ' + esc(q.clientAddress || '—') +
     '</div>';
 
+    var effRooms = getEffectiveRooms(q).rooms;
     var hasAny = false;
-    for (var i = 0; i < q.rooms.length; i++) {
-      var r = q.rooms[i];
+    for (var i = 0; i < effRooms.length; i++) {
+      var r = effRooms[i];
       if (!r.items || !r.items.length) continue;
       hasAny = true;
       var rSum = 0;
@@ -2697,7 +2844,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
       '</tr></thead><tbody>';
       for (var j = 0; j < r.items.length; j++) {
         var it = r.items[j];
-        var s = (Number(it.qty) || 0) * (Number(it.price) || 0);
+        var s = it.sum;
         rSum += s;
         var prefix = it.type === 'material' ? '[Мат.] ' : '';
         html += '<tr>' +
@@ -2780,10 +2927,11 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
     y += 110; // Header
     y += 105; // Client box
 
+    var effPngRooms = getEffectiveRooms(q).rooms;
     var roomBlocks = [];
     tctx.font = '24px Arial, sans-serif';
-    for (var i = 0; i < q.rooms.length; i++) {
-      var r = q.rooms[i];
+    for (var i = 0; i < effPngRooms.length; i++) {
+      var r = effPngRooms[i];
       if (!r.items || !r.items.length) continue;
       y += 58; // Room bar + table header
       y += 38;
@@ -3128,13 +3276,14 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
     if (q.clientAddress) lines.push('📍 Обект: ' + q.clientAddress);
     lines.push('');
 
-    for (var i = 0; i < q.rooms.length; i++) {
-      var r = q.rooms[i];
+    var effViberRooms = getEffectiveRooms(q).rooms;
+    for (var i = 0; i < effViberRooms.length; i++) {
+      var r = effViberRooms[i];
       if (!r.items || !r.items.length) continue;
       lines.push('🔹 ' + r.name.toUpperCase() + ':');
       for (var j = 0; j < r.items.length; j++) {
         var it = r.items[j];
-        var s = (Number(it.qty) || 0) * (Number(it.price) || 0);
+        var s = it.sum;
         var tag = it.type === 'material' ? '[Мат.] ' : '';
         lines.push('• ' + tag + it.name + ' — ' + it.qty + ' ' + it.unit + ' × ' + fmt(it.price) + ' € = ' + fmt(s) + ' €');
       }
@@ -3319,7 +3468,7 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
   window.resetDefaultPrices = function() {
     if (!window.confirm('Да възстановим целия ценоразпис от ' + DEFAULT_PRICES.length + ' услуги със средните пазарни цени? (Вашите оферти и материали няма да се променят.)')) return;
     state.prices = JSON.parse(JSON.stringify(DEFAULT_PRICES));
-    state.pricesVersion = 4;
+    state.pricesVersion = 5;
     persistState();
     renderPriceListEditor();
     populatePresetSelect();
@@ -3474,6 +3623,14 @@ var LABOR_CATEGORIES = ["Шпакловки и грундове", "Боядис�
     document.getElementById('contingencyPct').value = state.current.contingencyPct || 10;
     document.getElementById('chkVat').checked = !!state.current.useVat;
     document.getElementById('chkEstimateNote').checked = !!state.current.isPreliminary;
+    document.getElementById('chkGeneralLabor').checked = !!state.current.useGeneralLabor;
+    var gV = state.current.generalLaborVal || 250;
+    document.getElementById('generalLaborVal').value = gV;
+    document.getElementById('generalLaborRange').value = gV;
+    document.getElementById('chkFuel').checked = !!state.current.useFuel;
+    var fV = state.current.fuelVal || 50;
+    document.getElementById('fuelVal').value = fV;
+    document.getElementById('fuelRange').value = fV;
   }
 
   function initUI() {
