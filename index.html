@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <meta name="theme-color" content="#0f172a" />
-  <title>FixBuild v4.4 — Калкулатор за оферти и договори | ФИКСБИЛД ГРУП ЕООД</title>
+  <title>FixBuild v4.4.1 — Калкулатор, Оферти и Договори | ФИКСБИЛД ГРУП ЕООД</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/png" href="icon-192.png" />
   <style>
@@ -56,9 +56,9 @@
       align-items: center;
       gap: 10px;
     }
-    .brand-logo {
-      width: 38px;
-      height: 38px;
+    .brand-logo-wrap {
+      width: 40px;
+      height: 40px;
       border-radius: 10px;
       background: linear-gradient(135deg, #f97316, #c2410c);
       display: flex;
@@ -66,9 +66,16 @@
       justify-content: center;
       font-weight: 900;
       color: #fff;
-      font-size: 16px;
+      font-size: 15px;
+      overflow: hidden;
       box-shadow: 0 2px 10px rgba(249,115,22,0.35);
       flex-shrink: 0;
+    }
+    .brand-logo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
     .brand-title { font-weight: 800; font-size: 15px; letter-spacing: 0.3px; }
     .brand-sub { font-size: 11px; color: var(--muted); }
@@ -143,6 +150,7 @@
     .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; }
     .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
     .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+    .grid-5 { display: grid; grid-template-columns: repeat(auto-fit, minmax(115px, 1fr)); gap: 8px; }
 
     label.field { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
     input[type="text"], input[type="number"], input[type="date"], select, textarea {
@@ -179,6 +187,7 @@
     .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
     .btn-green { background: #16a34a; border-color: #16a34a; color: #fff; }
     .btn-blue { background: #0284c7; border-color: #0284c7; color: #fff; }
+    .btn-purple { background: #7c3aed; border-color: #7c3aed; color: #fff; }
     .btn-red { background: #dc2626; border-color: #dc2626; color: #fff; }
     .btn-sm { padding: 5px 9px; font-size: 12px; border-radius: 7px; }
 
@@ -201,6 +210,30 @@
       margin-left: 4px;
       font-size: 11px;
     }
+
+    /* Room Dimensions Box (restored from v4.3) */
+    .dim-box {
+      background: rgba(15, 23, 42, 0.72);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin: 8px 0 10px 0;
+    }
+    .dim-metrics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .dim-pill {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .dim-pill strong { color: #fb923c; font-size: 13px; }
 
     .catalog-box {
       max-height: 310px;
@@ -301,7 +334,7 @@
     .save-banner.show { display: block; }
     .save-banner-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 
-    /* Offer & Contract A4 Paper Card (matching v4.3 screenshots) */
+    /* Offer & Contract A4 Paper Card */
     .paper-card {
       background: var(--paper);
       color: var(--paper-ink);
@@ -320,6 +353,16 @@
       padding-bottom: 14px;
       margin-bottom: 16px;
       flex-wrap: wrap;
+    }
+    .paper-brand { display: flex; align-items: center; gap: 12px; }
+    .paper-logo {
+      width: 52px;
+      height: 52px;
+      border-radius: 10px;
+      object-fit: cover;
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      flex-shrink: 0;
     }
     .paper-company { font-size: 20px; font-weight: 900; color: #0f172a; }
     .paper-meta { font-size: 12px; color: #475569; margin-top: 3px; }
@@ -457,13 +500,11 @@
     .bottom-nums strong { color: #fff; }
     .bottom-grand { font-size: 17px; font-weight: 900; color: #fb923c; }
 
-    /* Saved Offer highlight animation */
     .highlight-saved {
       outline: 2px solid #22c55e;
       background: rgba(34, 197, 94, 0.12) !important;
     }
 
-    /* Print styling for Offer or 2-copy Contract */
     #print-container { display: none; }
     @media print {
       body { background: #fff !important; color: #000 !important; padding: 0 !important; }
@@ -479,8 +520,7 @@
         max-width: 100% !important;
       }
       .page-break { page-break-before: always; break-before: page; }
-      .paper-room-bar { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .paper-grand-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .paper-room-bar, .paper-grand-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
   </style>
 </head>
@@ -489,16 +529,19 @@
 <header class="topbar">
   <div class="topbar-inner">
     <div class="brand">
-      <div class="brand-logo">FB</div>
+      <div class="brand-logo-wrap" id="hdr-logo-wrap">
+        <img src="icon-192.png" alt="FB" onerror="this.style.display='none'; this.parentNode.textContent='FB';" />
+      </div>
       <div>
-        <div class="brand-title"><span id="hdr-company-name">ФИКСБИЛД ГРУП ЕООД</span> <span class="version-badge">v4.4</span></div>
+        <div class="brand-title"><span id="hdr-company-name">ФИКСБИЛД ГРУП ЕООД</span> <span class="version-badge">v4.4.1</span></div>
         <div class="brand-sub" id="hdr-company-sub">гр. Пловдив • тел. 0886 321 665 • Калкулатор, Оферти и Договори (€)</div>
       </div>
     </div>
     <div class="nav-tabs">
-      <button class="tab-btn active" data-tab="tab-calc" onclick="switchTab('tab-calc')">1. Калкулатор</button>
-      <button class="tab-btn" data-tab="tab-offer" onclick="switchTab('tab-offer')">2. Оферта и Договор</button>
-      <button class="tab-btn" data-tab="tab-prices" onclick="switchTab('tab-prices')">3. Цени и Архив</button>
+      <button class="tab-btn active" data-tab="tab-calc" onclick="switchTab('tab-calc')">1. Обект</button>
+      <button class="tab-btn" data-tab="tab-offer" onclick="switchTab('tab-offer')">2. Оферта</button>
+      <button class="tab-btn" data-tab="tab-contract" onclick="switchTab('tab-contract')">3. Договор</button>
+      <button class="tab-btn" data-tab="tab-prices" onclick="switchTab('tab-prices')">4. Цени и Архив</button>
       <button class="saved-pill" onclick="jumpToSavedOffers()">📂 Запазени (<span id="saved-count-badge">0</span>)</button>
     </div>
   </div>
@@ -506,7 +549,7 @@
 
 <main class="container">
 
-  <!-- ===================== TAB 1: КАЛКУЛАТОР ===================== -->
+  <!-- ===================== TAB 1: ОБЕКТ / КАЛКУЛАТОР ===================== -->
   <section id="tab-calc" class="tab-panel active">
     <div class="card">
       <h2>
@@ -545,12 +588,40 @@
         </div>
       </h2>
       <div class="chips" id="room-chips"></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px;">
-        <div style="font-size:13px;color:var(--muted);">Активна секция: <strong id="active-room-label" style="color:#fff;"></strong></div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <button class="btn btn-sm" onclick="addWasteToActiveRoom(10)" title="Добавя 10% фира към количествата на материалите в тази стая">➕ 10% фира (материали)</button>
-          <button class="btn btn-sm btn-red" onclick="deleteActiveRoom()">🗑️ Изтрий секцията</button>
+
+      <!-- Калкулатор за размери на стаята (възстановен от v4.3) -->
+      <div class="dim-box">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:6px;">
+          <strong style="font-size:13px;">📐 Размери на „<span id="active-room-label"></span>“ (автоматично смята Под, Таван, Стени и Периметър)</strong>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="btn btn-sm" onclick="addWasteToActiveRoom(10)" title="Добавя 10% фира към количествата на материалите в тази стая">➕ 10% фира (материали)</button>
+            <button class="btn btn-sm btn-red" onclick="deleteActiveRoom()">🗑️ Изтрий секцията</button>
+          </div>
         </div>
+        <div class="grid-5">
+          <label class="field">Дължина (м)
+            <input type="number" step="0.05" min="0" id="dim-len" placeholder="напр. 5.0" oninput="updateRoomDimensions()" />
+          </label>
+          <label class="field">Ширина (м)
+            <input type="number" step="0.05" min="0" id="dim-wid" placeholder="напр. 4.0" oninput="updateRoomDimensions()" />
+          </label>
+          <label class="field">Височина (м)
+            <input type="number" step="0.05" min="0" id="dim-hei" placeholder="2.60" oninput="updateRoomDimensions()" />
+          </label>
+          <label class="field">Прозорци/Врати (м²)
+            <input type="number" step="0.1" min="0" id="dim-deduct" placeholder="0" oninput="updateRoomDimensions()" />
+          </label>
+          <label class="field">Бързо попълване
+            <select id="dim-quick-apply" onchange="applyDimToLastItem(this.value); this.value='';">
+              <option value="">Вземи площ →</option>
+              <option value="floor">Под / Таван (кв.м)</option>
+              <option value="walls">Стени (кв.м)</option>
+              <option value="all">Стени + Таван (кв.м)</option>
+              <option value="perim">Периметър (л.м)</option>
+            </select>
+          </label>
+        </div>
+        <div class="dim-metrics" id="dim-metrics-bar"></div>
       </div>
 
       <div style="overflow-x:auto;">
@@ -588,7 +659,7 @@
       <div class="catalog-box" id="catalog-picker-list"></div>
     </div>
 
-    <!-- Скрито разпределение + Надбавки -->
+    <!-- Скрито разпределение + Надбавки и Отстъпка -->
     <div class="grid-2">
       <div class="card hidden-box">
         <h2>
@@ -635,7 +706,7 @@
       </div>
 
       <div class="card">
-        <h2>⚙️ Допълнителни настройки и надбавки</h2>
+        <h2>⚙️ Допълнителни настройки, Отстъпка и ДДС</h2>
         <div class="check-row">
           <label class="check-left">
             <input type="checkbox" id="opt-weekend-on" onchange="recalcAll()" />
@@ -643,6 +714,15 @@
           </label>
           <div class="check-right">
             <input type="number" min="0" max="200" step="5" id="opt-weekend-pct" value="25" oninput="recalcAll()" /> <span>%</span>
+          </div>
+        </div>
+        <div class="check-row">
+          <label class="check-left">
+            <input type="checkbox" id="opt-discount-on" onchange="recalcAll()" />
+            Отстъпка за клиента (% от крайната сума)
+          </label>
+          <div class="check-right">
+            <input type="number" min="0" max="50" step="1" id="opt-discount-pct" value="5" oninput="recalcAll()" /> <span>%</span>
           </div>
         </div>
         <div class="check-row">
@@ -665,12 +745,12 @@
     </div>
   </section>
 
-  <!-- ===================== TAB 2: ОФЕРТА И ДОГОВОР ===================== -->
+  <!-- ===================== TAB 2: ОФЕРТА ===================== -->
   <section id="tab-offer" class="tab-panel">
     <div id="save-confirm-banner" class="save-banner">
       <div style="font-weight:800;font-size:14px;">✅ Офертата е запазена успешно!</div>
       <div style="font-size:13px;margin-top:3px;">
-        📍 <strong>Къде е запазена:</strong> Във вътрешната памет на приложението → Таб <strong>„3. Цени и Архив“</strong> → секция <strong>„Запазени оферти“</strong> (или натисни бутона по-долу да я свалиш като файл на устройството).
+        📍 <strong>Къде е запазена:</strong> Във вътрешната памет на приложението → Таб <strong>„4. Цени и Архив“</strong> → секция <strong>„Запазени оферти“</strong> (или свали файла директно на устройството си).
       </div>
       <div class="save-banner-actions">
         <button class="btn btn-sm btn-green" onclick="jumpToSavedOffers(lastSavedOfferId)">📂 Отвори запазените оферти</button>
@@ -682,114 +762,109 @@
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <button class="btn btn-primary" id="btn-sub-offer" onclick="setDocSubView('offer')">📄 Преглед на Оферта</button>
-          <button class="btn btn-blue" id="btn-sub-contract" onclick="setDocSubView('contract')">📝 Договор по офертата</button>
-        </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
           <button class="btn btn-green" onclick="saveCurrentOffer()">💾 Запази оферта</button>
-          <button class="btn" onclick="copyOfferForViber()">📋 Копирай за Viber</button>
+          <button class="btn btn-purple" onclick="exportOfferAsPng()">📸 Снимка (PNG за Viber)</button>
+          <button class="btn" onclick="copyOfferForViber()">📋 Текст за Viber</button>
           <button class="btn btn-primary" onclick="printOffer()">🖨️ Печат / PDF Оферта</button>
         </div>
+        <button class="btn btn-blue" onclick="switchTab('tab-contract')">📝 Премини към Договор →</button>
       </div>
     </div>
 
-    <!-- SUB-VIEW 1: ОФЕРТА -->
-    <div id="subview-offer">
-      <div class="paper-card" id="offer-paper-preview"></div>
-    </div>
+    <div class="paper-card" id="offer-paper-preview"></div>
+  </section>
 
-    <!-- SUB-VIEW 2: ДОГОВОР -->
-    <div id="subview-contract" style="display:none;">
-      <div class="card">
-        <h2>
-          <span>📝 Настройки на Договора за СМР (корекции преди печат)</span>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <button class="btn btn-green btn-sm" onclick="saveContractToArchive()">💾 Запази договора в архива</button>
-            <button class="btn btn-sm" onclick="printContract(1)">🖨️ Печат / PDF (1 екз.)</button>
-            <button class="btn btn-primary btn-sm" onclick="printContract(2)">🖨️ Печат / PDF (2 екземпляра)</button>
-          </div>
-        </h2>
-
-        <div class="grid-4" style="margin-bottom:10px;">
-          <label class="field">Възложител (Име и фамилия)
-            <input type="text" id="ctr-client-name" oninput="renderContractPreview()" />
-          </label>
-          <label class="field">ЕГН / № на Лична карта
-            <input type="text" id="ctr-client-egn" placeholder="по желание" oninput="renderContractPreview()" />
-          </label>
-          <label class="field">Адрес на обекта
-            <input type="text" id="ctr-address" oninput="renderContractPreview()" />
-          </label>
-          <label class="field">Дата на договора
-            <input type="date" id="ctr-date" oninput="renderContractPreview()" />
-          </label>
+  <!-- ===================== TAB 3: ДОГОВОР (ОТДЕЛЕН ТАБ!) ===================== -->
+  <section id="tab-contract" class="tab-panel">
+    <div class="card">
+      <h2>
+        <span>📝 Договор за СМР по Оферта № <span id="ctr-offer-num-badge" style="color:#fb923c;"></span></span>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn btn-green btn-sm" onclick="saveContractToArchive()">💾 Запази договора в архива</button>
+          <button class="btn btn-sm" onclick="printContract(1)">🖨️ Печат / PDF (1 екз.)</button>
+          <button class="btn btn-primary btn-sm" onclick="printContract(2)">🖨️ Печат / PDF (2 екземпляра)</button>
         </div>
+      </h2>
 
-        <div class="grid-4" style="margin-bottom:12px;">
-          <label class="field">Срок за изпълнение (дни)
-            <input type="number" id="ctr-days" value="15" min="1" oninput="renderContractPreview()" />
-          </label>
-          <label class="field">Тип дни
-            <select id="ctr-days-type" onchange="renderContractPreview()">
-              <option value="работни дни">работни дни</option>
-              <option value="календарни дни">календарни дни</option>
-            </select>
-          </label>
-          <label class="field">Осигуряване на материалите
-            <select id="ctr-materials-mode" onchange="renderContractPreview()">
-              <option value="Изпълнителят осигурява и доставя описаните в Офертата материали, а финалните облицовъчни и санитарни изделия (плочки, санитария, врати, ламинат) се осигуряват от Възложителя.">Комбинирано (груби от Изпълнителя, финални от Възложителя)</option>
-              <option value="Всички материали, включени в Офертата (Приложение №1), се осигуряват и доставят от Изпълнителя.">Изцяло от Изпълнителя (по Офертата)</option>
-              <option value="Всички строителни и довършителни материали се осигуряват и доставят на обекта от Възложителя.">Изцяло от Възложителя</option>
-            </select>
-          </label>
-          <label class="field">Гаранционен срок (месеци)
-            <input type="number" id="ctr-warranty" value="24" min="0" oninput="renderContractPreview()" />
-          </label>
-        </div>
-
-        <h3 style="margin-top:4px;font-size:14px;">💳 Избор на схема на плащане (автоматично разпределение на крайната сума в €)</h3>
-        <div class="scheme-cards">
-          <div class="scheme-card active" id="scheme-card-1" onclick="selectPaymentScheme(1)">
-            <div class="sc-title">Вариант 1: 4 етапа (3 × 30% + 10%)</div>
-            <div class="sc-desc">30% аванс + 30% етап 2 + 30% етап 3 + 10% на финал при предаване</div>
-          </div>
-          <div class="scheme-card" id="scheme-card-2" onclick="selectPaymentScheme(2)">
-            <div class="sc-title">Вариант 2: 3 етапа (50% + 40% + 10%)</div>
-            <div class="sc-desc">50% първоначално (при повече материали) + 40% междинен + 10% при предаване</div>
-          </div>
-          <div class="scheme-card" id="scheme-card-3" onclick="selectPaymentScheme(3)">
-            <div class="sc-title">Вариант 3: По договаряне (свободни %)</div>
-            <div class="sc-desc">Въвеждаш процентите и етапите според договорката с клиента (сбор 100%)</div>
-          </div>
-        </div>
-
-        <div id="custom-scheme-editor" style="display:none;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:6px;">
-            <strong style="font-size:13px;">Редакция на етапите по договаряне:</strong>
-            <div style="display:flex;gap:8px;align-items:center;">
-              <span id="custom-pct-status" style="font-size:12px;font-weight:700;"></span>
-              <button class="btn btn-sm btn-primary" onclick="addCustomStage()">+ Добави вноска</button>
-            </div>
-          </div>
-          <div id="custom-stages-list"></div>
-        </div>
-
-        <label class="field">Допълнителни уговорки към договора (по желание)
-          <textarea id="ctr-extra-notes" rows="2" placeholder="напр. Работно време на обекта 08:30 – 17:30 ч. при спазване на тихите часове." oninput="renderContractPreview()"></textarea>
+      <div class="grid-4" style="margin-bottom:10px;">
+        <label class="field">Възложител (Име и фамилия)
+          <input type="text" id="ctr-client-name" oninput="renderContractPreview()" />
+        </label>
+        <label class="field">ЕГН / № на Лична карта
+          <input type="text" id="ctr-client-egn" placeholder="по желание" oninput="renderContractPreview()" />
+        </label>
+        <label class="field">Адрес на обекта
+          <input type="text" id="ctr-address" oninput="renderContractPreview()" />
+        </label>
+        <label class="field">Дата на договора
+          <input type="date" id="ctr-date" oninput="renderContractPreview()" />
         </label>
       </div>
 
-      <div class="paper-card" id="contract-paper-preview"></div>
+      <div class="grid-4" style="margin-bottom:12px;">
+        <label class="field">Срок за изпълнение (дни)
+          <input type="number" id="ctr-days" value="15" min="1" oninput="renderContractPreview()" />
+        </label>
+        <label class="field">Тип дни
+          <select id="ctr-days-type" onchange="renderContractPreview()">
+            <option value="работни дни">работни дни</option>
+            <option value="календарни дни">календарни дни</option>
+          </select>
+        </label>
+        <label class="field">Осигуряване на материалите
+          <select id="ctr-materials-mode" onchange="renderContractPreview()">
+            <option value="Изпълнителят осигурява и доставя описаните в Офертата материали, а финалните облицовъчни и санитарни изделия (плочки, санитария, врати, ламинат) се осигуряват от Възложителя.">Комбинирано (груби от Изпълнителя, финални от Възложителя)</option>
+            <option value="Всички материали, включени в Офертата (Приложение №1), се осигуряват и доставят от Изпълнителя.">Изцяло от Изпълнителя (по Офертата)</option>
+            <option value="Всички строителни и довършителни материали се осигуряват и доставят на обекта от Възложителя.">Изцяло от Възложителя</option>
+          </select>
+        </label>
+        <label class="field">Гаранционен срок (месеци)
+          <input type="number" id="ctr-warranty" value="24" min="0" oninput="renderContractPreview()" />
+        </label>
+      </div>
+
+      <h3 style="margin-top:4px;font-size:14px;">💳 Избор на схема на плащане (автоматично разпределение на крайната сума в €)</h3>
+      <div class="scheme-cards">
+        <div class="scheme-card active" id="scheme-card-1" onclick="selectPaymentScheme(1)">
+          <div class="sc-title">Вариант 1: 4 етапа (3 × 30% + 10%)</div>
+          <div class="sc-desc">30% аванс + 30% етап 2 + 30% етап 3 + 10% на финал при предаване</div>
+        </div>
+        <div class="scheme-card" id="scheme-card-2" onclick="selectPaymentScheme(2)">
+          <div class="sc-title">Вариант 2: 3 етапа (50% + 40% + 10%)</div>
+          <div class="sc-desc">50% първоначално (при повече материали) + 40% междинен + 10% при предаване</div>
+        </div>
+        <div class="scheme-card" id="scheme-card-3" onclick="selectPaymentScheme(3)">
+          <div class="sc-title">Вариант 3: По договаряне (свободни %)</div>
+          <div class="sc-desc">Въвеждаш процентите и етапите според договорката с клиента (сбор 100%)</div>
+        </div>
+      </div>
+
+      <div id="custom-scheme-editor" style="display:none;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:6px;">
+          <strong style="font-size:13px;">Редакция на етапите по договаряне:</strong>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span id="custom-pct-status" style="font-size:12px;font-weight:700;"></span>
+            <button class="btn btn-sm btn-primary" onclick="addCustomStage()">+ Добави вноска</button>
+          </div>
+        </div>
+        <div id="custom-stages-list"></div>
+      </div>
+
+      <label class="field">Допълнителни уговорки към договора (по желание)
+        <textarea id="ctr-extra-notes" rows="2" placeholder="напр. Работно време на обекта 08:30 – 17:30 ч. при спазване на тихите часове." oninput="renderContractPreview()"></textarea>
+      </label>
     </div>
+
+    <div class="paper-card" id="contract-paper-preview"></div>
   </section>
 
-  <!-- ===================== TAB 3: ЦЕНИ, НАСТРОЙКИ И АРХИВ ===================== -->
+  <!-- ===================== TAB 4: ЦЕНИ, НАСТРОЙКИ И АРХИВ ===================== -->
   <section id="tab-prices" class="tab-panel">
-    <!-- Запазени оферти и договори -->
     <div class="card" id="saved-offers-section">
       <h2>
         <span>📂 Запазени оферти и договори (в паметта на приложението)</span>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn btn-sm" onclick="scanLegacyStorage()">🔍 Потърси стари оферти (от v4.3)</button>
           <label class="btn btn-sm btn-blue" style="cursor:pointer;">
             ⬆️ Импортирай (.json)
             <input type="file" accept=".json" style="display:none;" onchange="importOfferFromFile(event)" />
@@ -802,12 +877,11 @@
       <div id="saved-offers-list"></div>
     </div>
 
-    <!-- Онлайн ъпдейт и Фирмени данни -->
     <div class="grid-2">
       <div class="card">
         <h2>🔄 Онлайн обновяване на ценоразписа (GitHub)</h2>
         <p style="font-size:12.5px;color:var(--muted);margin:0 0 10px 0;">
-          Текуща база: <strong id="db-version-info" style="color:#fff;">v4.4</strong> •
+          Текуща база: <strong id="db-version-info" style="color:#fff;">v4.4.1</strong> •
           Услуги: <strong id="db-srv-count" style="color:#fb923c;">0</strong> •
           Материали: <strong id="db-mat-count" style="color:#7dd3fc;">0</strong>
         </p>
@@ -844,7 +918,6 @@
       </div>
     </div>
 
-    <!-- Редактор на цени и добавяне на нова позиция -->
     <div class="card">
       <h2>
         <span>💶 Редактор на ценоразписа (Труд и Материали)</span>
@@ -874,21 +947,21 @@
     <div class="bottom-nums">
       Труд: <strong id="bar-labor">0.00 €</strong> &nbsp;|&nbsp;
       Материали: <strong id="bar-mat">0.00 €</strong>
+      <span id="bar-disc-wrap" style="display:none;"> &nbsp;|&nbsp; Отстъпка: <strong id="bar-disc" style="color:#4ade80;">-0.00 €</strong></span>
       <span id="bar-vat-wrap" style="display:none;"> &nbsp;|&nbsp; ДДС: <strong id="bar-vat">0.00 €</strong></span>
     </div>
-    <div style="display:flex;align-items:center;gap:12px;">
+    <div style="display:flex;align-items:center;gap:10px;">
       <div class="bottom-grand" id="bar-grand">0.00 €</div>
-      <button class="btn btn-primary" onclick="switchTab('tab-offer')">Оферта →</button>
+      <button class="btn btn-primary btn-sm" onclick="switchTab('tab-offer')">Оферта →</button>
+      <button class="btn btn-blue btn-sm" onclick="switchTab('tab-contract')">Договор →</button>
     </div>
   </div>
 </div>
 
-<!-- Контейнер само за печат -->
 <div id="print-container"></div>
 
 <script>
-// ================= DEFAULT BUILT-IN DATABASE (v4.4 — 100% OFFLINE READY) =================
-const DEFAULT_DB = {"version": "4.4", "updated": "2026-11-25", "currency": "€", "company": {"name": "ФИКСБИЛД ГРУП ЕООД", "city": "гр. Пловдив", "phone": "0886 321 665", "manager": "Ангел Георгиев", "eik": "", "email": ""}, "services": [{"id": "srv_kart_plochki", "cat": "Къртене и Общи", "name": "Къртене на плочки (фаянс/теракота)", "unit": "кв.м", "price": 9.5, "min": 8.0, "max": 11.0}, {"id": "srv_kart_mazilka", "cat": "Къртене и Общи", "name": "Къртене на стара мазилка / замазка", "unit": "кв.м", "price": 10.5, "min": 8.5, "max": 12.5}, {"id": "srv_kart_tuhla", "cat": "Къртене и Общи", "name": "Къртене на тухлена стена (единичка/четворка)", "unit": "кв.м", "price": 18.0, "min": 15.0, "max": 21.0}, {"id": "srv_kart_beton", "cat": "Къртене и Общи", "name": "Къртене на бетон (подпрозорец / праг)", "unit": "бр.", "price": 65.0, "min": 50.0, "max": 80.0}, {"id": "srv_demont_sanit", "cat": "Къртене и Общи", "name": "Демонтаж на санитария / стара мивка / WC", "unit": "бр.", "price": 22.5, "min": 18.0, "max": 27.0}, {"id": "srv_demont_vrata", "cat": "Къртене и Общи", "name": "Демонтаж на стара интериорна врата и каса", "unit": "бр.", "price": 25.0, "min": 20.0, "max": 30.0}, {"id": "srv_demont_laminat", "cat": "Къртене и Общи", "name": "Демонтаж на стар ламинат / балатум / мокет", "unit": "кв.м", "price": 3.5, "min": 2.5, "max": 4.5}, {"id": "srv_demont_tapeti", "cat": "Къртене и Общи", "name": "Сваляне на стари тапети (с намокряне)", "unit": "кв.м", "price": 4.0, "min": 3.0, "max": 5.0}, {"id": "srv_ostragvane_boya", "cat": "Къртене и Общи", "name": "Остъргване на стара постна боя / лющене", "unit": "кв.м", "price": 5.0, "min": 4.0, "max": 6.0}, {"id": "srv_chuv_iznasyane", "cat": "Къртене и Общи", "name": "Събиране в чували и изнасяне на отпадъци", "unit": "чувал", "price": 2.5, "min": 2.0, "max": 3.0}, {"id": "srv_konteiner", "cat": "Къртене и Общи", "name": "Контейнер за строителни отпадъци (наем + извозване)", "unit": "бр.", "price": 150.0, "min": 130.0, "max": 170.0}, {"id": "srv_zashtita_pod", "cat": "Къртене и Общи", "name": "Облепяне и защита на подове, мебели и дограма", "unit": "кв.м", "price": 2.25, "min": 1.5, "max": 3.0}, {"id": "srv_pochistvane", "cat": "Къртене и Общи", "name": "Почистване след ремонт (грубо и фино)", "unit": "кв.м", "price": 4.5, "min": 3.5, "max": 5.5}, {"id": "srv_vrata_int", "cat": "Къртене и Общи", "name": "Монтаж на интериорна врата (стандартна)", "unit": "бр.", "price": 75.0, "min": 65.0, "max": 85.0}, {"id": "srv_podproz_kamak", "cat": "Къртене и Общи", "name": "Монтаж / лепене на подпрозоречен камък (перваз)", "unit": "л.м", "price": 25.0, "min": 20.0, "max": 30.0}, {"id": "srv_podproz_kamak_br", "cat": "Къртене и Общи", "name": "Монтаж / лепене на подпрозоречен камък (до 1.5 м, с обръщане)", "unit": "бр.", "price": 35.0, "min": 28.0, "max": 42.0}, {"id": "srv_gk_tavan_prav", "cat": "Гипсокартон и Тавани", "name": "Окачен таван от гипсокартон (прав, едно ниво)", "unit": "кв.м", "price": 24.0, "min": 20.0, "max": 28.0}, {"id": "srv_gk_tavan_dvoin", "cat": "Гипсокартон и Тавани", "name": "Окачен таван от гипсокартон на двойна скара", "unit": "кв.м", "price": 27.5, "min": 24.0, "max": 31.0}, {"id": "srv_gk_tavan_skat_20", "cat": "Гипсокартон и Тавани", "name": "Скатов таван от гипсокартон (+20% трудност / леко скосение)", "unit": "кв.м", "price": 28.8, "min": 25.0, "max": 32.5}, {"id": "srv_gk_tavan_skat_35", "cat": "Гипсокартон и Тавани", "name": "Скатов таван от гипсокартон (+35% трудност / стандартно скосение)", "unit": "кв.м", "price": 32.4, "min": 28.5, "max": 36.5}, {"id": "srv_gk_tavan_skat_50", "cat": "Гипсокартон и Тавани", "name": "Скатов таван от гипсокартон (+50% трудност / сложни чупки и капандури)", "unit": "кв.м", "price": 36.0, "min": 32.0, "max": 40.0}, {"id": "srv_gk_skrito_1", "cat": "Гипсокартон и Тавани", "name": "Скрито осветление от гипсокартон – 1 чело (5–7 €/л.м)", "unit": "л.м", "price": 6.0, "min": 5.0, "max": 7.0}, {"id": "srv_gk_skrito_2", "cat": "Гипсокартон и Тавани", "name": "Скрито осветление от гипсокартон – 2 чела", "unit": "л.м", "price": 12.0, "min": 10.0, "max": 14.0}, {"id": "srv_gk_skrito_3", "cat": "Гипсокартон и Тавани", "name": "Скрито осветление от гипсокартон – 3 чела", "unit": "л.м", "price": 18.0, "min": 15.0, "max": 21.0}, {"id": "srv_gk_skrito_4", "cat": "Гипсокартон и Тавани", "name": "Скрито осветление от гипсокартон – 4 чела", "unit": "л.м", "price": 24.0, "min": 20.0, "max": 28.0}, {"id": "srv_gk_skrito_5", "cat": "Гипсокартон и Тавани", "name": "Скрито осветление от гипсокартон – 5 чела", "unit": "л.м", "price": 30.0, "min": 25.0, "max": 35.0}, {"id": "srv_gk_predst_konstr", "cat": "Гипсокартон и Тавани", "name": "Предстенна обшивка от гипсокартон на конструкция", "unit": "кв.м", "price": 20.0, "min": 17.0, "max": 23.0}, {"id": "srv_gk_lepene", "cat": "Гипсокартон и Тавани", "name": "Лепене на гипсокартон на стени (с лепило)", "unit": "кв.м", "price": 15.5, "min": 13.0, "max": 18.0}, {"id": "srv_gk_pregradna", "cat": "Гипсокартон и Тавани", "name": "Преградна стена от гипсокартон (единична обшивка + вата)", "unit": "кв.м", "price": 27.0, "min": 23.0, "max": 31.0}, {"id": "srv_gk_pregradna_2", "cat": "Гипсокартон и Тавани", "name": "Преградна стена от гипсокартон (двойна обшивка + вата)", "unit": "кв.м", "price": 34.0, "min": 30.0, "max": 38.0}, {"id": "srv_gk_kufar", "cat": "Гипсокартон и Тавани", "name": "Изработка на куфар / обръщане на тръби от гипсокартон", "unit": "л.м", "price": 24.0, "min": 20.0, "max": 28.0}, {"id": "srv_gk_obrushtane", "cat": "Гипсокартон и Тавани", "name": "Обръщане на прозорци / врати с гипсокартон", "unit": "л.м", "price": 17.0, "min": 14.0, "max": 20.0}, {"id": "srv_gk_pvc_profil", "cat": "Гипсокартон и Тавани", "name": "Монтаж / лепене на PVC завършващ профил към дограма (такер / спрей)", "unit": "л.м", "price": 4.5, "min": 3.5, "max": 5.5}, {"id": "srv_gk_vata", "cat": "Гипсокартон и Тавани", "name": "Полагане на минерална / каменна вата (в конструкция)", "unit": "кв.м", "price": 4.0, "min": 3.0, "max": 5.0}, {"id": "srv_gk_fugirane", "cat": "Гипсокартон и Тавани", "name": "Фугиране на гипсокартон с лента (Q2, две ръце)", "unit": "кв.м", "price": 5.5, "min": 4.5, "max": 6.5}, {"id": "srv_gk_kordiz", "cat": "Гипсокартон и Тавани", "name": "Ниша за скрит корниз от гипсокартон", "unit": "л.м", "price": 22.0, "min": 18.0, "max": 26.0}, {"id": "srv_grund", "cat": "Мазилки и Шпакловки", "name": "Грундиране на стени и тавани (дълбокопроникващ / бетонконтакт)", "unit": "кв.м", "price": 1.75, "min": 1.5, "max": 2.0}, {"id": "srv_shpaklovka_gips", "cat": "Мазилки и Шпакловки", "name": "Гипсова шпакловка (1–2 ръце) + шлайфане", "unit": "кв.м", "price": 9.5, "min": 8.0, "max": 11.0}, {"id": "srv_shpaklovka_fina", "cat": "Мазилки и Шпакловки", "name": "Фина пастообразна шпакловка (Sheetrock / Baumit / Боро) + шлайфане", "unit": "кв.м", "price": 7.5, "min": 6.5, "max": 8.5}, {"id": "srv_shpaklovka_mreja", "cat": "Мазилки и Шпакловки", "name": "Шпакловка със стъклофибърна мрежа (армиране)", "unit": "кв.м", "price": 11.5, "min": 9.5, "max": 13.5}, {"id": "srv_shpaklovka_q4", "cat": "Мазилки и Шпакловки", "name": "Цялостна шпакловка до Q4 (на лампа / жираф)", "unit": "кв.м", "price": 15.0, "min": 13.0, "max": 17.0}, {"id": "srv_mazilka_vc", "cat": "Мазилки и Шпакловки", "name": "Вароциментова мазилка на стени / бани (ръчно измазване по майки)", "unit": "кв.м", "price": 14.5, "min": 12.0, "max": 17.0}, {"id": "srv_obrushtane_shpak", "cat": "Мазилки и Шпакловки", "name": "Обръщане на прозорци / врати с шпакловка и ъглохранители", "unit": "л.м", "price": 16.0, "min": 13.0, "max": 19.0}, {"id": "srv_alu_ugli_hr", "cat": "Мазилки и Шпакловки", "name": "Монтаж на алуминиеви ъглохранители", "unit": "л.м", "price": 4.25, "min": 3.5, "max": 5.0}, {"id": "srv_alu_ugli_utoch", "cat": "Мазилки и Шпакловки", "name": "Поставяне на алуминиеви ъгли (към шпакловка / гипсокартон)", "unit": "л.м", "price": 4.25, "min": 3.5, "max": 5.0}, {"id": "srv_shlaifane", "cat": "Мазилки и Шпакловки", "name": "Машинно шлайфане с жираф и прахосмукачка", "unit": "кв.м", "price": 3.0, "min": 2.5, "max": 3.5}, {"id": "srv_boya_byalo", "cat": "Боядисване", "name": "Боядисване с латекс – бял (2 ръце)", "unit": "кв.м", "price": 5.25, "min": 4.5, "max": 6.0}, {"id": "srv_boya_cvyat", "cat": "Боядисване", "name": "Боядисване с латекс – цвят (2 ръце, с отсичане)", "unit": "кв.м", "price": 6.5, "min": 5.5, "max": 7.5}, {"id": "srv_boya_tamna", "cat": "Боядисване", "name": "Боядисване с тъмен / наситен цвят (3 ръце)", "unit": "кв.м", "price": 8.0, "min": 7.0, "max": 9.0}, {"id": "srv_boya_bezvazd", "cat": "Боядисване", "name": "Безвъздушно боядисване (машинно, 2 ръце)", "unit": "кв.м", "price": 4.75, "min": 4.0, "max": 5.5}, {"id": "srv_boya_blajna", "cat": "Боядисване", "name": "Боядисване на тръби / радиатори / метал", "unit": "л.м", "price": 4.5, "min": 3.5, "max": 5.5}, {"id": "srv_boya_korniz", "cat": "Боядисване", "name": "Монтаж и боядисване на декоративни корнизи / лайсни", "unit": "л.м", "price": 7.0, "min": 5.5, "max": 8.5}, {"id": "srv_hidro", "cat": "Плочки и Баня", "name": "Полагане на течна хидроизолация (2 ръце + лента по ъгли)", "unit": "кв.м", "price": 11.0, "min": 9.0, "max": 13.0}, {"id": "srv_fayans", "cat": "Плочки и Баня", "name": "Лепене на фаянс и теракота (стандартни формати до 60×60)", "unit": "кв.м", "price": 30.0, "min": 26.0, "max": 34.0}, {"id": "srv_granitogres", "cat": "Плочки и Баня", "name": "Лепене на гранитогрес (под / стени, с нивелационна система)", "unit": "кв.м", "price": 33.25, "min": 29.0, "max": 37.5}, {"id": "srv_granit_golyam", "cat": "Плочки и Баня", "name": "Лепене на широкоформатен гранитогрес (60×120 и нагоре)", "unit": "кв.м", "price": 42.0, "min": 36.0, "max": 48.0}, {"id": "srv_cokal_plochki", "cat": "Плочки и Баня", "name": "Лепене на цокъл от гранитогрес / теракота", "unit": "л.м", "price": 8.5, "min": 7.0, "max": 10.0}, {"id": "srv_gerung", "cat": "Плочки и Баня", "name": "Рязане на плочки под 45° (герунг) и оформяне на ръб", "unit": "л.м", "price": 30.0, "min": 25.0, "max": 35.0}, {"id": "srv_otvor_plochka", "cat": "Плочки и Баня", "name": "Пробиване на отвор в гранитогрес / фаянс (боркорона)", "unit": "бр.", "price": 7.5, "min": 6.0, "max": 9.0}, {"id": "srv_sifon_lineen", "cat": "Плочки и Баня", "name": "Монтаж на линеен сифон и оформяне на наклони", "unit": "бр.", "price": 100.0, "min": 85.0, "max": 115.0}, {"id": "srv_sifon_rogov", "cat": "Плочки и Баня", "name": "Монтаж на точков / рогов подов сифон", "unit": "бр.", "price": 45.0, "min": 35.0, "max": 55.0}, {"id": "srv_struktura_wc", "cat": "Плочки и Баня", "name": "Монтаж на структура за вграждане (WC) + обличане", "unit": "бр.", "price": 115.0, "min": 95.0, "max": 135.0}, {"id": "srv_sanitariya", "cat": "Плочки и Баня", "name": "Монтаж на санитария (мивка / смесител / моноблок / душ система)", "unit": "бр.", "price": 52.5, "min": 40.0, "max": 65.0}, {"id": "srv_dush_kabina", "cat": "Плочки и Баня", "name": "Монтаж на душ кабина / стъклен параван (само труд)", "unit": "бр.", "price": 150.0, "min": 120.0, "max": 180.0}, {"id": "srv_silikonirane", "cat": "Плочки и Баня", "name": "Силикониране на фуги и санитария в баня", "unit": "л.м", "price": 3.5, "min": 2.5, "max": 4.5}, {"id": "srv_fugirane_epoks", "cat": "Плочки и Баня", "name": "Фугиране с епоксидна фугираща смес (надбавка)", "unit": "кв.м", "price": 12.0, "min": 10.0, "max": 14.0}, {"id": "srv_zamazka_banya", "cat": "Плочки и Баня", "name": "Подова циментова замазка в баня с наклони", "unit": "кв.м", "price": 18.0, "min": 15.0, "max": 21.0}, {"id": "srv_laminat", "cat": "Подови настилки", "name": "Редене на ламиниран паркет (с подложка)", "unit": "кв.м", "price": 10.75, "min": 9.0, "max": 12.5}, {"id": "srv_spc_vinil", "cat": "Подови настилки", "name": "Редене на SPC / винилова клик настилка", "unit": "кв.м", "price": 12.5, "min": 10.5, "max": 14.5}, {"id": "srv_pervazi", "cat": "Подови настилки", "name": "Монтаж на подови первази (PVC / MDF)", "unit": "л.м", "price": 4.38, "min": 3.5, "max": 5.25}, {"id": "srv_samonivel", "cat": "Подови настилки", "name": "Полагане на саморазливна подова замазка", "unit": "кв.м", "price": 11.5, "min": 9.5, "max": 13.5}, {"id": "srv_lajsna_prehod", "cat": "Подови настилки", "name": "Монтаж на преходна лайсна между настилки", "unit": "бр.", "price": 10.0, "min": 8.0, "max": 12.0}, {"id": "srv_epoks_pod", "cat": "Подови настилки", "name": "Нанасяне на двукомпонентно епоксидно подово покритие (2 ръце)", "unit": "кв.м", "price": 14.0, "min": 11.0, "max": 17.0}, {"id": "srv_vik_tochka", "cat": "ВиК услуги", "name": "Изграждане на ВиК точка (водопровод + канал)", "unit": "точка", "price": 38.25, "min": 32.0, "max": 44.5}, {"id": "srv_vik_smyana_trabi", "cat": "ВиК услуги", "name": "Подмяна на водопроводни тръби (PPR с вкопаване)", "unit": "л.м", "price": 14.0, "min": 11.0, "max": 17.0}, {"id": "srv_vik_kanal", "cat": "ВиК услуги", "name": "Полагане на вътрешна PVC канализация (ф40–ф110)", "unit": "л.м", "price": 12.0, "min": 9.5, "max": 14.5}, {"id": "srv_vik_vodomer", "cat": "ВиК услуги", "name": "Монтаж / подмяна на водомер и спирателен кран", "unit": "бр.", "price": 30.0, "min": 25.0, "max": 35.0}, {"id": "srv_vik_boiler", "cat": "ВиК услуги", "name": "Монтаж и ВиК свързване на бойлер", "unit": "бр.", "price": 55.0, "min": 45.0, "max": 65.0}, {"id": "srv_vik_peralnya", "cat": "ВиК услуги", "name": "Свързване на пералня / съдомиялна", "unit": "бр.", "price": 25.0, "min": 20.0, "max": 30.0}, {"id": "srv_el_tochka_komb", "cat": "Електроуслуги", "name": "Изграждане на Ел. точка (конзола + кабел + вкопаване)", "unit": "точка", "price": 23.25, "min": 19.0, "max": 27.5}, {"id": "srv_el_nova_tochka", "cat": "Електроуслуги", "name": "Изграждане на нова електрическа точка", "unit": "бр.", "price": 20.0, "min": 15.0, "max": 25.0}, {"id": "srv_el_kontakt", "cat": "Електроуслуги", "name": "Монтаж на контакт", "unit": "бр.", "price": 6.0, "min": 5.0, "max": 7.0}, {"id": "srv_el_klyuch", "cat": "Електроуслуги", "name": "Монтаж на ключ", "unit": "бр.", "price": 6.0, "min": 5.0, "max": 7.0}, {"id": "srv_el_osvet_tyalo", "cat": "Електроуслуги", "name": "Монтаж на осветително тяло", "unit": "бр.", "price": 20.0, "min": 15.0, "max": 25.0}, {"id": "srv_el_led_spot", "cat": "Електроуслуги", "name": "Монтаж на LED спот / луничка", "unit": "бр.", "price": 12.0, "min": 8.0, "max": 15.0}, {"id": "srv_el_led_lenta", "cat": "Електроуслуги", "name": "Монтаж на LED лента (с профил / захранване)", "unit": "л.м", "price": 7.5, "min": 7.0, "max": 8.0}, {"id": "srv_el_tablo", "cat": "Електроуслуги", "name": "Монтаж на електрическо табло (апартаментно)", "unit": "бр.", "price": 95.0, "min": 80.0, "max": 110.0}, {"id": "srv_el_predpazitel", "cat": "Електроуслуги", "name": "Свързване на автоматичен предпазител", "unit": "бр.", "price": 9.0, "min": 8.0, "max": 10.0}, {"id": "srv_el_razkl_kutiya", "cat": "Електроуслуги", "name": "Свързване на разклонителна кутия", "unit": "бр.", "price": 10.0, "min": 8.0, "max": 12.0}, {"id": "srv_el_boiler", "cat": "Електроуслуги", "name": "Свързване на бойлер (електрическо)", "unit": "бр.", "price": 25.0, "min": 20.0, "max": 30.0}, {"id": "srv_el_ventilator", "cat": "Електроуслуги", "name": "Монтаж и свързване на вентилатор за баня", "unit": "бр.", "price": 20.0, "min": 15.0, "max": 25.0}], "materials": [{"id": "mat_gk_byal", "cat": "Гипсокартон и Профили", "name": "Гипсокартон Knauf обикновен (бял) 12.5 мм, 1200×2000 (2.4 м²)", "unit": "лист", "price": 5.62}, {"id": "mat_gk_zelen", "cat": "Гипсокартон и Профили", "name": "Гипсокартон Knauf влагоустойчив (зелен) 12.5 мм, 1200×2000 (2.4 м²)", "unit": "лист", "price": 8.5}, {"id": "mat_gk_rozov", "cat": "Гипсокартон и Профили", "name": "Гипсокартон пожароустойчив (розов DF) 12.5 мм, 1200×2000 (2.4 м²)", "unit": "лист", "price": 9.48}, {"id": "mat_cd_profil", "cat": "Гипсокартон и Профили", "name": "Профил CD 60/27 – 3 м (0.6 мм)", "unit": "бр.", "price": 3.57}, {"id": "mat_ud_profil", "cat": "Гипсокартон и Профили", "name": "Профил UD 28/27 – 3 м (0.6 мм)", "unit": "бр.", "price": 2.39}, {"id": "mat_cw50", "cat": "Гипсокартон и Профили", "name": "Профил CW 50 – 3 м (0.6 мм)", "unit": "бр.", "price": 4.2}, {"id": "mat_uw50", "cat": "Гипсокартон и Профили", "name": "Профил UW 50 – 3 м (0.6 мм)", "unit": "бр.", "price": 3.45}, {"id": "mat_cw75", "cat": "Гипсокартон и Профили", "name": "Профил CW 75 – 3 м (0.6 мм)", "unit": "бр.", "price": 4.95}, {"id": "mat_uw75", "cat": "Гипсокартон и Профили", "name": "Профил UW 75 – 3 м (0.6 мм)", "unit": "бр.", "price": 4.1}, {"id": "mat_okachvach_direkt", "cat": "Гипсокартон и Профили", "name": "Директен окачвач за CD профил (125 мм)", "unit": "бр.", "price": 0.35}, {"id": "mat_okachvach_burs", "cat": "Гипсокартон и Профили", "name": "Бърз окачвач + тел с ухо (250–500 мм)", "unit": "к-т", "price": 0.65}, {"id": "mat_krast_vrazka", "cat": "Гипсокартон и Профили", "name": "Кръстата връзка за CD профил (двойна скара)", "unit": "бр.", "price": 0.45}, {"id": "mat_uduljitel_cd", "cat": "Гипсокартон и Профили", "name": "Удължител (снаждане) за CD профил", "unit": "бр.", "price": 0.4}, {"id": "mat_alu_ugal_25", "cat": "Гипсокартон и Профили", "name": "Алуминиев ъглохранител 2.5 м (перфориран)", "unit": "бр.", "price": 1.25}, {"id": "mat_alu_ugal_30", "cat": "Гипсокартон и Профили", "name": "Алуминиев ъглохранител 3.0 м (перфориран)", "unit": "бр.", "price": 1.55}, {"id": "mat_pvc_zavursh_dograma", "cat": "Гипсокартон и Профили", "name": "PVC завършващ профил за гипсокартон към дограма 3.05 м (Baustoff + Metall)", "unit": "бр.", "price": 4.48}, {"id": "mat_sprei_wurth", "cat": "Гипсокартон и Профили", "name": "Спрей лепило Würth Kraft Plus / Multi 400 мл (за PVC профили)", "unit": "бр.", "price": 19.43}, {"id": "mat_sprei_tkk", "cat": "Гипсокартон и Профили", "name": "Спрей лепило контактно TKK FI·X 71 300 мл (Baustoff + Metall)", "unit": "бр.", "price": 3.95}, {"id": "mat_lepilo_gk_technogips", "cat": "Гипсокартон и Профили", "name": "Лепило за гипсокартон Technogips Pro FIX – 25 кг", "unit": "торба", "price": 6.75}, {"id": "mat_lepilo_gk_perlfix", "cat": "Гипсокартон и Профили", "name": "Лепило за гипсокартон Knauf Perlfix – 25 кг", "unit": "торба", "price": 9.5}, {"id": "mat_lepilo_gk_rigips", "cat": "Гипсокартон и Профили", "name": "Лепило за гипсокартон Rigips Rifix – 25 кг", "unit": "торба", "price": 9.4}, {"id": "mat_lenta_fibafuse", "cat": "Гипсокартон и Профили", "name": "Лента за фуги FibaFuse гласфазерна (52 мм × 76 м)", "unit": "ролка", "price": 9.9}, {"id": "mat_lenta_fibafuse_max", "cat": "Гипсокартон и Профили", "name": "Лента за фуги FibaFuse MAX подсилена (52 мм × 76 м)", "unit": "ролка", "price": 14.55}, {"id": "mat_lenta_glasfazer", "cat": "Гипсокартон и Профили", "name": "Гласфазерна лента за фуги (50 мм × 25 м)", "unit": "ролка", "price": 2.9}, {"id": "mat_lenta_arm_samozal", "cat": "Гипсокартон и Профили", "name": "Армираща самозалепваща лента (стъклофибърна мрежа 50 мм × 45 м)", "unit": "ролка", "price": 3.2}, {"id": "mat_lenta_hartiena", "cat": "Гипсокартон и Профили", "name": "Хартиена лента за гипсокартон Knauf (50 мм × 75 м)", "unit": "ролка", "price": 5.6}, {"id": "mat_lenta_ud_uplat", "cat": "Гипсокартон и Профили", "name": "Уплътнителна лента за UD/UW профил (30 мм × 30 м)", "unit": "ролка", "price": 4.8}, {"id": "mat_vata_5cm", "cat": "Гипсокартон и Профили", "name": "Минерална вата Knauf 5 см (ролка 18 м²)", "unit": "ролка", "price": 31.5}, {"id": "mat_vata_kam_5cm", "cat": "Гипсокартон и Профили", "name": "Каменна вата 5 см (пакет 7.2 м²)", "unit": "пакет", "price": 24.5}, {"id": "mat_vint_tn25", "cat": "Гипсокартон и Профили", "name": "Винтове за гипсокартон TN 3.5×25 (кутия 1000 бр.)", "unit": "кутия", "price": 9.8}, {"id": "mat_vint_tn35", "cat": "Гипсокартон и Профили", "name": "Винтове за гипсокартон TN 3.5×35 (кутия 1000 бр.)", "unit": "кутия", "price": 12.2}, {"id": "mat_vint_tex", "cat": "Гипсокартон и Профили", "name": "Копчета (самопробивни винтове 3.5×9.5, кутия 1000 бр.)", "unit": "кутия", "price": 9.5}, {"id": "mat_dyubel_pir", "cat": "Гипсокартон и Профили", "name": "Дюбел-пирон 6×40 мм (кутия 100 бр.)", "unit": "кутия", "price": 4.5}, {"id": "mat_anker_klin", "cat": "Гипсокартон и Профили", "name": "Анкер-клин метален за таван 6×40 (кутия 100 бр.)", "unit": "кутия", "price": 11.5}, {"id": "mat_grund_borogrund", "cat": "Мазилки, Шпакловки и Грундове", "name": "Борогрунд дълбокопроникващ – 5 л", "unit": "туба", "price": 14.57}, {"id": "mat_grund_ct17_2l", "cat": "Мазилки, Шпакловки и Грундове", "name": "Дълбокопроникващ грунд Ceresit CT 17 – 2 л", "unit": "туба", "price": 8.9}, {"id": "mat_grund_ct17_5l", "cat": "Мазилки, Шпакловки и Грундове", "name": "Дълбокопроникващ грунд Ceresit CT 17 – 5 л", "unit": "туба", "price": 17.5}, {"id": "mat_grund_ct17_10l", "cat": "Мазилки, Шпакловки и Грундове", "name": "Дълбокопроникващ грунд Ceresit CT 17 – 10 л", "unit": "туба", "price": 29.65}, {"id": "mat_grund_cn94_5l", "cat": "Мазилки, Шпакловки и Грундове", "name": "Контактен грунд Ceresit CN 94 (гладки основи) – 5 л", "unit": "туба", "price": 34.5}, {"id": "mat_grund_ct19_75", "cat": "Мазилки, Шпакловки и Грундове", "name": "Бетонконтакт грунд Ceresit CT 19 – 7.5 кг", "unit": "бака", "price": 26.8}, {"id": "mat_grund_betonkont_5", "cat": "Мазилки, Шпакловки и Грундове", "name": "Бетонконтакт Baumit / Боро – 5 кг", "unit": "бака", "price": 14.2}, {"id": "mat_maz_vc_baumit", "cat": "Мазилки, Шпакловки и Грундове", "name": "Вароциментова мазилка за бани Baumit MPI 25 – 25 кг", "unit": "торба", "price": 4.95}, {"id": "mat_maz_vc_angro_25", "cat": "Мазилки, Шпакловки и Грундове", "name": "Вароциментова мазилка за бани Ангро – 25 кг", "unit": "торба", "price": 4.15}, {"id": "mat_maz_vc_angro_40", "cat": "Мазилки, Шпакловки и Грундове", "name": "Вароциментова мазилка за бани Ангро – 40 кг", "unit": "торба", "price": 5.63}, {"id": "mat_maz_vc_weber", "cat": "Мазилки, Шпакловки и Грундове", "name": "Вароциментова хастарна мазилка за бани Weber – 25 кг", "unit": "торба", "price": 5.59}, {"id": "mat_shpak_baumit_fin", "cat": "Мазилки, Шпакловки и Грундове", "name": "Пастообразна шпакловка Baumit Финиш Експерт – 20 кг", "unit": "бака", "price": 23.0}, {"id": "mat_shpak_boro_20", "cat": "Мазилки, Шпакловки и Грундове", "name": "Фина пастообразна шпакловка Боро (Борокит) – бака 20 кг", "unit": "бака", "price": 17.8}, {"id": "mat_shpak_boro_suha15", "cat": "Мазилки, Шпакловки и Грундове", "name": "Гипсова шпакловка Боро (суха) – 15 кг", "unit": "торба", "price": 8.4}, {"id": "mat_shpak_ct126", "cat": "Мазилки, Шпакловки и Грундове", "name": "Гипсова шпакловка Ceresit CT 126 – 20 кг", "unit": "торба", "price": 9.4}, {"id": "mat_shpak_ct127", "cat": "Мазилки, Шпакловки и Грундове", "name": "Фина бяла шпакловка Ceresit CT 127 – 20 кг", "unit": "торба", "price": 12.9}, {"id": "mat_knauf_zelen_6", "cat": "Мазилки, Шпакловки и Грундове", "name": "Knauf Sheetrock Super Finish (зелен капак) – 6 кг (малка бака)", "unit": "бака", "price": 9.85}, {"id": "mat_knauf_zelen_20", "cat": "Мазилки, Шпакловки и Грундове", "name": "Knauf Sheetrock Super Finish (зелен капак) – 20 кг", "unit": "бака", "price": 18.65}, {"id": "mat_knauf_zelen_25", "cat": "Мазилки, Шпакловки и Грундове", "name": "Knauf Sheetrock Super Finish (зелен капак) – 25 кг", "unit": "бака", "price": 25.8}, {"id": "mat_knauf_sin_20", "cat": "Мазилки, Шпакловки и Грундове", "name": "Knauf Fill & Finish Light / Sheetrock (син капак) – 20 кг", "unit": "бака", "price": 24.9}, {"id": "mat_knauf_sin_28", "cat": "Мазилки, Шпакловки и Грундове", "name": "Knauf Sheetrock Roll & Spray (син капак) – 28 кг", "unit": "бака", "price": 33.8}, {"id": "mat_knauf_oranj_6", "cat": "Мазилки, Шпакловки и Грундове", "name": "Knauf Sheetrock All Purpose / Dust Control (оранжев капак) – 6 кг", "unit": "бака", "price": 10.15}, {"id": "mat_knauf_oranj_25", "cat": "Мазилки, Шпакловки и Грундове", "name": "Knauf Sheetrock All Purpose (оранжев капак) – 25 кг", "unit": "бака", "price": 32.7}, {"id": "mat_knauf_jult_20", "cat": "Мазилки, Шпакловки и Грундове", "name": "Knauf Rotband ProFinish / Finitura (жълт/сив капак) – 20 кг", "unit": "бака", "price": 23.5}, {"id": "mat_knauf_fugen", "cat": "Мазилки, Шпакловки и Грундове", "name": "Фугопълнител Knauf Fugenfüller Leicht – 25 кг", "unit": "торба", "price": 19.7}, {"id": "mat_knauf_uniflott", "cat": "Мазилки, Шпакловки и Грундове", "name": "Фугопълнител Knauf Uniflott – 25 кг", "unit": "торба", "price": 34.5}, {"id": "mat_mreja_staklo", "cat": "Мазилки, Шпакловки и Грундове", "name": "Стъклофибърна мрежа 145 г/м² (ролка 50 м²)", "unit": "ролка", "price": 36.0}, {"id": "mat_lateks_byal_15", "cat": "Бои, Защита и Шлайфане", "name": "Интериорен латекс бял (миещ се, клас 1/2) – 15 л", "unit": "бака", "price": 56.0}, {"id": "mat_lateks_cvyat_10", "cat": "Бои, Защита и Шлайфане", "name": "Интериорен латекс тониран (цвят) – 10 л", "unit": "бака", "price": 52.0}, {"id": "mat_lateks_banya_25", "cat": "Бои, Защита и Шлайфане", "name": "Латекс за баня и влажни помещения (антимухъл) – 2.5 л", "unit": "бака", "price": 22.5}, {"id": "mat_tikso_obik_25", "cat": "Бои, Защита и Шлайфане", "name": "Тиксо обикновено маскиращо (хартиено 25 мм × 50 м)", "unit": "ролка", "price": 1.65}, {"id": "mat_tikso_obik_38", "cat": "Бои, Защита и Шлайфане", "name": "Тиксо обикновено маскиращо (хартиено 38 мм × 50 м)", "unit": "ролка", "price": 2.35}, {"id": "mat_tikso_obik_50", "cat": "Бои, Защита и Шлайфане", "name": "Тиксо обикновено маскиращо (хартиено 50 мм × 50 м)", "unit": "ролка", "price": 2.95}, {"id": "mat_tikso_otsich_24", "cat": "Бои, Защита и Шлайфане", "name": "Тиксо за отсичане прецизно Washi / Blue Dolphin (24 мм × 50 м)", "unit": "ролка", "price": 3.6}, {"id": "mat_tikso_otsich_36", "cat": "Бои, Защита и Шлайфане", "name": "Тиксо за отсичане прецизно Washi / Blue Dolphin (36 мм × 50 м)", "unit": "ролка", "price": 4.65}, {"id": "mat_tikso_otsich_48", "cat": "Бои, Защита и Шлайфане", "name": "Тиксо за отсичане прецизно Washi / Blue Dolphin (48 мм × 50 м)", "unit": "ролка", "price": 5.4}, {"id": "mat_nailon_tanak", "cat": "Бои, Защита и Шлайфане", "name": "Покривен найлон 4×5 м (20 м², тънък)", "unit": "бр.", "price": 0.95}, {"id": "mat_nailon_platen", "cat": "Бои, Защита и Шлайфане", "name": "Покривен найлон плътен 4×5 м (20 м², 40 мк)", "unit": "бр.", "price": 2.45}, {"id": "mat_nailon_rolka", "cat": "Бои, Защита и Шлайфане", "name": "Найлон защитен на ролка (4 м × 25 м = 100 м², плътен)", "unit": "ролка", "price": 18.5}, {"id": "mat_velpape_10m", "cat": "Бои, Защита и Шлайфане", "name": "Велпапе защитно на ролка (1 м × 10 м = 10 м²)", "unit": "ролка", "price": 6.8}, {"id": "mat_velpape_25m", "cat": "Бои, Защита и Шлайфане", "name": "Велпапе защитно на ролка (1 м × 25 м = 25 м²)", "unit": "ролка", "price": 14.9}, {"id": "mat_velpape_50m", "cat": "Бои, Защита и Шлайфане", "name": "Велпапе защитно на ролка (1 м × 50 м = 50 м²)", "unit": "ролка", "price": 27.5}, {"id": "mat_shkurka_jiraf_120", "cat": "Бои, Защита и Шлайфане", "name": "Шкурка за шлайфане ф225 (жираф) P120", "unit": "бр.", "price": 1.6}, {"id": "mat_shkurka_jiraf_150", "cat": "Бои, Защита и Шлайфане", "name": "Шкурка за шлайфане ф225 (жираф) P150", "unit": "бр.", "price": 1.55}, {"id": "mat_shkurka_jiraf_180", "cat": "Бои, Защита и Шлайфане", "name": "Шкурка за шлайфане ф225 (жираф) P180 / P240", "unit": "бр.", "price": 1.55}, {"id": "mat_shkurka_mreja", "cat": "Бои, Защита и Шлайфане", "name": "Шкурка мрежеста (за ръчно шкурене P120/P150/P180)", "unit": "бр.", "price": 0.9}, {"id": "mat_shkurka_rolka", "cat": "Бои, Защита и Шлайфане", "name": "Шкурка на ролка (115 мм × 5 м, P120–P180)", "unit": "ролка", "price": 4.2}, {"id": "mat_torbi_prah_5", "cat": "Бои, Защита и Шлайфане", "name": "Торби за строителна прахосмукачка (комплект 5 бр., флийс/хартия)", "unit": "пакет", "price": 12.5}, {"id": "mat_torba_prah_1", "cat": "Бои, Защита и Шлайфане", "name": "Торба за строителна прахосмукачка (1 бр.)", "unit": "бр.", "price": 2.6}, {"id": "mat_valyak", "cat": "Бои, Защита и Шлайфане", "name": "Валяк бояджийски (25 см микрофибър) + четка за отсичане", "unit": "к-т", "price": 9.5}, {"id": "mat_hidro_5kg", "cat": "Плочки и Баня (Материали)", "name": "Течна хидроизолация (Ceresit CL 51 / Marisan Hydrozol) – 5 кг", "unit": "бака", "price": 28.0}, {"id": "mat_hidro_15kg", "cat": "Плочки и Баня (Материали)", "name": "Течна хидроизолация (Ceresit CL 51 / Marisan Hydrozol) – 15 кг", "unit": "бака", "price": 69.0}, {"id": "mat_hidro_lenta", "cat": "Плочки и Баня (Материали)", "name": "Хидроизолационна лента за ъгли – 10 м", "unit": "ролка", "price": 19.5}, {"id": "mat_hidro_manshon", "cat": "Плочки и Баня (Материали)", "name": "Хидроизолационен маншон за тръба / сифон", "unit": "бр.", "price": 3.8}, {"id": "mat_cm16", "cat": "Плочки и Баня (Материали)", "name": "Флексово лепило за гранитогрес Ceresit CM 16 – 25 кг", "unit": "торба", "price": 14.8}, {"id": "mat_cm17", "cat": "Плочки и Баня (Материали)", "name": "Еластично лепило S1 Ceresit CM 17 – 25 кг", "unit": "торба", "price": 21.5}, {"id": "mat_baumacol", "cat": "Плочки и Баня (Материали)", "name": "Флексово лепило Baumit Baumacol FlexUni – 25 кг", "unit": "торба", "price": 13.1}, {"id": "mat_ce40", "cat": "Плочки и Баня (Материали)", "name": "Фугираща смес Ceresit CE 40 Aquastatic – 2 кг", "unit": "бака", "price": 8.5}, {"id": "mat_mapei_fugin", "cat": "Плочки и Баня (Материали)", "name": "Фугираща смес Mapei Ultracolor Plus – 5 кг", "unit": "торба", "price": 18.5}, {"id": "mat_klipsi", "cat": "Плочки и Баня (Материали)", "name": "Нивелационни клипси за плочки – 100 бр.", "unit": "пакет", "price": 2.5}, {"id": "mat_klinove", "cat": "Плочки и Баня (Материали)", "name": "Нивелационни клинове за плочки – 100 бр.", "unit": "пакет", "price": 6.5}, {"id": "mat_krastch", "cat": "Плочки и Баня (Материали)", "name": "Кръстчета за плочки (1.5 / 2 мм) – 200 бр.", "unit": "пакет", "price": 1.8}, {"id": "mat_lajsna_plochki", "cat": "Плочки и Баня (Материали)", "name": "Алуминиева лайсна за плочки (2.5 м)", "unit": "бр.", "price": 8.5}, {"id": "mat_zamazka_25", "cat": "Плочки и Баня (Материали)", "name": "Циментова замазка Baumit Solido E225 – 25 кг", "unit": "торба", "price": 4.5}, {"id": "mat_samonivel_25", "cat": "Плочки и Баня (Материали)", "name": "Саморазливна замазка Ceresit CN 69 / Baumit Nivello – 25 кг", "unit": "торба", "price": 16.5}, {"id": "mat_ppr20_1m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тръба топла вода (PN20 фибростъкло) ф20 – 1 м", "unit": "бр.", "price": 1.95}, {"id": "mat_ppr20_2m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тръба топла вода (PN20 фибростъкло) ф20 – 2 м", "unit": "бр.", "price": 3.9}, {"id": "mat_ppr20_3m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тръба топла вода (PN20 фибростъкло) ф20 – 3 м", "unit": "бр.", "price": 5.85}, {"id": "mat_ppr20_4m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тръба топла вода (PN20 фибростъкло) ф20 – 4 м", "unit": "бр.", "price": 7.8}, {"id": "mat_ppr25_1m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тръба топла вода (PN20 фибростъкло) ф25 – 1 м", "unit": "бр.", "price": 2.35}, {"id": "mat_ppr25_2m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тръба топла вода (PN20 фибростъкло) ф25 – 2 м", "unit": "бр.", "price": 4.7}, {"id": "mat_ppr25_3m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тръба топла вода (PN20 фибростъкло) ф25 – 3 м", "unit": "бр.", "price": 7.05}, {"id": "mat_ppr25_4m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тръба топла вода (PN20 фибростъкло) ф25 – 4 м", "unit": "бр.", "price": 9.4}, {"id": "mat_ppr_mufa_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR муфа ф20", "unit": "бр.", "price": 0.42}, {"id": "mat_ppr_mufa_25", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR муфа ф25", "unit": "бр.", "price": 0.55}, {"id": "mat_ppr_kol90_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR коляно 90° ф20", "unit": "бр.", "price": 0.45}, {"id": "mat_ppr_kol90_25", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR коляно 90° ф25", "unit": "бр.", "price": 0.62}, {"id": "mat_ppr_kol45_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR коляно 45° ф20", "unit": "бр.", "price": 0.5}, {"id": "mat_ppr_kol45_25", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR коляно 45° ф25", "unit": "бр.", "price": 0.68}, {"id": "mat_ppr_troi_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тройник ф20", "unit": "бр.", "price": 0.55}, {"id": "mat_ppr_troi_25", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тройник ф25", "unit": "бр.", "price": 0.72}, {"id": "mat_ppr_troi_red_25_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR редуктивен тройник ф25×ф20×ф25", "unit": "бр.", "price": 0.75}, {"id": "mat_ppr_red_25_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR редукция (муфа редуктор) ф25×ф20", "unit": "бр.", "price": 0.58}, {"id": "mat_ppr_tapa_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тапа ф20", "unit": "бр.", "price": 0.4}, {"id": "mat_ppr_tapa_25", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тапа ф25", "unit": "бр.", "price": 0.52}, {"id": "mat_ppr_skoba_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR скоба (единична) ф20", "unit": "бр.", "price": 0.35}, {"id": "mat_ppr_skoba_25", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR скоба (единична) ф25", "unit": "бр.", "price": 0.42}, {"id": "mat_ppr_duga_razm_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR дъга за разминаване (обходна) ф20", "unit": "бр.", "price": 1.65}, {"id": "mat_ppr_duga_razm_25", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR дъга за разминаване (обходна) ф25", "unit": "бр.", "price": 2.2}, {"id": "mat_ppr_kran_sf_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR сферичен кран ф20", "unit": "бр.", "price": 10.5}, {"id": "mat_ppr_kran_sf_25", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR сферичен кран ф25", "unit": "бр.", "price": 12.8}, {"id": "mat_ppr_kran_vgr_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR спирателен кран за вграждане с розетка ф20", "unit": "бр.", "price": 13.5}, {"id": "mat_ppr_kran_vgr_25", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR спирателен кран за вграждане с розетка ф25", "unit": "бр.", "price": 15.8}, {"id": "mat_ppr_ukb_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR УКБ (универсален комплект за батерия 150 мм, ф20×1/2\"Ж)", "unit": "бр.", "price": 11.2}, {"id": "mat_ppr_stenno_kol_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR стенно коляно с уши ф20×1/2\"Ж", "unit": "бр.", "price": 3.4}, {"id": "mat_ppr_prehod_20_12m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR прав преход с мъжка резба (МР) ф20×1/2\"М", "unit": "бр.", "price": 2.95}, {"id": "mat_ppr_prehod_20_34m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR прав преход с мъжка резба (МР) ф20×3/4\"М", "unit": "бр.", "price": 4.2}, {"id": "mat_ppr_prehod_25_12m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR прав преход с мъжка резба (МР) ф25×1/2\"М", "unit": "бр.", "price": 3.55}, {"id": "mat_ppr_prehod_25_34m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR прав преход с мъжка резба (МР) ф25×3/4\"М", "unit": "бр.", "price": 4.45}, {"id": "mat_ppr_prehod_20_12j", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR прав преход с женска резба (ЖР) ф20×1/2\"Ж", "unit": "бр.", "price": 2.55}, {"id": "mat_ppr_prehod_20_34j", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR прав преход с женска резба (ЖР) ф20×3/4\"Ж", "unit": "бр.", "price": 3.45}, {"id": "mat_ppr_prehod_25_12j", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR прав преход с женска резба (ЖР) ф25×1/2\"Ж", "unit": "бр.", "price": 3.25}, {"id": "mat_ppr_prehod_25_34j", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR прав преход с женска резба (ЖР) ф25×3/4\"Ж", "unit": "бр.", "price": 3.65}, {"id": "mat_ppr_kol_20_12m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR коляно с мъжка резба (МР) ф20×1/2\"М", "unit": "бр.", "price": 4.35}, {"id": "mat_ppr_kol_25_12m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR коляно с мъжка резба (МР) ф25×1/2\"М", "unit": "бр.", "price": 4.85}, {"id": "mat_ppr_kol_25_34m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR коляно с мъжка резба (МР) ф25×3/4\"М", "unit": "бр.", "price": 5.4}, {"id": "mat_ppr_kol_20_12j", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR коляно с женска резба (ЖР) ф20×1/2\"Ж", "unit": "бр.", "price": 3.3}, {"id": "mat_ppr_kol_25_12j", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR коляно с женска резба (ЖР) ф25×1/2\"Ж", "unit": "бр.", "price": 4.1}, {"id": "mat_ppr_kol_25_34j", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR коляно с женска резба (ЖР) ф25×3/4\"Ж", "unit": "бр.", "price": 4.65}, {"id": "mat_ppr_troi_20_12m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тройник с мъжка резба (МР) ф20×1/2\"М", "unit": "бр.", "price": 4.4}, {"id": "mat_ppr_troi_20_12j", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тройник с женска резба (ЖР) ф20×1/2\"Ж", "unit": "бр.", "price": 3.55}, {"id": "mat_ppr_holender_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR холендър ф20×1/2\" (или 3/4\")", "unit": "бр.", "price": 5.2}, {"id": "mat_ppr_holender_25", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR холендър ф25×3/4\"", "unit": "бр.", "price": 6.4}, {"id": "mat_vik_izol_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "Тръбна изолация (микропореста) за ф20/ф25 – 2 м", "unit": "бр.", "price": 1.4}, {"id": "mat_vik_teflon", "cat": "ВиК – ППР (ф20 и ф25)", "name": "Тефлонова лента / конец Loctite за резби", "unit": "бр.", "price": 3.5}, {"id": "mat_vik_kran_uglov", "cat": "ВиК – ППР (ф20 и ф25)", "name": "Ъглов спирателен кран 1/2\"×3/8\" (за смесител/казанче)", "unit": "бр.", "price": 6.5}, {"id": "mat_vik_meka_vrazka", "cat": "ВиК – ППР (ф20 и ф25)", "name": "Мека връзка за вода 1/2\" (40–50 см)", "unit": "бр.", "price": 4.5}, {"id": "mat_pvc_tr_25", "cat": "ВиК – PVC Канализация", "name": "PVC отводнителна тръба ф25 – 1 м", "unit": "м", "price": 1.65}, {"id": "mat_pvc_tr_40", "cat": "ВиК – PVC Канализация", "name": "PVC отводнителна тръба ф40 (муфирана) – 1 м", "unit": "м", "price": 2.45}, {"id": "mat_pvc_tr_50", "cat": "ВиК – PVC Канализация", "name": "PVC отводнителна тръба ф50 (муфирана) – 1 м", "unit": "м", "price": 3.15}, {"id": "mat_pvc_tr_75", "cat": "ВиК – PVC Канализация", "name": "PVC отводнителна тръба ф75 (муфирана) – 1 м", "unit": "м", "price": 4.4}, {"id": "mat_pvc_tr_110", "cat": "ВиК – PVC Канализация", "name": "PVC отводнителна тръба ф110 (муфирана) – 1 м", "unit": "м", "price": 5.65}, {"id": "mat_pvc_d15_25", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 15° ф25", "unit": "бр.", "price": 0.65}, {"id": "mat_pvc_d30_25", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 30° ф25", "unit": "бр.", "price": 0.65}, {"id": "mat_pvc_d45_25", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 45° ф25", "unit": "бр.", "price": 0.7}, {"id": "mat_pvc_d90_25", "cat": "ВиК – PVC Канализация", "name": "PVC коляно (дъга) 90° ф25", "unit": "бр.", "price": 0.75}, {"id": "mat_pvc_d15_40", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 15° ф40", "unit": "бр.", "price": 0.8}, {"id": "mat_pvc_d30_40", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 30° ф40", "unit": "бр.", "price": 0.8}, {"id": "mat_pvc_d45_40", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 45° ф40", "unit": "бр.", "price": 0.85}, {"id": "mat_pvc_d90_40", "cat": "ВиК – PVC Канализация", "name": "PVC коляно (дъга) 90° / 87° ф40", "unit": "бр.", "price": 0.9}, {"id": "mat_pvc_d15_50", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 15° ф50", "unit": "бр.", "price": 0.78}, {"id": "mat_pvc_d30_50", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 30° ф50", "unit": "бр.", "price": 0.78}, {"id": "mat_pvc_d45_50", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 45° ф50", "unit": "бр.", "price": 0.75}, {"id": "mat_pvc_d90_50", "cat": "ВиК – PVC Канализация", "name": "PVC коляно (дъга) 90° / 87° ф50", "unit": "бр.", "price": 0.84}, {"id": "mat_pvc_d15_75", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 15° ф75", "unit": "бр.", "price": 1.45}, {"id": "mat_pvc_d30_75", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 30° ф75", "unit": "бр.", "price": 1.45}, {"id": "mat_pvc_d45_75", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 45° ф75", "unit": "бр.", "price": 1.55}, {"id": "mat_pvc_d90_75", "cat": "ВиК – PVC Канализация", "name": "PVC коляно (дъга) 90° / 87° ф75", "unit": "бр.", "price": 1.75}, {"id": "mat_pvc_d15_110", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 15° ф110", "unit": "бр.", "price": 2.35}, {"id": "mat_pvc_d30_110", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 30° ф110", "unit": "бр.", "price": 2.4}, {"id": "mat_pvc_d45_110", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 45° ф110", "unit": "бр.", "price": 2.59}, {"id": "mat_pvc_d90_110", "cat": "ВиК – PVC Канализация", "name": "PVC коляно (дъга) 90° / 87° ф110", "unit": "бр.", "price": 3.15}, {"id": "mat_pvc_tr_25_45", "cat": "ВиК – PVC Канализация", "name": "PVC тройник (разклонител) ф25", "unit": "бр.", "price": 1.05}, {"id": "mat_pvc_tr_40_45", "cat": "ВиК – PVC Канализация", "name": "PVC тройник (разклонител) ф40/40 (45° или 87°)", "unit": "бр.", "price": 1.35}, {"id": "mat_pvc_tr_50_45", "cat": "ВиК – PVC Канализация", "name": "PVC тройник (разклонител) ф50/50 (45° или 87°)", "unit": "бр.", "price": 1.4}, {"id": "mat_pvc_tr_75_50", "cat": "ВиК – PVC Канализация", "name": "PVC тройник (разклонител) ф75/50 или ф75/75", "unit": "бр.", "price": 2.45}, {"id": "mat_pvc_tr_110_50", "cat": "ВиК – PVC Канализация", "name": "PVC тройник (разклонител) ф110/50 (45° или 87°)", "unit": "бр.", "price": 3.45}, {"id": "mat_pvc_tr_110_110", "cat": "ВиК – PVC Канализация", "name": "PVC тройник (разклонител) ф110/110 (45° или 87°)", "unit": "бр.", "price": 4.2}, {"id": "mat_pvc_mufa_25", "cat": "ВиК – PVC Канализация", "name": "PVC муфа ф25", "unit": "бр.", "price": 0.6}, {"id": "mat_pvc_mufa_40", "cat": "ВиК – PVC Канализация", "name": "PVC муфа двустранна ф40", "unit": "бр.", "price": 1.25}, {"id": "mat_pvc_mufa_50", "cat": "ВиК – PVC Канализация", "name": "PVC муфа двустранна ф50", "unit": "бр.", "price": 1.55}, {"id": "mat_pvc_mufa_75", "cat": "ВиК – PVC Канализация", "name": "PVC муфа двустранна ф75", "unit": "бр.", "price": 2.1}, {"id": "mat_pvc_mufa_110", "cat": "ВиК – PVC Канализация", "name": "PVC муфа двустранна ф110", "unit": "бр.", "price": 2.6}, {"id": "mat_pvc_red_40_25", "cat": "ВиК – PVC Канализация", "name": "PVC редукция (преход) ф40×ф25 / маншон", "unit": "бр.", "price": 0.95}, {"id": "mat_pvc_red_50_40", "cat": "ВиК – PVC Канализация", "name": "PVC редукция (преход) ф50×ф40", "unit": "бр.", "price": 0.95}, {"id": "mat_pvc_red_75_50", "cat": "ВиК – PVC Канализация", "name": "PVC редукция (преход) ф75×ф50", "unit": "бр.", "price": 1.5}, {"id": "mat_pvc_red_110_50", "cat": "ВиК – PVC Канализация", "name": "PVC редукция (преход) ф110×ф50", "unit": "бр.", "price": 1.95}, {"id": "mat_pvc_red_110_75", "cat": "ВиК – PVC Канализация", "name": "PVC редукция (преход) ф110×ф75", "unit": "бр.", "price": 2.15}, {"id": "mat_pvc_rev_50", "cat": "ВиК – PVC Канализация", "name": "PVC ревизия ф50", "unit": "бр.", "price": 2.95}, {"id": "mat_pvc_rev_75", "cat": "ВиК – PVC Канализация", "name": "PVC ревизия ф75", "unit": "бр.", "price": 4.2}, {"id": "mat_pvc_rev_110", "cat": "ВиК – PVC Канализация", "name": "PVC ревизия ф110", "unit": "бр.", "price": 5.8}, {"id": "mat_pvc_tapa_40", "cat": "ВиК – PVC Канализация", "name": "PVC тапа ф40 / ф25", "unit": "бр.", "price": 0.45}, {"id": "mat_pvc_tapa_50", "cat": "ВиК – PVC Канализация", "name": "PVC тапа ф50", "unit": "бр.", "price": 0.5}, {"id": "mat_pvc_tapa_75", "cat": "ВиК – PVC Канализация", "name": "PVC тапа ф75", "unit": "бр.", "price": 1.09}, {"id": "mat_pvc_tapa_110", "cat": "ВиК – PVC Канализация", "name": "PVC тапа ф110", "unit": "бр.", "price": 1.39}, {"id": "mat_pvc_skoba_50", "cat": "ВиК – PVC Канализация", "name": "Скоба с гума за PVC тръба ф40 / ф50", "unit": "бр.", "price": 1.45}, {"id": "mat_pvc_skoba_110", "cat": "ВиК – PVC Канализация", "name": "Скоба с гума за PVC тръба ф75 / ф110", "unit": "бр.", "price": 2.3}, {"id": "mat_pvc_sifon_pod", "cat": "ВиК – PVC Канализация", "name": "Подов сифон PVC ф50 (класически с решетка)", "unit": "бр.", "price": 12.5}, {"id": "mat_pvc_manshon_wc", "cat": "ВиК – PVC Канализация", "name": "Гофрирана / ексцентрична връзка за WC ф110", "unit": "бр.", "price": 7.5}, {"id": "mat_shpilka_m8", "cat": "Крепежи, Анкери и Силикони", "name": "Резбова шпилка поцинкована M8 – 1 м (DIN 975/976)", "unit": "бр.", "price": 1.45}, {"id": "mat_shpilka_m10", "cat": "Крепежи, Анкери и Силикони", "name": "Резбова шпилка поцинкована M10 – 1 м (DIN 975/976)", "unit": "бр.", "price": 2.25}, {"id": "mat_shpilka_m12", "cat": "Крепежи, Анкери и Силикони", "name": "Резбова шпилка поцинкована M12 – 1 м (DIN 975/976)", "unit": "бр.", "price": 3.4}, {"id": "mat_gaika_dv_m8", "cat": "Крепежи, Анкери и Силикони", "name": "Двойна (удължена) гайка M8 (DIN 6334)", "unit": "бр.", "price": 0.35}, {"id": "mat_gaika_dv_m10", "cat": "Крепежи, Анкери и Силикони", "name": "Двойна (удължена) гайка M10 (DIN 6334)", "unit": "бр.", "price": 0.5}, {"id": "mat_gaika_dv_m12", "cat": "Крепежи, Анкери и Силикони", "name": "Двойна (удължена) гайка M12 (DIN 6334)", "unit": "бр.", "price": 0.75}, {"id": "mat_gaika_norm_m8", "cat": "Крепежи, Анкери и Силикони", "name": "Нормална гайка M8 (DIN 934)", "unit": "бр.", "price": 0.08}, {"id": "mat_gaika_norm_m10", "cat": "Крепежи, Анкери и Силикони", "name": "Нормална гайка M10 (DIN 934)", "unit": "бр.", "price": 0.12}, {"id": "mat_gaika_norm_m12", "cat": "Крепежи, Анкери и Силикони", "name": "Нормална гайка M12 (DIN 934)", "unit": "бр.", "price": 0.18}, {"id": "mat_shaiba_m8", "cat": "Крепежи, Анкери и Силикони", "name": "Шайба поцинкована M8 (стандартна / широка)", "unit": "бр.", "price": 0.08}, {"id": "mat_shaiba_m10", "cat": "Крепежи, Анкери и Силикони", "name": "Шайба поцинкована M10 (стандартна / широка)", "unit": "бр.", "price": 0.12}, {"id": "mat_shaiba_m12", "cat": "Крепежи, Анкери и Силикони", "name": "Шайба поцинкована M12 (стандартна / широка)", "unit": "бр.", "price": 0.18}, {"id": "mat_him_anker_soudal", "cat": "Крепежи, Анкери и Силикони", "name": "Химически анкер Soudal Soudafix P300-SF – 280/300 мл", "unit": "бр.", "price": 8.4}, {"id": "mat_him_anker_tkk", "cat": "Крепежи, Анкери и Силикони", "name": "Химически анкер TKK FI-X Expert PE – 300 мл", "unit": "бр.", "price": 7.65}, {"id": "mat_him_anker_ceresit", "cat": "Крепежи, Анкери и Силикони", "name": "Химически анкер Ceresit CF 850 / CF 920 – 300 мл", "unit": "бр.", "price": 10.9}, {"id": "mat_gilza_m8_50", "cat": "Крепежи, Анкери и Силикони", "name": "Пластмасова гилза (мрежичка) за хим. анкер M8 – 12×50 мм", "unit": "бр.", "price": 0.45}, {"id": "mat_gilza_m8_80", "cat": "Крепежи, Анкери и Силикони", "name": "Пластмасова гилза (мрежичка) за хим. анкер M8 – 12×80 мм", "unit": "бр.", "price": 0.55}, {"id": "mat_gilza_m8_100", "cat": "Крепежи, Анкери и Силикони", "name": "Пластмасова гилза (мрежичка) за хим. анкер M8 – 12×100 мм", "unit": "бр.", "price": 0.68}, {"id": "mat_gilza_m10_85", "cat": "Крепежи, Анкери и Силикони", "name": "Пластмасова гилза (мрежичка) за хим. анкер M10 – 15×85 мм", "unit": "бр.", "price": 0.65}, {"id": "mat_gilza_m10_100", "cat": "Крепежи, Анкери и Силикони", "name": "Пластмасова гилза (мрежичка) за хим. анкер M10 – 15×100 мм", "unit": "бр.", "price": 0.78}, {"id": "mat_gilza_m10_130", "cat": "Крепежи, Анкери и Силикони", "name": "Пластмасова гилза (мрежичка) за хим. анкер M10 – 15×130 мм", "unit": "бр.", "price": 0.92}, {"id": "mat_gilza_m12_85", "cat": "Крепежи, Анкери и Силикони", "name": "Пластмасова гилза (мрежичка) за хим. анкер M12 – 16×85 мм", "unit": "бр.", "price": 0.72}, {"id": "mat_gilza_m12_130", "cat": "Крепежи, Анкери и Силикони", "name": "Пластмасова гилза (мрежичка) за хим. анкер M12 – 16×130 мм", "unit": "бр.", "price": 0.98}, {"id": "mat_gilza_m12_20x85", "cat": "Крепежи, Анкери и Силикони", "name": "Пластмасова гилза (мрежичка) за хим. анкер M12 – 20×85 мм (подсилена)", "unit": "бр.", "price": 1.1}, {"id": "mat_sil_cer_san_bp", "cat": "Крепежи, Анкери и Силикони", "name": "Санитарен силикон за баня Ceresit CS 25 (бял / прозрачен) 280 мл", "unit": "бр.", "price": 5.05}, {"id": "mat_sil_cer_san_cv", "cat": "Крепежи, Анкери и Силикони", "name": "Санитарен силикон за баня Ceresit CS 25 (цветен) 280 мл", "unit": "бр.", "price": 6.3}, {"id": "mat_akr_cer_cs11", "cat": "Крепежи, Анкери и Силикони", "name": "Акрилен уплътнител Ceresit CS 11 (бял) 280 мл", "unit": "бр.", "price": 2.05}, {"id": "mat_sil_soud_san_bp", "cat": "Крепежи, Анкери и Силикони", "name": "Санитарен силикон за баня Soudal Stop (бял / прозрачен) 280 мл", "unit": "бр.", "price": 3.35}, {"id": "mat_sil_soud_san_cv", "cat": "Крепежи, Анкери и Силикони", "name": "Санитарен силикон за баня Soudal Stop (цветен) 280 мл", "unit": "бр.", "price": 3.6}, {"id": "mat_akr_soud", "cat": "Крепежи, Анкери и Силикони", "name": "Акрилен уплътнител Soudal (бял) 280 мл", "unit": "бр.", "price": 2.05}, {"id": "mat_sil_tkk_san", "cat": "Крепежи, Анкери и Силикони", "name": "Санитарен силикон за баня TKK Tekasil / Seal (бял / прозрачен) 280 мл", "unit": "бр.", "price": 2.35}, {"id": "mat_akr_tkk", "cat": "Крепежи, Анкери и Силикони", "name": "Акрилен уплътнител TKK Tekadom Universal (бял) 300 мл", "unit": "бр.", "price": 1.69}, {"id": "mat_pyana_mont", "cat": "Крепежи, Анкери и Силикони", "name": "Монтажна пистолетна пяна Soudal / TKK 750 мл", "unit": "бр.", "price": 5.6}, {"id": "mat_mont_lepilo", "cat": "Крепежи, Анкери и Силикони", "name": "Монтажно полимерно лепило Soudal T-Rex / Fix All 290 мл", "unit": "бр.", "price": 7.6}, {"id": "mat_kabel_3x15", "cat": "Електро и Подови консумативи", "name": "Кабел СВТ / ПВВМБ1 3×1.5 мм² (осветление)", "unit": "м", "price": 1.05}, {"id": "mat_kabel_3x25", "cat": "Електро и Подови консумативи", "name": "Кабел СВТ / ПВВМБ1 3×2.5 мм² (контакти)", "unit": "м", "price": 1.65}, {"id": "mat_kabel_3x4", "cat": "Електро и Подови консумативи", "name": "Кабел СВТ / ПВВМБ1 3×4.0 мм² (бойлер / фурна)", "unit": "м", "price": 2.8}, {"id": "mat_konzola", "cat": "Електро и Подови консумативи", "name": "Конзолна кутия (за тухла или гипсокартон)", "unit": "бр.", "price": 0.65}, {"id": "mat_razkl_kutiya", "cat": "Електро и Подови консумативи", "name": "Разклонителна кутия 100×100 + WAGO клеми (к-т)", "unit": "к-т", "price": 3.5}, {"id": "mat_gofre", "cat": "Електро и Подови консумативи", "name": "Гофрирана тръба ф16 / ф20", "unit": "м", "price": 0.45}, {"id": "mat_avt_predp", "cat": "Електро и Подови консумативи", "name": "Автоматичен предпазител Schneider / ABB (10A–25A)", "unit": "бр.", "price": 5.5}, {"id": "mat_dtz", "cat": "Електро и Подови консумативи", "name": "Дефектнотокова защита (ДТЗ) Type A 30mA", "unit": "бр.", "price": 36.0}, {"id": "mat_podlojka_lam", "cat": "Електро и Подови консумативи", "name": "Подложка за ламинат XPS 3–5 мм (пакет 5 м²)", "unit": "пакет", "price": 9.5}, {"id": "mat_pervaz_pvc", "cat": "Електро и Подови консумативи", "name": "Подов перваз PVC 2.5 м + ъгли/тапи", "unit": "бр.", "price": 3.9}, {"id": "mat_chuvali_str", "cat": "Електро и Подови консумативи", "name": "Здрави строителни чували (пакет 10 бр.)", "unit": "пакет", "price": 3.5}]};
+const DEFAULT_DB = {"version": "4.4.1", "updated": "2026-11-25", "currency": "€", "company": {"name": "ФИКСБИЛД ГРУП ЕООД", "city": "гр. Пловдив", "phone": "0886 321 665", "manager": "Ангел Георгиев", "eik": "", "email": ""}, "services": [{"id": "srv_kart_plochki", "cat": "Къртене и Общи", "name": "Къртене на плочки (фаянс/теракота)", "unit": "кв.м", "price": 9.5, "min": 8.0, "max": 11.0}, {"id": "srv_kart_mazilka", "cat": "Къртене и Общи", "name": "Къртене на стара мазилка / замазка", "unit": "кв.м", "price": 10.5, "min": 8.5, "max": 12.5}, {"id": "srv_kart_tuhla", "cat": "Къртене и Общи", "name": "Къртене на тухлена стена (единичка/четворка)", "unit": "кв.м", "price": 18.0, "min": 15.0, "max": 21.0}, {"id": "srv_kart_beton", "cat": "Къртене и Общи", "name": "Къртене на бетон (подпрозорец / праг)", "unit": "бр.", "price": 65.0, "min": 50.0, "max": 80.0}, {"id": "srv_demont_sanit", "cat": "Къртене и Общи", "name": "Демонтаж на санитария / стара мивка / WC", "unit": "бр.", "price": 22.5, "min": 18.0, "max": 27.0}, {"id": "srv_demont_vrata", "cat": "Къртене и Общи", "name": "Демонтаж на стара интериорна врата и каса", "unit": "бр.", "price": 25.0, "min": 20.0, "max": 30.0}, {"id": "srv_demont_laminat", "cat": "Къртене и Общи", "name": "Демонтаж на стар ламинат / балатум / мокет", "unit": "кв.м", "price": 3.5, "min": 2.5, "max": 4.5}, {"id": "srv_demont_tapeti", "cat": "Къртене и Общи", "name": "Сваляне на стари тапети (с намокряне)", "unit": "кв.м", "price": 4.0, "min": 3.0, "max": 5.0}, {"id": "srv_ostragvane_boya", "cat": "Къртене и Общи", "name": "Остъргване на стара постна боя / лющене", "unit": "кв.м", "price": 5.0, "min": 4.0, "max": 6.0}, {"id": "srv_chuv_iznasyane", "cat": "Къртене и Общи", "name": "Събиране в чували и изнасяне на отпадъци", "unit": "чувал", "price": 2.5, "min": 2.0, "max": 3.0}, {"id": "srv_konteiner", "cat": "Къртене и Общи", "name": "Контейнер за строителни отпадъци (наем + извозване)", "unit": "бр.", "price": 150.0, "min": 130.0, "max": 170.0}, {"id": "srv_zashtita_pod", "cat": "Къртене и Общи", "name": "Облепяне и защита на подове, мебели и дограма", "unit": "кв.м", "price": 2.25, "min": 1.5, "max": 3.0}, {"id": "srv_pochistvane", "cat": "Къртене и Общи", "name": "Почистване след ремонт (грубо и фино)", "unit": "кв.м", "price": 4.5, "min": 3.5, "max": 5.5}, {"id": "srv_vrata_int", "cat": "Къртене и Общи", "name": "Монтаж на интериорна врата (стандартна)", "unit": "бр.", "price": 75.0, "min": 65.0, "max": 85.0}, {"id": "srv_podproz_kamak", "cat": "Къртене и Общи", "name": "Монтаж / лепене на подпрозоречен камък (перваз)", "unit": "л.м", "price": 25.0, "min": 20.0, "max": 30.0}, {"id": "srv_podproz_kamak_br", "cat": "Къртене и Общи", "name": "Монтаж / лепене на подпрозоречен камък (до 1.5 м, с обръщане)", "unit": "бр.", "price": 35.0, "min": 28.0, "max": 42.0}, {"id": "srv_gk_tavan_prav", "cat": "Гипсокартон и Тавани", "name": "Окачен таван от гипсокартон (прав, едно ниво)", "unit": "кв.м", "price": 24.0, "min": 20.0, "max": 28.0}, {"id": "srv_gk_tavan_dvoin", "cat": "Гипсокартон и Тавани", "name": "Окачен таван от гипсокартон на двойна скара", "unit": "кв.м", "price": 27.5, "min": 24.0, "max": 31.0}, {"id": "srv_gk_tavan_skat_20", "cat": "Гипсокартон и Тавани", "name": "Скатов таван от гипсокартон (+20% трудност / леко скосение)", "unit": "кв.м", "price": 28.8, "min": 25.0, "max": 32.5}, {"id": "srv_gk_tavan_skat_35", "cat": "Гипсокартон и Тавани", "name": "Скатов таван от гипсокартон (+35% трудност / стандартно скосение)", "unit": "кв.м", "price": 32.4, "min": 28.5, "max": 36.5}, {"id": "srv_gk_tavan_skat_50", "cat": "Гипсокартон и Тавани", "name": "Скатов таван от гипсокартон (+50% трудност / сложни чупки и капандури)", "unit": "кв.м", "price": 36.0, "min": 32.0, "max": 40.0}, {"id": "srv_gk_skrito_1", "cat": "Гипсокартон и Тавани", "name": "Скрито осветление от гипсокартон – 1 чело (5–7 €/л.м)", "unit": "л.м", "price": 6.0, "min": 5.0, "max": 7.0}, {"id": "srv_gk_skrito_2", "cat": "Гипсокартон и Тавани", "name": "Скрито осветление от гипсокартон – 2 чела", "unit": "л.м", "price": 12.0, "min": 10.0, "max": 14.0}, {"id": "srv_gk_skrito_3", "cat": "Гипсокартон и Тавани", "name": "Скрито осветление от гипсокартон – 3 чела", "unit": "л.м", "price": 18.0, "min": 15.0, "max": 21.0}, {"id": "srv_gk_skrito_4", "cat": "Гипсокартон и Тавани", "name": "Скрито осветление от гипсокартон – 4 чела", "unit": "л.м", "price": 24.0, "min": 20.0, "max": 28.0}, {"id": "srv_gk_skrito_5", "cat": "Гипсокартон и Тавани", "name": "Скрито осветление от гипсокартон – 5 чела", "unit": "л.м", "price": 30.0, "min": 25.0, "max": 35.0}, {"id": "srv_gk_predst_konstr", "cat": "Гипсокартон и Тавани", "name": "Предстенна обшивка от гипсокартон на конструкция", "unit": "кв.м", "price": 20.0, "min": 17.0, "max": 23.0}, {"id": "srv_gk_lepene", "cat": "Гипсокартон и Тавани", "name": "Лепене на гипсокартон на стени (с лепило)", "unit": "кв.м", "price": 15.5, "min": 13.0, "max": 18.0}, {"id": "srv_gk_pregradna", "cat": "Гипсокартон и Тавани", "name": "Преградна стена от гипсокартон (единична обшивка + вата)", "unit": "кв.м", "price": 27.0, "min": 23.0, "max": 31.0}, {"id": "srv_gk_pregradna_2", "cat": "Гипсокартон и Тавани", "name": "Преградна стена от гипсокартон (двойна обшивка + вата)", "unit": "кв.м", "price": 34.0, "min": 30.0, "max": 38.0}, {"id": "srv_gk_kufar", "cat": "Гипсокартон и Тавани", "name": "Изработка на куфар / обръщане на тръби от гипсокартон", "unit": "л.м", "price": 24.0, "min": 20.0, "max": 28.0}, {"id": "srv_gk_obrushtane", "cat": "Гипсокартон и Тавани", "name": "Обръщане на прозорци / врати с гипсокартон", "unit": "л.м", "price": 17.0, "min": 14.0, "max": 20.0}, {"id": "srv_gk_pvc_profil", "cat": "Гипсокартон и Тавани", "name": "Монтаж / лепене на PVC завършващ профил към дограма (такер / спрей)", "unit": "л.м", "price": 4.5, "min": 3.5, "max": 5.5}, {"id": "srv_gk_vata", "cat": "Гипсокартон и Тавани", "name": "Полагане на минерална / каменна вата (в конструкция)", "unit": "кв.м", "price": 4.0, "min": 3.0, "max": 5.0}, {"id": "srv_gk_fugirane", "cat": "Гипсокартон и Тавани", "name": "Фугиране на гипсокартон с лента (Q2, две ръце)", "unit": "кв.м", "price": 5.5, "min": 4.5, "max": 6.5}, {"id": "srv_gk_kordiz", "cat": "Гипсокартон и Тавани", "name": "Ниша за скрит корниз от гипсокартон", "unit": "л.м", "price": 22.0, "min": 18.0, "max": 26.0}, {"id": "srv_grund", "cat": "Мазилки и Шпакловки", "name": "Грундиране на стени и тавани (дълбокопроникващ / бетонконтакт)", "unit": "кв.м", "price": 1.75, "min": 1.5, "max": 2.0}, {"id": "srv_shpaklovka_gips", "cat": "Мазилки и Шпакловки", "name": "Гипсова шпакловка (1–2 ръце) + шлайфане", "unit": "кв.м", "price": 9.5, "min": 8.0, "max": 11.0}, {"id": "srv_shpaklovka_fina", "cat": "Мазилки и Шпакловки", "name": "Фина пастообразна шпакловка (Sheetrock / Baumit / Боро) + шлайфане", "unit": "кв.м", "price": 7.5, "min": 6.5, "max": 8.5}, {"id": "srv_shpaklovka_mreja", "cat": "Мазилки и Шпакловки", "name": "Шпакловка със стъклофибърна мрежа (армиране)", "unit": "кв.м", "price": 11.5, "min": 9.5, "max": 13.5}, {"id": "srv_shpaklovka_q4", "cat": "Мазилки и Шпакловки", "name": "Цялостна шпакловка до Q4 (на лампа / жираф)", "unit": "кв.м", "price": 15.0, "min": 13.0, "max": 17.0}, {"id": "srv_mazilka_vc", "cat": "Мазилки и Шпакловки", "name": "Вароциментова мазилка на стени / бани (ръчно измазване по майки)", "unit": "кв.м", "price": 14.5, "min": 12.0, "max": 17.0}, {"id": "srv_obrushtane_shpak", "cat": "Мазилки и Шпакловки", "name": "Обръщане на прозорци / врати с шпакловка и ъглохранители", "unit": "л.м", "price": 16.0, "min": 13.0, "max": 19.0}, {"id": "srv_alu_ugli_hr", "cat": "Мазилки и Шпакловки", "name": "Монтаж на алуминиеви ъглохранители", "unit": "л.м", "price": 4.25, "min": 3.5, "max": 5.0}, {"id": "srv_alu_ugli_utoch", "cat": "Мазилки и Шпакловки", "name": "Поставяне на алуминиеви ъгли (към шпакловка / гипсокартон)", "unit": "л.м", "price": 4.25, "min": 3.5, "max": 5.0}, {"id": "srv_shlaifane", "cat": "Мазилки и Шпакловки", "name": "Машинно шлайфане с жираф и прахосмукачка", "unit": "кв.м", "price": 3.0, "min": 2.5, "max": 3.5}, {"id": "srv_boya_byalo", "cat": "Боядисване", "name": "Боядисване с латекс – бял (2 ръце)", "unit": "кв.м", "price": 5.25, "min": 4.5, "max": 6.0}, {"id": "srv_boya_cvyat", "cat": "Боядисване", "name": "Боядисване с латекс – цвят (2 ръце, с отсичане)", "unit": "кв.м", "price": 6.5, "min": 5.5, "max": 7.5}, {"id": "srv_boya_tamna", "cat": "Боядисване", "name": "Боядисване с тъмен / наситен цвят (3 ръце)", "unit": "кв.м", "price": 8.0, "min": 7.0, "max": 9.0}, {"id": "srv_boya_bezvazd", "cat": "Боядисване", "name": "Безвъздушно боядисване (машинно, 2 ръце)", "unit": "кв.м", "price": 4.75, "min": 4.0, "max": 5.5}, {"id": "srv_boya_blajna", "cat": "Боядисване", "name": "Боядисване на тръби / радиатори / метал", "unit": "л.м", "price": 4.5, "min": 3.5, "max": 5.5}, {"id": "srv_boya_korniz", "cat": "Боядисване", "name": "Монтаж и боядисване на декоративни корнизи / лайсни", "unit": "л.м", "price": 7.0, "min": 5.5, "max": 8.5}, {"id": "srv_hidro", "cat": "Плочки и Баня", "name": "Полагане на течна хидроизолация (2 ръце + лента по ъгли)", "unit": "кв.м", "price": 11.0, "min": 9.0, "max": 13.0}, {"id": "srv_fayans", "cat": "Плочки и Баня", "name": "Лепене на фаянс и теракота (стандартни формати до 60×60)", "unit": "кв.м", "price": 30.0, "min": 26.0, "max": 34.0}, {"id": "srv_granitogres", "cat": "Плочки и Баня", "name": "Лепене на гранитогрес (под / стени, с нивелационна система)", "unit": "кв.м", "price": 33.25, "min": 29.0, "max": 37.5}, {"id": "srv_granit_golyam", "cat": "Плочки и Баня", "name": "Лепене на широкоформатен гранитогрес (60×120 и нагоре)", "unit": "кв.м", "price": 42.0, "min": 36.0, "max": 48.0}, {"id": "srv_cokal_plochki", "cat": "Плочки и Баня", "name": "Лепене на цокъл от гранитогрес / теракота", "unit": "л.м", "price": 8.5, "min": 7.0, "max": 10.0}, {"id": "srv_gerung", "cat": "Плочки и Баня", "name": "Рязане на плочки под 45° (герунг) и оформяне на ръб", "unit": "л.м", "price": 30.0, "min": 25.0, "max": 35.0}, {"id": "srv_otvor_plochka", "cat": "Плочки и Баня", "name": "Пробиване на отвор в гранитогрес / фаянс (боркорона)", "unit": "бр.", "price": 7.5, "min": 6.0, "max": 9.0}, {"id": "srv_sifon_lineen", "cat": "Плочки и Баня", "name": "Монтаж на линеен сифон и оформяне на наклони", "unit": "бр.", "price": 100.0, "min": 85.0, "max": 115.0}, {"id": "srv_sifon_rogov", "cat": "Плочки и Баня", "name": "Монтаж на точков / рогов подов сифон", "unit": "бр.", "price": 45.0, "min": 35.0, "max": 55.0}, {"id": "srv_struktura_wc", "cat": "Плочки и Баня", "name": "Монтаж на структура за вграждане (WC) + обличане", "unit": "бр.", "price": 115.0, "min": 95.0, "max": 135.0}, {"id": "srv_sanitariya", "cat": "Плочки и Баня", "name": "Монтаж на санитария (мивка / смесител / моноблок / душ система)", "unit": "бр.", "price": 52.5, "min": 40.0, "max": 65.0}, {"id": "srv_dush_kabina", "cat": "Плочки и Баня", "name": "Монтаж на душ кабина / стъклен параван (само труд)", "unit": "бр.", "price": 150.0, "min": 120.0, "max": 180.0}, {"id": "srv_silikonirane", "cat": "Плочки и Баня", "name": "Силикониране на фуги и санитария в баня", "unit": "л.м", "price": 3.5, "min": 2.5, "max": 4.5}, {"id": "srv_fugirane_epoks", "cat": "Плочки и Баня", "name": "Фугиране с епоксидна фугираща смес (надбавка)", "unit": "кв.м", "price": 12.0, "min": 10.0, "max": 14.0}, {"id": "srv_zamazka_banya", "cat": "Плочки и Баня", "name": "Подова циментова замазка в баня с наклони", "unit": "кв.м", "price": 18.0, "min": 15.0, "max": 21.0}, {"id": "srv_laminat", "cat": "Подови настилки", "name": "Редене на ламиниран паркет (с подложка)", "unit": "кв.м", "price": 10.75, "min": 9.0, "max": 12.5}, {"id": "srv_spc_vinil", "cat": "Подови настилки", "name": "Редене на SPC / винилова клик настилка", "unit": "кв.м", "price": 12.5, "min": 10.5, "max": 14.5}, {"id": "srv_pervazi", "cat": "Подови настилки", "name": "Монтаж на подови первази (PVC / MDF)", "unit": "л.м", "price": 4.38, "min": 3.5, "max": 5.25}, {"id": "srv_samonivel", "cat": "Подови настилки", "name": "Полагане на саморазливна подова замазка", "unit": "кв.м", "price": 11.5, "min": 9.5, "max": 13.5}, {"id": "srv_lajsna_prehod", "cat": "Подови настилки", "name": "Монтаж на преходна лайсна между настилки", "unit": "бр.", "price": 10.0, "min": 8.0, "max": 12.0}, {"id": "srv_epoks_pod", "cat": "Подови настилки", "name": "Нанасяне на двукомпонентно епоксидно подово покритие (2 ръце)", "unit": "кв.м", "price": 14.0, "min": 11.0, "max": 17.0}, {"id": "srv_vik_tochka", "cat": "ВиК услуги", "name": "Изграждане на ВиК точка (водопровод + канал)", "unit": "точка", "price": 38.25, "min": 32.0, "max": 44.5}, {"id": "srv_vik_smyana_trabi", "cat": "ВиК услуги", "name": "Подмяна на водопроводни тръби (PPR с вкопаване)", "unit": "л.м", "price": 14.0, "min": 11.0, "max": 17.0}, {"id": "srv_vik_kanal", "cat": "ВиК услуги", "name": "Полагане на вътрешна PVC канализация (ф40–ф110)", "unit": "л.м", "price": 12.0, "min": 9.5, "max": 14.5}, {"id": "srv_vik_vodomer", "cat": "ВиК услуги", "name": "Монтаж / подмяна на водомер и спирателен кран", "unit": "бр.", "price": 30.0, "min": 25.0, "max": 35.0}, {"id": "srv_vik_boiler", "cat": "ВиК услуги", "name": "Монтаж и ВиК свързване на бойлер", "unit": "бр.", "price": 55.0, "min": 45.0, "max": 65.0}, {"id": "srv_vik_peralnya", "cat": "ВиК услуги", "name": "Свързване на пералня / съдомиялна", "unit": "бр.", "price": 25.0, "min": 20.0, "max": 30.0}, {"id": "srv_el_tochka_komb", "cat": "Електроуслуги", "name": "Изграждане на Ел. точка (конзола + кабел + вкопаване)", "unit": "точка", "price": 23.25, "min": 19.0, "max": 27.5}, {"id": "srv_el_nova_tochka", "cat": "Електроуслуги", "name": "Изграждане на нова електрическа точка", "unit": "бр.", "price": 20.0, "min": 15.0, "max": 25.0}, {"id": "srv_el_kontakt", "cat": "Електроуслуги", "name": "Монтаж на контакт", "unit": "бр.", "price": 6.0, "min": 5.0, "max": 7.0}, {"id": "srv_el_klyuch", "cat": "Електроуслуги", "name": "Монтаж на ключ", "unit": "бр.", "price": 6.0, "min": 5.0, "max": 7.0}, {"id": "srv_el_osvet_tyalo", "cat": "Електроуслуги", "name": "Монтаж на осветително тяло", "unit": "бр.", "price": 20.0, "min": 15.0, "max": 25.0}, {"id": "srv_el_led_spot", "cat": "Електроуслуги", "name": "Монтаж на LED спот / луничка", "unit": "бр.", "price": 12.0, "min": 8.0, "max": 15.0}, {"id": "srv_el_led_lenta", "cat": "Електроуслуги", "name": "Монтаж на LED лента (с профил / захранване)", "unit": "л.м", "price": 7.5, "min": 7.0, "max": 8.0}, {"id": "srv_el_tablo", "cat": "Електроуслуги", "name": "Монтаж на електрическо табло (апартаментно)", "unit": "бр.", "price": 95.0, "min": 80.0, "max": 110.0}, {"id": "srv_el_predpazitel", "cat": "Електроуслуги", "name": "Свързване на автоматичен предпазител", "unit": "бр.", "price": 9.0, "min": 8.0, "max": 10.0}, {"id": "srv_el_razkl_kutiya", "cat": "Електроуслуги", "name": "Свързване на разклонителна кутия", "unit": "бр.", "price": 10.0, "min": 8.0, "max": 12.0}, {"id": "srv_el_boiler", "cat": "Електроуслуги", "name": "Свързване на бойлер (електрическо)", "unit": "бр.", "price": 25.0, "min": 20.0, "max": 30.0}, {"id": "srv_el_ventilator", "cat": "Електроуслуги", "name": "Монтаж и свързване на вентилатор за баня", "unit": "бр.", "price": 20.0, "min": 15.0, "max": 25.0}], "materials": [{"id": "mat_gk_byal", "cat": "Гипсокартон и Профили", "name": "Гипсокартон Knauf обикновен (бял) 12.5 мм, 1200×2000 (2.4 м²)", "unit": "лист", "price": 5.62}, {"id": "mat_gk_zelen", "cat": "Гипсокартон и Профили", "name": "Гипсокартон Knauf влагоустойчив (зелен) 12.5 мм, 1200×2000 (2.4 м²)", "unit": "лист", "price": 8.5}, {"id": "mat_gk_rozov", "cat": "Гипсокартон и Профили", "name": "Гипсокартон пожароустойчив (розов DF) 12.5 мм, 1200×2000 (2.4 м²)", "unit": "лист", "price": 9.48}, {"id": "mat_cd_profil", "cat": "Гипсокартон и Профили", "name": "Профил CD 60/27 – 3 м (0.6 мм)", "unit": "бр.", "price": 3.57}, {"id": "mat_ud_profil", "cat": "Гипсокартон и Профили", "name": "Профил UD 28/27 – 3 м (0.6 мм)", "unit": "бр.", "price": 2.39}, {"id": "mat_cw50", "cat": "Гипсокартон и Профили", "name": "Профил CW 50 – 3 м (0.6 мм)", "unit": "бр.", "price": 4.2}, {"id": "mat_uw50", "cat": "Гипсокартон и Профили", "name": "Профил UW 50 – 3 м (0.6 мм)", "unit": "бр.", "price": 3.45}, {"id": "mat_cw75", "cat": "Гипсокартон и Профили", "name": "Профил CW 75 – 3 м (0.6 мм)", "unit": "бр.", "price": 4.95}, {"id": "mat_uw75", "cat": "Гипсокартон и Профили", "name": "Профил UW 75 – 3 м (0.6 мм)", "unit": "бр.", "price": 4.1}, {"id": "mat_okachvach_direkt", "cat": "Гипсокартон и Профили", "name": "Директен окачвач за CD профил (125 мм)", "unit": "бр.", "price": 0.35}, {"id": "mat_okachvach_burs", "cat": "Гипсокартон и Профили", "name": "Бърз окачвач + тел с ухо (250–500 мм)", "unit": "к-т", "price": 0.65}, {"id": "mat_krast_vrazka", "cat": "Гипсокартон и Профили", "name": "Кръстата връзка за CD профил (двойна скара)", "unit": "бр.", "price": 0.45}, {"id": "mat_uduljitel_cd", "cat": "Гипсокартон и Профили", "name": "Удължител (снаждане) за CD профил", "unit": "бр.", "price": 0.4}, {"id": "mat_alu_ugal_25", "cat": "Гипсокартон и Профили", "name": "Алуминиев ъглохранител 2.5 м (перфориран)", "unit": "бр.", "price": 1.25}, {"id": "mat_alu_ugal_30", "cat": "Гипсокартон и Профили", "name": "Алуминиев ъглохранител 3.0 м (перфориран)", "unit": "бр.", "price": 1.55}, {"id": "mat_pvc_zavursh_dograma", "cat": "Гипсокартон и Профили", "name": "PVC завършващ профил за гипсокартон към дограма 3.05 м (Baustoff + Metall)", "unit": "бр.", "price": 4.48}, {"id": "mat_sprei_wurth", "cat": "Гипсокартон и Профили", "name": "Спрей лепило Würth Kraft Plus / Multi 400 мл (за PVC профили)", "unit": "бр.", "price": 19.43}, {"id": "mat_sprei_tkk", "cat": "Гипсокартон и Профили", "name": "Спрей лепило контактно TKK FI·X 71 300 мл (Baustoff + Metall)", "unit": "бр.", "price": 3.95}, {"id": "mat_lepilo_gk_technogips", "cat": "Гипсокартон и Профили", "name": "Лепило за гипсокартон Technogips Pro FIX – 25 кг", "unit": "торба", "price": 6.75}, {"id": "mat_lepilo_gk_perlfix", "cat": "Гипсокартон и Профили", "name": "Лепило за гипсокартон Knauf Perlfix – 25 кг", "unit": "торба", "price": 9.5}, {"id": "mat_lepilo_gk_rigips", "cat": "Гипсокартон и Профили", "name": "Лепило за гипсокартон Rigips Rifix – 25 кг", "unit": "торба", "price": 9.4}, {"id": "mat_lenta_fibafuse", "cat": "Гипсокартон и Профили", "name": "Лента за фуги FibaFuse гласфазерна (52 мм × 76 м)", "unit": "ролка", "price": 9.9}, {"id": "mat_lenta_fibafuse_max", "cat": "Гипсокартон и Профили", "name": "Лента за фуги FibaFuse MAX подсилена (52 мм × 76 м)", "unit": "ролка", "price": 14.55}, {"id": "mat_lenta_glasfazer", "cat": "Гипсокартон и Профили", "name": "Гласфазерна лента за фуги (50 мм × 25 м)", "unit": "ролка", "price": 2.9}, {"id": "mat_lenta_arm_samozal", "cat": "Гипсокартон и Профили", "name": "Армираща самозалепваща лента (стъклофибърна мрежа 50 мм × 45 м)", "unit": "ролка", "price": 3.2}, {"id": "mat_lenta_hartiena", "cat": "Гипсокартон и Профили", "name": "Хартиена лента за гипсокартон Knauf (50 мм × 75 м)", "unit": "ролка", "price": 5.6}, {"id": "mat_lenta_ud_uplat", "cat": "Гипсокартон и Профили", "name": "Уплътнителна лента за UD/UW профил (30 мм × 30 м)", "unit": "ролка", "price": 4.8}, {"id": "mat_vata_5cm", "cat": "Гипсокартон и Профили", "name": "Минерална вата Knauf 5 см (ролка 18 м²)", "unit": "ролка", "price": 31.5}, {"id": "mat_vata_kam_5cm", "cat": "Гипсокартон и Профили", "name": "Каменна вата 5 см (пакет 7.2 м²)", "unit": "пакет", "price": 24.5}, {"id": "mat_vint_tn25", "cat": "Гипсокартон и Профили", "name": "Винтове за гипсокартон TN 3.5×25 (кутия 1000 бр.)", "unit": "кутия", "price": 9.8}, {"id": "mat_vint_tn35", "cat": "Гипсокартон и Профили", "name": "Винтове за гипсокартон TN 3.5×35 (кутия 1000 бр.)", "unit": "кутия", "price": 12.2}, {"id": "mat_vint_tex", "cat": "Гипсокартон и Профили", "name": "Копчета (самопробивни винтове 3.5×9.5, кутия 1000 бр.)", "unit": "кутия", "price": 9.5}, {"id": "mat_dyubel_pir", "cat": "Гипсокартон и Профили", "name": "Дюбел-пирон 6×40 мм (кутия 100 бр.)", "unit": "кутия", "price": 4.5}, {"id": "mat_anker_klin", "cat": "Гипсокартон и Профили", "name": "Анкер-клин метален за таван 6×40 (кутия 100 бр.)", "unit": "кутия", "price": 11.5}, {"id": "mat_grund_borogrund", "cat": "Мазилки, Шпакловки и Грундове", "name": "Борогрунд дълбокопроникващ – 5 л", "unit": "туба", "price": 14.57}, {"id": "mat_grund_ct17_2l", "cat": "Мазилки, Шпакловки и Грундове", "name": "Дълбокопроникващ грунд Ceresit CT 17 – 2 л", "unit": "туба", "price": 8.9}, {"id": "mat_grund_ct17_5l", "cat": "Мазилки, Шпакловки и Грундове", "name": "Дълбокопроникващ грунд Ceresit CT 17 – 5 л", "unit": "туба", "price": 17.5}, {"id": "mat_grund_ct17_10l", "cat": "Мазилки, Шпакловки и Грундове", "name": "Дълбокопроникващ грунд Ceresit CT 17 – 10 л", "unit": "туба", "price": 29.65}, {"id": "mat_grund_cn94_5l", "cat": "Мазилки, Шпакловки и Грундове", "name": "Контактен грунд Ceresit CN 94 (гладки основи) – 5 л", "unit": "туба", "price": 34.5}, {"id": "mat_grund_ct19_75", "cat": "Мазилки, Шпакловки и Грундове", "name": "Бетонконтакт грунд Ceresit CT 19 – 7.5 кг", "unit": "бака", "price": 26.8}, {"id": "mat_grund_betonkont_5", "cat": "Мазилки, Шпакловки и Грундове", "name": "Бетонконтакт Baumit / Боро – 5 кг", "unit": "бака", "price": 14.2}, {"id": "mat_maz_vc_baumit", "cat": "Мазилки, Шпакловки и Грундове", "name": "Вароциментова мазилка за бани Baumit MPI 25 – 25 кг", "unit": "торба", "price": 4.95}, {"id": "mat_maz_vc_angro_25", "cat": "Мазилки, Шпакловки и Грундове", "name": "Вароциментова мазилка за бани Ангро – 25 кг", "unit": "торба", "price": 4.15}, {"id": "mat_maz_vc_angro_40", "cat": "Мазилки, Шпакловки и Грундове", "name": "Вароциментова мазилка за бани Ангро – 40 кг", "unit": "торба", "price": 5.63}, {"id": "mat_maz_vc_weber", "cat": "Мазилки, Шпакловки и Грундове", "name": "Вароциментова хастарна мазилка за бани Weber – 25 кг", "unit": "торба", "price": 5.59}, {"id": "mat_shpak_baumit_fin", "cat": "Мазилки, Шпакловки и Грундове", "name": "Пастообразна шпакловка Baumit Финиш Експерт – 20 кг", "unit": "бака", "price": 23.0}, {"id": "mat_shpak_boro_20", "cat": "Мазилки, Шпакловки и Грундове", "name": "Фина пастообразна шпакловка Боро (Борокит) – бака 20 кг", "unit": "бака", "price": 17.8}, {"id": "mat_shpak_boro_suha15", "cat": "Мазилки, Шпакловки и Грундове", "name": "Гипсова шпакловка Боро (суха) – 15 кг", "unit": "торба", "price": 8.4}, {"id": "mat_shpak_ct126", "cat": "Мазилки, Шпакловки и Грундове", "name": "Гипсова шпакловка Ceresit CT 126 – 20 кг", "unit": "торба", "price": 9.4}, {"id": "mat_shpak_ct127", "cat": "Мазилки, Шпакловки и Грундове", "name": "Фина бяла шпакловка Ceresit CT 127 – 20 кг", "unit": "торба", "price": 12.9}, {"id": "mat_knauf_zelen_6", "cat": "Мазилки, Шпакловки и Грундове", "name": "Knauf Sheetrock Super Finish (зелен капак) – 6 кг (малка бака)", "unit": "бака", "price": 9.85}, {"id": "mat_knauf_zelen_20", "cat": "Мазилки, Шпакловки и Грундове", "name": "Knauf Sheetrock Super Finish (зелен капак) – 20 кг", "unit": "бака", "price": 18.65}, {"id": "mat_knauf_zelen_25", "cat": "Мазилки, Шпакловки и Грундове", "name": "Knauf Sheetrock Super Finish (зелен капак) – 25 кг", "unit": "бака", "price": 25.8}, {"id": "mat_knauf_sin_20", "cat": "Мазилки, Шпакловки и Грундове", "name": "Knauf Fill & Finish Light / Sheetrock (син капак) – 20 кг", "unit": "бака", "price": 24.9}, {"id": "mat_knauf_sin_28", "cat": "Мазилки, Шпакловки и Грундове", "name": "Knauf Sheetrock Roll & Spray (син капак) – 28 кг", "unit": "бака", "price": 33.8}, {"id": "mat_knauf_oranj_6", "cat": "Мазилки, Шпакловки и Грундове", "name": "Knauf Sheetrock All Purpose / Dust Control (оранжев капак) – 6 кг", "unit": "бака", "price": 10.15}, {"id": "mat_knauf_oranj_25", "cat": "Мазилки, Шпакловки и Грундове", "name": "Knauf Sheetrock All Purpose (оранжев капак) – 25 кг", "unit": "бака", "price": 32.7}, {"id": "mat_knauf_jult_20", "cat": "Мазилки, Шпакловки и Грундове", "name": "Knauf Rotband ProFinish / Finitura (жълт/сив капак) – 20 кг", "unit": "бака", "price": 23.5}, {"id": "mat_knauf_fugen", "cat": "Мазилки, Шпакловки и Грундове", "name": "Фугопълнител Knauf Fugenfüller Leicht – 25 кг", "unit": "торба", "price": 19.7}, {"id": "mat_knauf_uniflott", "cat": "Мазилки, Шпакловки и Грундове", "name": "Фугопълнител Knauf Uniflott – 25 кг", "unit": "торба", "price": 34.5}, {"id": "mat_mreja_staklo", "cat": "Мазилки, Шпакловки и Грундове", "name": "Стъклофибърна мрежа 145 г/м² (ролка 50 м²)", "unit": "ролка", "price": 36.0}, {"id": "mat_lateks_byal_15", "cat": "Бои, Защита и Шлайфане", "name": "Интериорен латекс бял (миещ се, клас 1/2) – 15 л", "unit": "бака", "price": 56.0}, {"id": "mat_lateks_cvyat_10", "cat": "Бои, Защита и Шлайфане", "name": "Интериорен латекс тониран (цвят) – 10 л", "unit": "бака", "price": 52.0}, {"id": "mat_lateks_banya_25", "cat": "Бои, Защита и Шлайфане", "name": "Латекс за баня и влажни помещения (антимухъл) – 2.5 л", "unit": "бака", "price": 22.5}, {"id": "mat_tikso_obik_25", "cat": "Бои, Защита и Шлайфане", "name": "Тиксо обикновено маскиращо (хартиено 25 мм × 50 м)", "unit": "ролка", "price": 1.65}, {"id": "mat_tikso_obik_38", "cat": "Бои, Защита и Шлайфане", "name": "Тиксо обикновено маскиращо (хартиено 38 мм × 50 м)", "unit": "ролка", "price": 2.35}, {"id": "mat_tikso_obik_50", "cat": "Бои, Защита и Шлайфане", "name": "Тиксо обикновено маскиращо (хартиено 50 мм × 50 м)", "unit": "ролка", "price": 2.95}, {"id": "mat_tikso_otsich_24", "cat": "Бои, Защита и Шлайфане", "name": "Тиксо за отсичане прецизно Washi / Blue Dolphin (24 мм × 50 м)", "unit": "ролка", "price": 3.6}, {"id": "mat_tikso_otsich_36", "cat": "Бои, Защита и Шлайфане", "name": "Тиксо за отсичане прецизно Washi / Blue Dolphin (36 мм × 50 м)", "unit": "ролка", "price": 4.65}, {"id": "mat_tikso_otsich_48", "cat": "Бои, Защита и Шлайфане", "name": "Тиксо за отсичане прецизно Washi / Blue Dolphin (48 мм × 50 м)", "unit": "ролка", "price": 5.4}, {"id": "mat_nailon_tanak", "cat": "Бои, Защита и Шлайфане", "name": "Покривен найлон 4×5 м (20 м², тънък)", "unit": "бр.", "price": 0.95}, {"id": "mat_nailon_platen", "cat": "Бои, Защита и Шлайфане", "name": "Покривен найлон плътен 4×5 м (20 м², 40 мк)", "unit": "бр.", "price": 2.45}, {"id": "mat_nailon_rolka", "cat": "Бои, Защита и Шлайфане", "name": "Найлон защитен на ролка (4 м × 25 м = 100 м², плътен)", "unit": "ролка", "price": 18.5}, {"id": "mat_velpape_10m", "cat": "Бои, Защита и Шлайфане", "name": "Велпапе защитно на ролка (1 м × 10 м = 10 м²)", "unit": "ролка", "price": 6.8}, {"id": "mat_velpape_25m", "cat": "Бои, Защита и Шлайфане", "name": "Велпапе защитно на ролка (1 м × 25 м = 25 м²)", "unit": "ролка", "price": 14.9}, {"id": "mat_velpape_50m", "cat": "Бои, Защита и Шлайфане", "name": "Велпапе защитно на ролка (1 м × 50 м = 50 м²)", "unit": "ролка", "price": 27.5}, {"id": "mat_shkurka_jiraf_120", "cat": "Бои, Защита и Шлайфане", "name": "Шкурка за шлайфане ф225 (жираф) P120", "unit": "бр.", "price": 1.6}, {"id": "mat_shkurka_jiraf_150", "cat": "Бои, Защита и Шлайфане", "name": "Шкурка за шлайфане ф225 (жираф) P150", "unit": "бр.", "price": 1.55}, {"id": "mat_shkurka_jiraf_180", "cat": "Бои, Защита и Шлайфане", "name": "Шкурка за шлайфане ф225 (жираф) P180 / P240", "unit": "бр.", "price": 1.55}, {"id": "mat_shkurka_mreja", "cat": "Бои, Защита и Шлайфане", "name": "Шкурка мрежеста (за ръчно шкурене P120/P150/P180)", "unit": "бр.", "price": 0.9}, {"id": "mat_shkurka_rolka", "cat": "Бои, Защита и Шлайфане", "name": "Шкурка на ролка (115 мм × 5 м, P120–P180)", "unit": "ролка", "price": 4.2}, {"id": "mat_torbi_prah_5", "cat": "Бои, Защита и Шлайфане", "name": "Торби за строителна прахосмукачка (комплект 5 бр., флийс/хартия)", "unit": "пакет", "price": 12.5}, {"id": "mat_torba_prah_1", "cat": "Бои, Защита и Шлайфане", "name": "Торба за строителна прахосмукачка (1 бр.)", "unit": "бр.", "price": 2.6}, {"id": "mat_valyak", "cat": "Бои, Защита и Шлайфане", "name": "Валяк бояджийски (25 см микрофибър) + четка за отсичане", "unit": "к-т", "price": 9.5}, {"id": "mat_hidro_5kg", "cat": "Плочки и Баня (Материали)", "name": "Течна хидроизолация (Ceresit CL 51 / Marisan Hydrozol) – 5 кг", "unit": "бака", "price": 28.0}, {"id": "mat_hidro_15kg", "cat": "Плочки и Баня (Материали)", "name": "Течна хидроизолация (Ceresit CL 51 / Marisan Hydrozol) – 15 кг", "unit": "бака", "price": 69.0}, {"id": "mat_hidro_lenta", "cat": "Плочки и Баня (Материали)", "name": "Хидроизолационна лента за ъгли – 10 м", "unit": "ролка", "price": 19.5}, {"id": "mat_hidro_manshon", "cat": "Плочки и Баня (Материали)", "name": "Хидроизолационен маншон за тръба / сифон", "unit": "бр.", "price": 3.8}, {"id": "mat_cm16", "cat": "Плочки и Баня (Материали)", "name": "Флексово лепило за гранитогрес Ceresit CM 16 – 25 кг", "unit": "торба", "price": 14.8}, {"id": "mat_cm17", "cat": "Плочки и Баня (Материали)", "name": "Еластично лепило S1 Ceresit CM 17 – 25 кг", "unit": "торба", "price": 21.5}, {"id": "mat_baumacol", "cat": "Плочки и Баня (Материали)", "name": "Флексово лепило Baumit Baumacol FlexUni – 25 кг", "unit": "торба", "price": 13.1}, {"id": "mat_ce40", "cat": "Плочки и Баня (Материали)", "name": "Фугираща смес Ceresit CE 40 Aquastatic – 2 кг", "unit": "бака", "price": 8.5}, {"id": "mat_mapei_fugin", "cat": "Плочки и Баня (Материали)", "name": "Фугираща смес Mapei Ultracolor Plus – 5 кг", "unit": "торба", "price": 18.5}, {"id": "mat_klipsi", "cat": "Плочки и Баня (Материали)", "name": "Нивелационни клипси за плочки – 100 бр.", "unit": "пакет", "price": 2.5}, {"id": "mat_klinove", "cat": "Плочки и Баня (Материали)", "name": "Нивелационни клинове за плочки – 100 бр.", "unit": "пакет", "price": 6.5}, {"id": "mat_krastch", "cat": "Плочки и Баня (Материали)", "name": "Кръстчета за плочки (1.5 / 2 мм) – 200 бр.", "unit": "пакет", "price": 1.8}, {"id": "mat_lajsna_plochki", "cat": "Плочки и Баня (Материали)", "name": "Алуминиева лайсна за плочки (2.5 м)", "unit": "бр.", "price": 8.5}, {"id": "mat_zamazka_25", "cat": "Плочки и Баня (Материали)", "name": "Циментова замазка Baumit Solido E225 – 25 кг", "unit": "торба", "price": 4.5}, {"id": "mat_samonivel_25", "cat": "Плочки и Баня (Материали)", "name": "Саморазливна замазка Ceresit CN 69 / Baumit Nivello – 25 кг", "unit": "торба", "price": 16.5}, {"id": "mat_ppr20_1m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тръба топла вода (PN20 фибростъкло) ф20 – 1 м", "unit": "бр.", "price": 1.95}, {"id": "mat_ppr20_2m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тръба топла вода (PN20 фибростъкло) ф20 – 2 м", "unit": "бр.", "price": 3.9}, {"id": "mat_ppr20_3m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тръба топла вода (PN20 фибростъкло) ф20 – 3 м", "unit": "бр.", "price": 5.85}, {"id": "mat_ppr20_4m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тръба топла вода (PN20 фибростъкло) ф20 – 4 м", "unit": "бр.", "price": 7.8}, {"id": "mat_ppr25_1m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тръба топла вода (PN20 фибростъкло) ф25 – 1 м", "unit": "бр.", "price": 2.35}, {"id": "mat_ppr25_2m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тръба топла вода (PN20 фибростъкло) ф25 – 2 м", "unit": "бр.", "price": 4.7}, {"id": "mat_ppr25_3m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тръба топла вода (PN20 фибростъкло) ф25 – 3 м", "unit": "бр.", "price": 7.05}, {"id": "mat_ppr25_4m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тръба топла вода (PN20 фибростъкло) ф25 – 4 м", "unit": "бр.", "price": 9.4}, {"id": "mat_ppr_mufa_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR муфа ф20", "unit": "бр.", "price": 0.42}, {"id": "mat_ppr_mufa_25", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR муфа ф25", "unit": "бр.", "price": 0.55}, {"id": "mat_ppr_kol90_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR коляно 90° ф20", "unit": "бр.", "price": 0.45}, {"id": "mat_ppr_kol90_25", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR коляно 90° ф25", "unit": "бр.", "price": 0.62}, {"id": "mat_ppr_kol45_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR коляно 45° ф20", "unit": "бр.", "price": 0.5}, {"id": "mat_ppr_kol45_25", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR коляно 45° ф25", "unit": "бр.", "price": 0.68}, {"id": "mat_ppr_troi_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тройник ф20", "unit": "бр.", "price": 0.55}, {"id": "mat_ppr_troi_25", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тройник ф25", "unit": "бр.", "price": 0.72}, {"id": "mat_ppr_troi_red_25_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR редуктивен тройник ф25×ф20×ф25", "unit": "бр.", "price": 0.75}, {"id": "mat_ppr_red_25_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR редукция (муфа редуктор) ф25×ф20", "unit": "бр.", "price": 0.58}, {"id": "mat_ppr_tapa_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тапа ф20", "unit": "бр.", "price": 0.4}, {"id": "mat_ppr_tapa_25", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тапа ф25", "unit": "бр.", "price": 0.52}, {"id": "mat_ppr_skoba_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR скоба (единична) ф20", "unit": "бр.", "price": 0.35}, {"id": "mat_ppr_skoba_25", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR скоба (единична) ф25", "unit": "бр.", "price": 0.42}, {"id": "mat_ppr_duga_razm_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR дъга за разминаване (обходна) ф20", "unit": "бр.", "price": 1.65}, {"id": "mat_ppr_duga_razm_25", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR дъга за разминаване (обходна) ф25", "unit": "бр.", "price": 2.2}, {"id": "mat_ppr_kran_sf_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR сферичен кран ф20", "unit": "бр.", "price": 10.5}, {"id": "mat_ppr_kran_sf_25", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR сферичен кран ф25", "unit": "бр.", "price": 12.8}, {"id": "mat_ppr_kran_vgr_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR спирателен кран за вграждане с розетка ф20", "unit": "бр.", "price": 13.5}, {"id": "mat_ppr_kran_vgr_25", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR спирателен кран за вграждане с розетка ф25", "unit": "бр.", "price": 15.8}, {"id": "mat_ppr_ukb_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR УКБ (универсален комплект за батерия 150 мм, ф20×1/2\"Ж)", "unit": "бр.", "price": 11.2}, {"id": "mat_ppr_stenno_kol_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR стенно коляно с уши ф20×1/2\"Ж", "unit": "бр.", "price": 3.4}, {"id": "mat_ppr_prehod_20_12m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR прав преход с мъжка резба (МР) ф20×1/2\"М", "unit": "бр.", "price": 2.95}, {"id": "mat_ppr_prehod_20_34m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR прав преход с мъжка резба (МР) ф20×3/4\"М", "unit": "бр.", "price": 4.2}, {"id": "mat_ppr_prehod_25_12m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR прав преход с мъжка резба (МР) ф25×1/2\"М", "unit": "бр.", "price": 3.55}, {"id": "mat_ppr_prehod_25_34m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR прав преход с мъжка резба (МР) ф25×3/4\"М", "unit": "бр.", "price": 4.45}, {"id": "mat_ppr_prehod_20_12j", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR прав преход с женска резба (ЖР) ф20×1/2\"Ж", "unit": "бр.", "price": 2.55}, {"id": "mat_ppr_prehod_20_34j", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR прав преход с женска резба (ЖР) ф20×3/4\"Ж", "unit": "бр.", "price": 3.45}, {"id": "mat_ppr_prehod_25_12j", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR прав преход с женска резба (ЖР) ф25×1/2\"Ж", "unit": "бр.", "price": 3.25}, {"id": "mat_ppr_prehod_25_34j", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR прав преход с женска резба (ЖР) ф25×3/4\"Ж", "unit": "бр.", "price": 3.65}, {"id": "mat_ppr_kol_20_12m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR коляно с мъжка резба (МР) ф20×1/2\"М", "unit": "бр.", "price": 4.35}, {"id": "mat_ppr_kol_25_12m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR коляно с мъжка резба (МР) ф25×1/2\"М", "unit": "бр.", "price": 4.85}, {"id": "mat_ppr_kol_25_34m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR коляно с мъжка резба (МР) ф25×3/4\"М", "unit": "бр.", "price": 5.4}, {"id": "mat_ppr_kol_20_12j", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR коляно с женска резба (ЖР) ф20×1/2\"Ж", "unit": "бр.", "price": 3.3}, {"id": "mat_ppr_kol_25_12j", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR коляно с женска резба (ЖР) ф25×1/2\"Ж", "unit": "бр.", "price": 4.1}, {"id": "mat_ppr_kol_25_34j", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR коляно с женска резба (ЖР) ф25×3/4\"Ж", "unit": "бр.", "price": 4.65}, {"id": "mat_ppr_troi_20_12m", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тройник с мъжка резба (МР) ф20×1/2\"М", "unit": "бр.", "price": 4.4}, {"id": "mat_ppr_troi_20_12j", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR тройник с женска резба (ЖР) ф20×1/2\"Ж", "unit": "бр.", "price": 3.55}, {"id": "mat_ppr_holender_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR холендър ф20×1/2\" (или 3/4\")", "unit": "бр.", "price": 5.2}, {"id": "mat_ppr_holender_25", "cat": "ВиК – ППР (ф20 и ф25)", "name": "PPR холендър ф25×3/4\"", "unit": "бр.", "price": 6.4}, {"id": "mat_vik_izol_20", "cat": "ВиК – ППР (ф20 и ф25)", "name": "Тръбна изолация (микропореста) за ф20/ф25 – 2 м", "unit": "бр.", "price": 1.4}, {"id": "mat_vik_teflon", "cat": "ВиК – ППР (ф20 и ф25)", "name": "Тефлонова лента / конец Loctite за резби", "unit": "бр.", "price": 3.5}, {"id": "mat_vik_kran_uglov", "cat": "ВиК – ППР (ф20 и ф25)", "name": "Ъглов спирателен кран 1/2\"×3/8\" (за смесител/казанче)", "unit": "бр.", "price": 6.5}, {"id": "mat_vik_meka_vrazka", "cat": "ВиК – ППР (ф20 и ф25)", "name": "Мека връзка за вода 1/2\" (40–50 см)", "unit": "бр.", "price": 4.5}, {"id": "mat_pvc_tr_25", "cat": "ВиК – PVC Канализация", "name": "PVC отводнителна тръба ф25 – 1 м", "unit": "м", "price": 1.65}, {"id": "mat_pvc_tr_40", "cat": "ВиК – PVC Канализация", "name": "PVC отводнителна тръба ф40 (муфирана) – 1 м", "unit": "м", "price": 2.45}, {"id": "mat_pvc_tr_50", "cat": "ВиК – PVC Канализация", "name": "PVC отводнителна тръба ф50 (муфирана) – 1 м", "unit": "м", "price": 3.15}, {"id": "mat_pvc_tr_75", "cat": "ВиК – PVC Канализация", "name": "PVC отводнителна тръба ф75 (муфирана) – 1 м", "unit": "м", "price": 4.4}, {"id": "mat_pvc_tr_110", "cat": "ВиК – PVC Канализация", "name": "PVC отводнителна тръба ф110 (муфирана) – 1 м", "unit": "м", "price": 5.65}, {"id": "mat_pvc_d15_25", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 15° ф25", "unit": "бр.", "price": 0.65}, {"id": "mat_pvc_d30_25", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 30° ф25", "unit": "бр.", "price": 0.65}, {"id": "mat_pvc_d45_25", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 45° ф25", "unit": "бр.", "price": 0.7}, {"id": "mat_pvc_d90_25", "cat": "ВиК – PVC Канализация", "name": "PVC коляно (дъга) 90° ф25", "unit": "бр.", "price": 0.75}, {"id": "mat_pvc_d15_40", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 15° ф40", "unit": "бр.", "price": 0.8}, {"id": "mat_pvc_d30_40", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 30° ф40", "unit": "бр.", "price": 0.8}, {"id": "mat_pvc_d45_40", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 45° ф40", "unit": "бр.", "price": 0.85}, {"id": "mat_pvc_d90_40", "cat": "ВиК – PVC Канализация", "name": "PVC коляно (дъга) 90° / 87° ф40", "unit": "бр.", "price": 0.9}, {"id": "mat_pvc_d15_50", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 15° ф50", "unit": "бр.", "price": 0.78}, {"id": "mat_pvc_d30_50", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 30° ф50", "unit": "бр.", "price": 0.78}, {"id": "mat_pvc_d45_50", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 45° ф50", "unit": "бр.", "price": 0.75}, {"id": "mat_pvc_d90_50", "cat": "ВиК – PVC Канализация", "name": "PVC коляно (дъга) 90° / 87° ф50", "unit": "бр.", "price": 0.84}, {"id": "mat_pvc_d15_75", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 15° ф75", "unit": "бр.", "price": 1.45}, {"id": "mat_pvc_d30_75", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 30° ф75", "unit": "бр.", "price": 1.45}, {"id": "mat_pvc_d45_75", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 45° ф75", "unit": "бр.", "price": 1.55}, {"id": "mat_pvc_d90_75", "cat": "ВиК – PVC Канализация", "name": "PVC коляно (дъга) 90° / 87° ф75", "unit": "бр.", "price": 1.75}, {"id": "mat_pvc_d15_110", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 15° ф110", "unit": "бр.", "price": 2.35}, {"id": "mat_pvc_d30_110", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 30° ф110", "unit": "бр.", "price": 2.4}, {"id": "mat_pvc_d45_110", "cat": "ВиК – PVC Канализация", "name": "PVC дъга 45° ф110", "unit": "бр.", "price": 2.59}, {"id": "mat_pvc_d90_110", "cat": "ВиК – PVC Канализация", "name": "PVC коляно (дъга) 90° / 87° ф110", "unit": "бр.", "price": 3.15}, {"id": "mat_pvc_tr_25_45", "cat": "ВиК – PVC Канализация", "name": "PVC тройник (разклонител) ф25", "unit": "бр.", "price": 1.05}, {"id": "mat_pvc_tr_40_45", "cat": "ВиК – PVC Канализация", "name": "PVC тройник (разклонител) ф40/40 (45° или 87°)", "unit": "бр.", "price": 1.35}, {"id": "mat_pvc_tr_50_45", "cat": "ВиК – PVC Канализация", "name": "PVC тройник (разклонител) ф50/50 (45° или 87°)", "unit": "бр.", "price": 1.4}, {"id": "mat_pvc_tr_75_50", "cat": "ВиК – PVC Канализация", "name": "PVC тройник (разклонител) ф75/50 или ф75/75", "unit": "бр.", "price": 2.45}, {"id": "mat_pvc_tr_110_50", "cat": "ВиК – PVC Канализация", "name": "PVC тройник (разклонител) ф110/50 (45° или 87°)", "unit": "бр.", "price": 3.45}, {"id": "mat_pvc_tr_110_110", "cat": "ВиК – PVC Канализация", "name": "PVC тройник (разклонител) ф110/110 (45° или 87°)", "unit": "бр.", "price": 4.2}, {"id": "mat_pvc_mufa_25", "cat": "ВиК – PVC Канализация", "name": "PVC муфа ф25", "unit": "бр.", "price": 0.6}, {"id": "mat_pvc_mufa_40", "cat": "ВиК – PVC Канализация", "name": "PVC муфа двустранна ф40", "unit": "бр.", "price": 1.25}, {"id": "mat_pvc_mufa_50", "cat": "ВиК – PVC Канализация", "name": "PVC муфа двустранна ф50", "unit": "бр.", "price": 1.55}, {"id": "mat_pvc_mufa_75", "cat": "ВиК – PVC Канализация", "name": "PVC муфа двустранна ф75", "unit": "бр.", "price": 2.1}, {"id": "mat_pvc_mufa_110", "cat": "ВиК – PVC Канализация", "name": "PVC муфа двустранна ф110", "unit": "бр.", "price": 2.6}, {"id": "mat_pvc_red_40_25", "cat": "ВиК – PVC Канализация", "name": "PVC редукция (преход) ф40×ф25 / маншон", "unit": "бр.", "price": 0.95}, {"id": "mat_pvc_red_50_40", "cat": "ВиК – PVC Канализация", "name": "PVC редукция (преход) ф50×ф40", "unit": "бр.", "price": 0.95}, {"id": "mat_pvc_red_75_50", "cat": "ВиК – PVC Канализация", "name": "PVC редукция (преход) ф75×ф50", "unit": "бр.", "price": 1.5}, {"id": "mat_pvc_red_110_50", "cat": "ВиК – PVC Канализация", "name": "PVC редукция (преход) ф110×ф50", "unit": "бр.", "price": 1.95}, {"id": "mat_pvc_red_110_75", "cat": "ВиК – PVC Канализация", "name": "PVC редукция (преход) ф110×ф75", "unit": "бр.", "price": 2.15}, {"id": "mat_pvc_rev_50", "cat": "ВиК – PVC Канализация", "name": "PVC ревизия ф50", "unit": "бр.", "price": 2.95}, {"id": "mat_pvc_rev_75", "cat": "ВиК – PVC Канализация", "name": "PVC ревизия ф75", "unit": "бр.", "price": 4.2}, {"id": "mat_pvc_rev_110", "cat": "ВиК – PVC Канализация", "name": "PVC ревизия ф110", "unit": "бр.", "price": 5.8}, {"id": "mat_pvc_tapa_40", "cat": "ВиК – PVC Канализация", "name": "PVC тапа ф40 / ф25", "unit": "бр.", "price": 0.45}, {"id": "mat_pvc_tapa_50", "cat": "ВиК – PVC Канализация", "name": "PVC тапа ф50", "unit": "бр.", "price": 0.5}, {"id": "mat_pvc_tapa_75", "cat": "ВиК – PVC Канализация", "name": "PVC тапа ф75", "unit": "бр.", "price": 1.09}, {"id": "mat_pvc_tapa_110", "cat": "ВиК – PVC Канализация", "name": "PVC тапа ф110", "unit": "бр.", "price": 1.39}, {"id": "mat_pvc_skoba_50", "cat": "ВиК – PVC Канализация", "name": "Скоба с гума за PVC тръба ф40 / ф50", "unit": "бр.", "price": 1.45}, {"id": "mat_pvc_skoba_110", "cat": "ВиК – PVC Канализация", "name": "Скоба с гума за PVC тръба ф75 / ф110", "unit": "бр.", "price": 2.3}, {"id": "mat_pvc_sifon_pod", "cat": "ВиК – PVC Канализация", "name": "Подов сифон PVC ф50 (класически с решетка)", "unit": "бр.", "price": 12.5}, {"id": "mat_pvc_manshon_wc", "cat": "ВиК – PVC Канализация", "name": "Гофрирана / ексцентрична връзка за WC ф110", "unit": "бр.", "price": 7.5}, {"id": "mat_shpilka_m8", "cat": "Крепежи, Анкери и Силикони", "name": "Резбова шпилка поцинкована M8 – 1 м (DIN 975/976)", "unit": "бр.", "price": 1.45}, {"id": "mat_shpilka_m10", "cat": "Крепежи, Анкери и Силикони", "name": "Резбова шпилка поцинкована M10 – 1 м (DIN 975/976)", "unit": "бр.", "price": 2.25}, {"id": "mat_shpilka_m12", "cat": "Крепежи, Анкери и Силикони", "name": "Резбова шпилка поцинкована M12 – 1 м (DIN 975/976)", "unit": "бр.", "price": 3.4}, {"id": "mat_gaika_dv_m8", "cat": "Крепежи, Анкери и Силикони", "name": "Двойна (удължена) гайка M8 (DIN 6334)", "unit": "бр.", "price": 0.35}, {"id": "mat_gaika_dv_m10", "cat": "Крепежи, Анкери и Силикони", "name": "Двойна (удължена) гайка M10 (DIN 6334)", "unit": "бр.", "price": 0.5}, {"id": "mat_gaika_dv_m12", "cat": "Крепежи, Анкери и Силикони", "name": "Двойна (удължена) гайка M12 (DIN 6334)", "unit": "бр.", "price": 0.75}, {"id": "mat_gaika_norm_m8", "cat": "Крепежи, Анкери и Силикони", "name": "Нормална гайка M8 (DIN 934)", "unit": "бр.", "price": 0.08}, {"id": "mat_gaika_norm_m10", "cat": "Крепежи, Анкери и Силикони", "name": "Нормална гайка M10 (DIN 934)", "unit": "бр.", "price": 0.12}, {"id": "mat_gaika_norm_m12", "cat": "Крепежи, Анкери и Силикони", "name": "Нормална гайка M12 (DIN 934)", "unit": "бр.", "price": 0.18}, {"id": "mat_shaiba_m8", "cat": "Крепежи, Анкери и Силикони", "name": "Шайба поцинкована M8 (стандартна / широка)", "unit": "бр.", "price": 0.08}, {"id": "mat_shaiba_m10", "cat": "Крепежи, Анкери и Силикони", "name": "Шайба поцинкована M10 (стандартна / широка)", "unit": "бр.", "price": 0.12}, {"id": "mat_shaiba_m12", "cat": "Крепежи, Анкери и Силикони", "name": "Шайба поцинкована M12 (стандартна / широка)", "unit": "бр.", "price": 0.18}, {"id": "mat_him_anker_soudal", "cat": "Крепежи, Анкери и Силикони", "name": "Химически анкер Soudal Soudafix P300-SF – 280/300 мл", "unit": "бр.", "price": 8.4}, {"id": "mat_him_anker_tkk", "cat": "Крепежи, Анкери и Силикони", "name": "Химически анкер TKK FI-X Expert PE – 300 мл", "unit": "бр.", "price": 7.65}, {"id": "mat_him_anker_ceresit", "cat": "Крепежи, Анкери и Силикони", "name": "Химически анкер Ceresit CF 850 / CF 920 – 300 мл", "unit": "бр.", "price": 10.9}, {"id": "mat_gilza_m8_50", "cat": "Крепежи, Анкери и Силикони", "name": "Пластмасова гилза (мрежичка) за хим. анкер M8 – 12×50 мм", "unit": "бр.", "price": 0.45}, {"id": "mat_gilza_m8_80", "cat": "Крепежи, Анкери и Силикони", "name": "Пластмасова гилза (мрежичка) за хим. анкер M8 – 12×80 мм", "unit": "бр.", "price": 0.55}, {"id": "mat_gilza_m8_100", "cat": "Крепежи, Анкери и Силикони", "name": "Пластмасова гилза (мрежичка) за хим. анкер M8 – 12×100 мм", "unit": "бр.", "price": 0.68}, {"id": "mat_gilza_m10_85", "cat": "Крепежи, Анкери и Силикони", "name": "Пластмасова гилза (мрежичка) за хим. анкер M10 – 15×85 мм", "unit": "бр.", "price": 0.65}, {"id": "mat_gilza_m10_100", "cat": "Крепежи, Анкери и Силикони", "name": "Пластмасова гилза (мрежичка) за хим. анкер M10 – 15×100 мм", "unit": "бр.", "price": 0.78}, {"id": "mat_gilza_m10_130", "cat": "Крепежи, Анкери и Силикони", "name": "Пластмасова гилза (мрежичка) за хим. анкер M10 – 15×130 мм", "unit": "бр.", "price": 0.92}, {"id": "mat_gilza_m12_85", "cat": "Крепежи, Анкери и Силикони", "name": "Пластмасова гилза (мрежичка) за хим. анкер M12 – 16×85 мм", "unit": "бр.", "price": 0.72}, {"id": "mat_gilza_m12_130", "cat": "Крепежи, Анкери и Силикони", "name": "Пластмасова гилза (мрежичка) за хим. анкер M12 – 16×130 мм", "unit": "бр.", "price": 0.98}, {"id": "mat_gilza_m12_20x85", "cat": "Крепежи, Анкери и Силикони", "name": "Пластмасова гилза (мрежичка) за хим. анкер M12 – 20×85 мм (подсилена)", "unit": "бр.", "price": 1.1}, {"id": "mat_sil_cer_san_bp", "cat": "Крепежи, Анкери и Силикони", "name": "Санитарен силикон за баня Ceresit CS 25 (бял / прозрачен) 280 мл", "unit": "бр.", "price": 5.05}, {"id": "mat_sil_cer_san_cv", "cat": "Крепежи, Анкери и Силикони", "name": "Санитарен силикон за баня Ceresit CS 25 (цветен) 280 мл", "unit": "бр.", "price": 6.3}, {"id": "mat_akr_cer_cs11", "cat": "Крепежи, Анкери и Силикони", "name": "Акрилен уплътнител Ceresit CS 11 (бял) 280 мл", "unit": "бр.", "price": 2.05}, {"id": "mat_sil_soud_san_bp", "cat": "Крепежи, Анкери и Силикони", "name": "Санитарен силикон за баня Soudal Stop (бял / прозрачен) 280 мл", "unit": "бр.", "price": 3.35}, {"id": "mat_sil_soud_san_cv", "cat": "Крепежи, Анкери и Силикони", "name": "Санитарен силикон за баня Soudal Stop (цветен) 280 мл", "unit": "бр.", "price": 3.6}, {"id": "mat_akr_soud", "cat": "Крепежи, Анкери и Силикони", "name": "Акрилен уплътнител Soudal (бял) 280 мл", "unit": "бр.", "price": 2.05}, {"id": "mat_sil_tkk_san", "cat": "Крепежи, Анкери и Силикони", "name": "Санитарен силикон за баня TKK Tekasil / Seal (бял / прозрачен) 280 мл", "unit": "бр.", "price": 2.35}, {"id": "mat_akr_tkk", "cat": "Крепежи, Анкери и Силикони", "name": "Акрилен уплътнител TKK Tekadom Universal (бял) 300 мл", "unit": "бр.", "price": 1.69}, {"id": "mat_pyana_mont", "cat": "Крепежи, Анкери и Силикони", "name": "Монтажна пистолетна пяна Soudal / TKK 750 мл", "unit": "бр.", "price": 5.6}, {"id": "mat_mont_lepilo", "cat": "Крепежи, Анкери и Силикони", "name": "Монтажно полимерно лепило Soudal T-Rex / Fix All 290 мл", "unit": "бр.", "price": 7.6}, {"id": "mat_kabel_3x15", "cat": "Електро и Подови консумативи", "name": "Кабел СВТ / ПВВМБ1 3×1.5 мм² (осветление)", "unit": "м", "price": 1.05}, {"id": "mat_kabel_3x25", "cat": "Електро и Подови консумативи", "name": "Кабел СВТ / ПВВМБ1 3×2.5 мм² (контакти)", "unit": "м", "price": 1.65}, {"id": "mat_kabel_3x4", "cat": "Електро и Подови консумативи", "name": "Кабел СВТ / ПВВМБ1 3×4.0 мм² (бойлер / фурна)", "unit": "м", "price": 2.8}, {"id": "mat_konzola", "cat": "Електро и Подови консумативи", "name": "Конзолна кутия (за тухла или гипсокартон)", "unit": "бр.", "price": 0.65}, {"id": "mat_razkl_kutiya", "cat": "Електро и Подови консумативи", "name": "Разклонителна кутия 100×100 + WAGO клеми (к-т)", "unit": "к-т", "price": 3.5}, {"id": "mat_gofre", "cat": "Електро и Подови консумативи", "name": "Гофрирана тръба ф16 / ф20", "unit": "м", "price": 0.45}, {"id": "mat_avt_predp", "cat": "Електро и Подови консумативи", "name": "Автоматичен предпазител Schneider / ABB (10A–25A)", "unit": "бр.", "price": 5.5}, {"id": "mat_dtz", "cat": "Електро и Подови консумативи", "name": "Дефектнотокова защита (ДТЗ) Type A 30mA", "unit": "бр.", "price": 36.0}, {"id": "mat_podlojka_lam", "cat": "Електро и Подови консумативи", "name": "Подложка за ламинат XPS 3–5 мм (пакет 5 м²)", "unit": "пакет", "price": 9.5}, {"id": "mat_pervaz_pvc", "cat": "Електро и Подови консумативи", "name": "Подов перваз PVC 2.5 м + ъгли/тапи", "unit": "бр.", "price": 3.9}, {"id": "mat_chuvali_str", "cat": "Електро и Подови консумативи", "name": "Здрави строителни чували (пакет 10 бр.)", "unit": "пакет", "price": 3.5}]};
 
 const LS_KEYS = {
   db: 'fixbuild_db_v44',
@@ -905,8 +978,6 @@ let pickerMode = 'labor';
 let editorMode = 'labor';
 let activeRoomId = state.rooms[0]?.id || null;
 let lastSavedOfferId = null;
-
-// Contract state
 let contractScheme = 1;
 let customStages = [
   { pct: 40, label: 'Авансово плащане при подписване и старт' },
@@ -980,6 +1051,8 @@ function makeDefaultOfferNumber() {
   return `FB-${y}${m}${day}-${rnd}`;
 }
 
+function defaultDims() { return { len: '', wid: '', hei: 2.6, deduct: 0 }; }
+
 function createEmptyDraft() {
   return {
     clientName: '',
@@ -989,11 +1062,11 @@ function createEmptyDraft() {
     offerValidity: 14,
     offerNote: '',
     rooms: [
-      { id: 'r_hol', name: 'Хол', items: [] },
-      { id: 'r_spalnya', name: 'Спалня', items: [] },
-      { id: 'r_koridor', name: 'Коридор', items: [] },
-      { id: 'r_banya', name: 'Баня', items: [] },
-      { id: 'r_obshti', name: 'Общи/Демонтаж и Монтаж', items: [] }
+      { id: 'r_hol', name: 'Хол', dims: defaultDims(), items: [] },
+      { id: 'r_spalnya', name: 'Спалня', dims: defaultDims(), items: [] },
+      { id: 'r_koridor', name: 'Коридор', dims: defaultDims(), items: [] },
+      { id: 'r_banya', name: 'Баня', dims: defaultDims(), items: [] },
+      { id: 'r_obshti', name: 'Общи/Демонтаж и Монтаж', dims: defaultDims(), items: [] }
     ],
     hidden: {
       unforeseenOn: false, unforeseenPct: 10,
@@ -1003,6 +1076,7 @@ function createEmptyDraft() {
     },
     opts: {
       weekendOn: false, weekendPct: 25,
+      discountOn: false, discountPct: 5,
       vatOn: false,
       prelimOn: false
     }
@@ -1015,6 +1089,7 @@ function loadDraft() {
     if (raw) {
       const p = JSON.parse(raw);
       if (p && Array.isArray(p.rooms) && p.rooms.length) {
+        p.rooms.forEach(r => { if (!r.dims) r.dims = defaultDims(); });
         p.hidden = Object.assign(createEmptyDraft().hidden, p.hidden || {});
         p.opts = Object.assign(createEmptyDraft().opts, p.opts || {});
         return p;
@@ -1045,6 +1120,8 @@ function saveDraftState() {
   state.opts = {
     weekendOn: document.getElementById('opt-weekend-on').checked,
     weekendPct: Math.min(200, Math.max(0, Number(document.getElementById('opt-weekend-pct').value) || 0)),
+    discountOn: document.getElementById('opt-discount-on').checked,
+    discountPct: Math.min(50, Math.max(0, Number(document.getElementById('opt-discount-pct').value) || 0)),
     vatOn: document.getElementById('opt-vat-on').checked,
     prelimOn: document.getElementById('opt-prelim-on').checked
   };
@@ -1070,11 +1147,72 @@ function hydrateInputsFromState() {
 
   document.getElementById('opt-weekend-on').checked = !!state.opts.weekendOn;
   document.getElementById('opt-weekend-pct').value = state.opts.weekendPct ?? 25;
+  document.getElementById('opt-discount-on').checked = !!state.opts.discountOn;
+  document.getElementById('opt-discount-pct').value = state.opts.discountPct ?? 5;
   document.getElementById('opt-vat-on').checked = !!state.opts.vatOn;
   document.getElementById('opt-prelim-on').checked = !!state.opts.prelimOn;
 }
 
-// ================= CALCULATION ENGINE (EXACT v4.3/v4.4 FORMULA) =================
+// ================= ROOM DIMENSIONS CALCULATOR =================
+function getRoomMetrics(room) {
+  const d = room?.dims || defaultDims();
+  const L = Number(d.len) || 0;
+  const W = Number(d.wid) || 0;
+  const H = Number(d.hei) || 0;
+  const ded = Number(d.deduct) || 0;
+  const floor = round2(L * W);
+  const perim = round2(2 * (L + W));
+  const walls = round2(Math.max(0, perim * H - ded));
+  const all = round2(walls + floor);
+  return { floor, perim, walls, all };
+}
+
+function hydrateRoomDimensions() {
+  const cur = state.rooms.find(r => r.id === activeRoomId);
+  if (!cur) return;
+  if (!cur.dims) cur.dims = defaultDims();
+  document.getElementById('dim-len').value = cur.dims.len ?? '';
+  document.getElementById('dim-wid').value = cur.dims.wid ?? '';
+  document.getElementById('dim-hei').value = cur.dims.hei ?? 2.6;
+  document.getElementById('dim-deduct').value = cur.dims.deduct ?? 0;
+  renderRoomMetricsBar(cur);
+}
+
+function updateRoomDimensions() {
+  const cur = state.rooms.find(r => r.id === activeRoomId);
+  if (!cur) return;
+  cur.dims = {
+    len: document.getElementById('dim-len').value,
+    wid: document.getElementById('dim-wid').value,
+    hei: document.getElementById('dim-hei').value,
+    deduct: document.getElementById('dim-deduct').value
+  };
+  saveDraftState();
+  renderRoomMetricsBar(cur);
+}
+
+function renderRoomMetricsBar(room) {
+  const m = getRoomMetrics(room);
+  document.getElementById('dim-metrics-bar').innerHTML = `
+    <div class="dim-pill">Под / Таван: <strong>${m.floor.toFixed(2)} кв.м</strong></div>
+    <div class="dim-pill">Стени (чисто): <strong>${m.walls.toFixed(2)} кв.м</strong></div>
+    <div class="dim-pill">Стени + Таван: <strong>${m.all.toFixed(2)} кв.м</strong></div>
+    <div class="dim-pill">Периметър: <strong>${m.perim.toFixed(2)} л.м</strong></div>
+  `;
+}
+
+function applyDimToLastItem(kind) {
+  if (!kind) return;
+  const cur = state.rooms.find(r => r.id === activeRoomId);
+  if (!cur || !cur.items.length) return alert('Първо добави дейност/материал в стаята, за да попълниш площта ѝ.');
+  const m = getRoomMetrics(cur);
+  const val = m[kind] || 0;
+  if (val <= 0) return alert('Първо въведи Дължина и Ширина на стаята.');
+  cur.items[cur.items.length - 1].qty = val;
+  recalcAll();
+}
+
+// ================= CALCULATION ENGINE =================
 function computeTotals() {
   let rawLabor = 0;
   let rawMat = 0;
@@ -1089,11 +1227,9 @@ function computeTotals() {
   rawLabor = round2(rawLabor);
   rawMat = round2(rawMat);
 
-  // Weekend multiplier on labor
   const weekendMult = state.opts.weekendOn ? (1 + (state.opts.weekendPct / 100)) : 1;
   const baseLaborAfterWeekend = round2(rawLabor * weekendMult);
 
-  // Hidden overhead distributed strictly on labor
   let hiddenSum = 0;
   if (state.hidden.unforeseenOn) hiddenSum += round2(baseLaborAfterWeekend * (state.hidden.unforeseenPct / 100));
   if (state.hidden.generalOn) hiddenSum += round2(state.hidden.generalEur);
@@ -1123,12 +1259,14 @@ function computeTotals() {
   });
 
   const subTotal = round2(effLabor + effMat);
-  const vatAmount = state.opts.vatOn ? round2(subTotal * 0.20) : 0;
-  const grandTotal = round2(subTotal + vatAmount);
+  const discountAmount = state.opts.discountOn ? round2(subTotal * (state.opts.discountPct / 100)) : 0;
+  const afterDiscount = round2(subTotal - discountAmount);
+  const vatAmount = state.opts.vatOn ? round2(afterDiscount * 0.20) : 0;
+  const grandTotal = round2(afterDiscount + vatAmount);
 
   return {
     rawLabor, rawMat, hiddenSum, laborMult,
-    effLabor, effMat, subTotal, vatAmount, grandTotal,
+    effLabor, effMat, subTotal, discountAmount, afterDiscount, vatAmount, grandTotal,
     computedRooms
   };
 }
@@ -1137,14 +1275,14 @@ function recalcAll() {
   saveDraftState();
   const calc = computeTotals();
 
-  // Bottom bar
   document.getElementById('bar-labor').textContent = fmtEur(calc.effLabor);
   document.getElementById('bar-mat').textContent = fmtEur(calc.effMat);
+  document.getElementById('bar-disc-wrap').style.display = state.opts.discountOn && calc.discountAmount > 0 ? 'inline' : 'none';
+  document.getElementById('bar-disc').textContent = '-' + fmtEur(calc.discountAmount);
   document.getElementById('bar-vat-wrap').style.display = state.opts.vatOn ? 'inline' : 'none';
   document.getElementById('bar-vat').textContent = fmtEur(calc.vatAmount);
   document.getElementById('bar-grand').textContent = fmtEur(calc.grandTotal);
 
-  // Hidden overhead indicator (Tab 1 only)
   const hInfo = document.getElementById('hidden-summary-info');
   if (calc.hiddenSum > 0 && calc.rawLabor > 0) {
     const pct = ((calc.laborMult - 1) * 100).toFixed(2);
@@ -1162,33 +1300,23 @@ function recalcAll() {
   runSmartController(false);
 }
 
-// ================= TABS & NAVIGATION =================
+// ================= TABS =================
 function switchTab(tabId) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById(tabId).classList.add('active');
   const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
   if (btn) btn.classList.add('active');
-  if (tabId === 'tab-offer') {
+  if (tabId === 'tab-offer') renderOfferPreview();
+  if (tabId === 'tab-contract') {
     syncContractInputsFromOffer();
-    renderOfferPreview();
     renderContractPreview();
   }
   if (tabId === 'tab-prices') {
     renderSavedOffersList();
     renderPriceEditor();
   }
-}
-
-function setDocSubView(view) {
-  document.getElementById('subview-offer').style.display = view === 'offer' ? 'block' : 'none';
-  document.getElementById('subview-contract').style.display = view === 'contract' ? 'block' : 'none';
-  document.getElementById('btn-sub-offer').className = view === 'offer' ? 'btn btn-primary' : 'btn';
-  document.getElementById('btn-sub-contract').className = view === 'contract' ? 'btn btn-primary' : 'btn btn-blue';
-  if (view === 'contract') {
-    syncContractInputsFromOffer();
-    renderContractPreview();
-  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function jumpToSavedOffers(highlightId = null) {
@@ -1217,6 +1345,7 @@ function renderRoomChips() {
 function selectRoom(id) {
   activeRoomId = id;
   renderRoomChips();
+  hydrateRoomDimensions();
   renderActiveRoomItems(computeTotals());
 }
 
@@ -1225,9 +1354,10 @@ function addCustomRoom() {
   const name = inp.value.trim();
   if (!name) return;
   const id = 'r_' + Date.now();
-  state.rooms.push({ id, name, items: [] });
+  state.rooms.push({ id, name, dims: defaultDims(), items: [] });
   activeRoomId = id;
   inp.value = '';
+  hydrateRoomDimensions();
   recalcAll();
 }
 
@@ -1238,6 +1368,7 @@ function deleteActiveRoom() {
   if (cur.items.length && !confirm(`Да изтрия ли „${cur.name}“ заедно с ${cur.items.length} позиции?`)) return;
   state.rooms = state.rooms.filter(r => r.id !== activeRoomId);
   activeRoomId = state.rooms[0].id;
+  hydrateRoomDimensions();
   recalcAll();
 }
 
@@ -1300,13 +1431,26 @@ function addItemToActiveRoom(type, itemId) {
   if (existing) {
     existing.qty = round2((Number(existing.qty) || 0) + 1);
   } else {
+    // Auto-suggest room area when room dimensions are filled and unit is кв.м / л.м
+    let initQty = 1;
+    const m = getRoomMetrics(cur);
+    const nLow = src.name.toLowerCase();
+    if (src.unit === 'кв.м' && (m.floor > 0 || m.walls > 0)) {
+      if (nLow.includes('таван') || nLow.includes('ламинат') || nLow.includes('под') || nLow.includes('замазка') || nLow.includes('почистване')) {
+        if (m.floor > 0) initQty = m.floor;
+      } else if (nLow.includes('шпакловк') || nLow.includes('боядисв') || nLow.includes('грунд') || nLow.includes('мазилка') || nLow.includes('фаянс')) {
+        if (m.walls > 0) initQty = m.walls;
+      }
+    } else if (src.unit === 'л.м' && m.perim > 0 && (nLow.includes('перваз') || nLow.includes('цокъл'))) {
+      initQty = m.perim;
+    }
     cur.items.push({
       refId: src.id,
       type,
       cat: src.cat,
       name: src.name,
       unit: src.unit,
-      qty: 1,
+      qty: initQty,
       price: Number(src.price) || 0
     });
   }
@@ -1405,7 +1549,7 @@ function runSmartController(verbose) {
   }
 }
 
-// ================= OFFER PREVIEW, PRINT & VIBER =================
+// ================= OFFER PREVIEW, PRINT, VIBER & OFFLINE PNG EXPORT =================
 function buildOfferHtml(calc) {
   const nonEmptyRooms = calc.computedRooms.filter(r => r.rows.length > 0);
   const todayStr = new Date().toLocaleDateString('bg-BG');
@@ -1434,13 +1578,16 @@ function buildOfferHtml(calc) {
       </tbody>
     </table>
     <div class="paper-room-sub">Общо за ${escHtml(r.name)}: ${r.roomTotal.toFixed(2)} €</div>
-  `).join('') : `<p style="text-align:center;color:#64748b;padding:24px 0;">Офертата е празна — добави дейности или материали в таб „1. Калкулатор“.</p>`;
+  `).join('') : `<p style="text-align:center;color:#64748b;padding:24px 0;">Офертата е празна — добави дейности или материали в таб „1. Обект“.</p>`;
 
   return `
     <div class="paper-header">
-      <div>
-        <div class="paper-company">${escHtml(company.name)}</div>
-        <div class="paper-meta">${escHtml(company.city)} • тел. ${escHtml(company.phone)}${company.eik ? ' • ЕИК: ' + escHtml(company.eik) : ''}${company.email ? ' • ' + escHtml(company.email) : ''}</div>
+      <div class="paper-brand">
+        <img class="paper-logo" src="icon-192.png" alt="Logo" onerror="this.style.display='none'" />
+        <div>
+          <div class="paper-company">${escHtml(company.name)}</div>
+          <div class="paper-meta">${escHtml(company.city)} • тел. ${escHtml(company.phone)}${company.eik ? ' • ЕИК: ' + escHtml(company.eik) : ''}${company.email ? ' • ' + escHtml(company.email) : ''}</div>
+        </div>
       </div>
       <div style="text-align:right;">
         <div style="font-size:17px;font-weight:900;color:#c2410c;">${titleText} № ${escHtml(state.offerNumber)}</div>
@@ -1457,6 +1604,7 @@ function buildOfferHtml(calc) {
     <div class="paper-totals">
       <div class="paper-total-row"><span>Общо ТРУД:</span><span>${calc.effLabor.toFixed(2)} €</span></div>
       <div class="paper-total-row"><span>Общо МАТЕРИАЛИ:</span><span>${calc.effMat.toFixed(2)} €</span></div>
+      ${state.opts.discountOn && calc.discountAmount > 0 ? `<div class="paper-total-row" style="color:#15803d;"><span>Отстъпка (${state.opts.discountPct}%):</span><span>-${calc.discountAmount.toFixed(2)} €</span></div>` : ''}
       ${state.opts.vatOn ? `<div class="paper-total-row"><span>ДДС (20%):</span><span>${calc.vatAmount.toFixed(2)} €</span></div>` : ''}
       <div class="paper-grand-box">
         <span>КРАЙНА СУМА${state.opts.vatOn ? ' (с ДДС)' : ''}:</span>
@@ -1480,6 +1628,197 @@ function printOffer() {
   window.print();
 }
 
+function exportOfferAsPng() {
+  const calc = computeTotals();
+  const nonEmptyRooms = calc.computedRooms.filter(r => r.rows.length > 0);
+  const W = 1080;
+  const pad = 48;
+  const rowH = 38;
+
+  // Estimate height dynamically
+  let estH = 260;
+  for (const r of nonEmptyRooms) {
+    estH += 54 + 34 + r.rows.length * rowH + 40;
+  }
+  if (!nonEmptyRooms.length) estH += 80;
+  estH += 220 + (state.offerNote ? 50 : 0);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = estH;
+  const ctx = canvas.getContext('2d');
+
+  function drawAll(logoImg) {
+    ctx.fillStyle = '#fffdf8';
+    ctx.fillRect(0, 0, W, canvas.height);
+
+    let y = pad;
+    let xStart = pad;
+    if (logoImg) {
+      ctx.drawImage(logoImg, pad, y - 4, 62, 62);
+      xStart = pad + 78;
+    }
+
+    ctx.fillStyle = '#0f172a';
+    ctx.font = 'bold 28px Segoe UI, Arial, sans-serif';
+    ctx.fillText(company.name, xStart, y + 22);
+
+    ctx.fillStyle = '#475569';
+    ctx.font = '16px Segoe UI, Arial, sans-serif';
+    ctx.fillText(`${company.city} • тел. ${company.phone}${company.eik ? ' • ЕИК: ' + company.eik : ''}`, xStart, y + 48);
+
+    // Right title
+    const titleText = (state.opts.prelimOn ? 'ПРЕДВАРИТЕЛНА ОФЕРТА' : 'ОФЕРТА ЗА СМР') + ` № ${state.offerNumber}`;
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#c2410c';
+    ctx.font = 'bold 22px Segoe UI, Arial, sans-serif';
+    ctx.fillText(titleText, W - pad, y + 22);
+    ctx.fillStyle = '#475569';
+    ctx.font = '15px Segoe UI, Arial, sans-serif';
+    ctx.fillText(`Дата: ${new Date().toLocaleDateString('bg-BG')}`, W - pad, y + 46);
+    ctx.textAlign = 'left';
+
+    y += 74;
+    ctx.fillStyle = '#f97316';
+    ctx.fillRect(pad, y, W - pad * 2, 4);
+    y += 22;
+
+    // Client info box
+    ctx.fillStyle = '#f1f5f9';
+    ctx.fillRect(pad, y, W - pad * 2, 46);
+    ctx.fillStyle = '#1e293b';
+    ctx.font = 'bold 16px Segoe UI, Arial, sans-serif';
+    ctx.fillText(`Клиент: ${state.clientName || '—'} ${state.clientPhone ? '(' + state.clientPhone + ')' : ''}`, pad + 14, y + 29);
+    ctx.textAlign = 'right';
+    ctx.fillText(`Обект: ${state.clientAddress || '—'}`, W - pad - 14, y + 29);
+    ctx.textAlign = 'left';
+    y += 66;
+
+    if (!nonEmptyRooms.length) {
+      ctx.fillStyle = '#64748b';
+      ctx.font = '18px Segoe UI, Arial, sans-serif';
+      ctx.fillText('Няма добавени позиции в офертата.', pad, y + 24);
+      y += 60;
+    }
+
+    for (const r of nonEmptyRooms) {
+      // Room dark header
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(pad, y, W - pad * 2, 38);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 17px Segoe UI, Arial, sans-serif';
+      ctx.fillText(r.name, pad + 14, y + 25);
+      y += 44;
+
+      // Table column headers
+      ctx.fillStyle = '#64748b';
+      ctx.font = 'bold 13px Segoe UI, Arial, sans-serif';
+      ctx.fillText('ДЕЙНОСТ / МАТЕРИАЛ', pad + 8, y + 18);
+      ctx.textAlign = 'right';
+      ctx.fillText('КОЛ.', W - pad - 240, y + 18);
+      ctx.fillText('ЕД. ЦЕНА', W - pad - 120, y + 18);
+      ctx.fillText('ОБЩО', W - pad - 8, y + 18);
+      ctx.textAlign = 'left';
+      y += 26;
+      ctx.fillStyle = '#cbd5e1';
+      ctx.fillRect(pad, y, W - pad * 2, 1);
+      y += 6;
+
+      for (const row of r.rows) {
+        ctx.fillStyle = '#1e293b';
+        ctx.font = '15px Segoe UI, Arial, sans-serif';
+        let nm = row.name;
+        if (nm.length > 58) nm = nm.slice(0, 56) + '…';
+        ctx.fillText(nm, pad + 8, y + 23);
+        ctx.textAlign = 'right';
+        ctx.fillText(`${row.qty} ${row.unit}`, W - pad - 240, y + 23);
+        ctx.fillText(`${row.effPrice.toFixed(2)} €`, W - pad - 120, y + 23);
+        ctx.font = 'bold 15px Segoe UI, Arial, sans-serif';
+        ctx.fillText(`${row.lineTotal.toFixed(2)} €`, W - pad - 8, y + 23);
+        ctx.textAlign = 'left';
+        y += rowH;
+        ctx.fillStyle = '#e2e8f0';
+        ctx.fillRect(pad, y - 4, W - pad * 2, 1);
+      }
+
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#334155';
+      ctx.font = 'bold 16px Segoe UI, Arial, sans-serif';
+      ctx.fillText(`Общо за ${r.name}: ${r.roomTotal.toFixed(2)} €`, W - pad - 8, y + 22);
+      ctx.textAlign = 'left';
+      y += 42;
+    }
+
+    // Totals block
+    ctx.fillStyle = '#cbd5e1';
+    ctx.fillRect(pad, y, W - pad * 2, 2);
+    y += 28;
+
+    function drawTotalLine(lbl, val, color = '#334155') {
+      ctx.fillStyle = color;
+      ctx.font = 'bold 18px Segoe UI, Arial, sans-serif';
+      ctx.fillText(lbl, pad + 10, y);
+      ctx.textAlign = 'right';
+      ctx.fillText(val, W - pad - 10, y);
+      ctx.textAlign = 'left';
+      y += 30;
+    }
+
+    drawTotalLine('Общо ТРУД:', `${calc.effLabor.toFixed(2)} €`);
+    drawTotalLine('Общо МАТЕРИАЛИ:', `${calc.effMat.toFixed(2)} €`);
+    if (state.opts.discountOn && calc.discountAmount > 0) {
+      drawTotalLine(`Отстъпка (${state.opts.discountPct}%):`, `-${calc.discountAmount.toFixed(2)} €`, '#15803d');
+    }
+    if (state.opts.vatOn) {
+      drawTotalLine('ДДС (20%):', `${calc.vatAmount.toFixed(2)} €`);
+    }
+
+    // Grand total box
+    y += 6;
+    ctx.fillStyle = '#fff7ed';
+    ctx.fillRect(pad, y, W - pad * 2, 58);
+    ctx.strokeStyle = '#fdba74';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(pad, y, W - pad * 2, 58);
+    ctx.fillStyle = '#c2410c';
+    ctx.font = 'bold 26px Segoe UI, Arial, sans-serif';
+    ctx.fillText(`КРАЙНА СУМА${state.opts.vatOn ? ' (с ДДС)' : ''}:`, pad + 18, y + 38);
+    ctx.textAlign = 'right';
+    ctx.fillText(`${calc.grandTotal.toFixed(2)} €`, W - pad - 18, y + 38);
+    ctx.textAlign = 'left';
+    y += 78;
+
+    if (state.offerNote) {
+      ctx.fillStyle = '#334155';
+      ctx.font = '15px Segoe UI, Arial, sans-serif';
+      ctx.fillText(`Бележка: ${state.offerNote.slice(0, 110)}`, pad, y);
+      y += 28;
+    }
+
+    ctx.fillStyle = '#64748b';
+    ctx.font = '14px Segoe UI, Arial, sans-serif';
+    ctx.fillText(`Валидност на офертата: ${state.offerValidity || 14} дни. Посочените цени са в евро (€).`, pad, y + 10);
+
+    // Crop exact used height
+    const finalH = Math.min(canvas.height, y + 40);
+    const out = document.createElement('canvas');
+    out.width = W;
+    out.height = finalH;
+    out.getContext('2d').drawImage(canvas, 0, 0);
+
+    const a = document.createElement('a');
+    const safeClient = (state.clientName || 'Klient').replace(/[^a-zA-Z0-9а-яА-Я_-]+/g, '_');
+    a.download = `FixBuild_${state.offerNumber}_${safeClient}.png`;
+    a.href = out.toDataURL('image/png');
+    a.click();
+  }
+
+  const img = new Image();
+  img.onload = () => drawAll(img);
+  img.onerror = () => drawAll(null);
+  img.src = 'icon-192.png';
+}
+
 function copyOfferForViber() {
   const calc = computeTotals();
   let txt = `📋 ОФЕРТА № ${state.offerNumber} — ${company.name}\n`;
@@ -1495,6 +1834,7 @@ function copyOfferForViber() {
   }
   txt += `\n------------------------\n`;
   txt += `Труд: ${calc.effLabor.toFixed(2)} €\nМатериали: ${calc.effMat.toFixed(2)} €\n`;
+  if (state.opts.discountOn && calc.discountAmount > 0) txt += `Отстъпка (${state.opts.discountPct}%): -${calc.discountAmount.toFixed(2)} €\n`;
   if (state.opts.vatOn) txt += `ДДС (20%): ${calc.vatAmount.toFixed(2)} €\n`;
   txt += `💰 КРАЙНА СУМА: ${calc.grandTotal.toFixed(2)} €\n`;
   txt += `Тел. за връзка: ${company.phone}`;
@@ -1502,8 +1842,9 @@ function copyOfferForViber() {
     .catch(() => prompt('Копирай текста:', txt));
 }
 
-// ================= CONTRACT MODULE (v4.4 NEW) =================
+// ================= CONTRACT MODULE =================
 function syncContractInputsFromOffer() {
+  document.getElementById('ctr-offer-num-badge').textContent = state.offerNumber || '';
   const cn = document.getElementById('ctr-client-name');
   const ca = document.getElementById('ctr-address');
   const cd = document.getElementById('ctr-date');
@@ -1609,9 +1950,12 @@ function buildContractHtml(calc, copyLabel = '') {
   return `
     ${copyLabel ? `<div style="text-align:right;font-size:11px;font-weight:800;color:#c2410c;margin-bottom:6px;">${escHtml(copyLabel)}</div>` : ''}
     <div class="paper-header" style="margin-bottom:12px;padding-bottom:10px;">
-      <div>
-        <div class="paper-company">ДОГОВОР ЗА ИЗВЪРШВАНЕ НА СМР</div>
-        <div class="paper-meta">Вътрешни и довършителни ремонтни дейности • по Оферта № ${escHtml(state.offerNumber)}</div>
+      <div class="paper-brand">
+        <img class="paper-logo" src="icon-192.png" alt="Logo" onerror="this.style.display='none'" />
+        <div>
+          <div class="paper-company">ДОГОВОР ЗА ИЗВЪРШВАНЕ НА СМР</div>
+          <div class="paper-meta">Вътрешни и довършителни ремонтни дейности • по Оферта № ${escHtml(state.offerNumber)}</div>
+        </div>
       </div>
       <div style="text-align:right;font-size:12.5px;color:#334155;">
         <div><strong>${escHtml(company.city)}</strong></div>
@@ -1707,7 +2051,7 @@ function printContract(copies) {
   window.print();
 }
 
-// ================= SAVED OFFERS & CONTRACTS ARCHIVE =================
+// ================= SAVED OFFERS & LEGACY MIGRATION =================
 function getSavedOffers() {
   try {
     return JSON.parse(localStorage.getItem(LS_KEYS.saved) || '[]');
@@ -1721,6 +2065,53 @@ function setSavedOffers(arr) {
 
 function updateSavedBadge() {
   document.getElementById('saved-count-badge').textContent = getSavedOffers().length;
+}
+
+function scanLegacyStorage(silent = false) {
+  const existing = getSavedOffers();
+  const existingIds = new Set(existing.map(x => x.id));
+  let imported = 0;
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (!k || k === LS_KEYS.saved || k === LS_KEYS.db || k === LS_KEYS.dbBackup || k === LS_KEYS.draft) continue;
+    if (/offer|saved|fixbuild/i.test(k)) {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(k));
+        if (Array.isArray(parsed)) {
+          for (const item of parsed) {
+            if (item && (item.rooms || item.state?.rooms)) {
+              const id = item.id || ('legacy_' + k + '_' + imported);
+              if (!existingIds.has(id)) {
+                const st = item.state || item;
+                existing.push({
+                  id,
+                  savedAt: item.savedAt || item.date || new Date().toISOString(),
+                  offerNumber: item.offerNumber || st.offerNumber || 'Стара оферта',
+                  clientName: item.clientName || st.clientName || 'Архив v4.3',
+                  clientAddress: item.clientAddress || st.clientAddress || '',
+                  grandTotal: Number(item.grandTotal || item.total || 0),
+                  effLabor: Number(item.effLabor || item.labor || 0),
+                  effMat: Number(item.effMat || item.materials || 0),
+                  hasContract: !!item.contract,
+                  state: st,
+                  contract: item.contract || null
+                });
+                existingIds.add(id);
+                imported++;
+              }
+            }
+          }
+        }
+      } catch (e) {}
+    }
+  }
+  if (imported > 0) {
+    setSavedOffers(existing);
+    renderSavedOffersList();
+    if (!silent) alert(`✅ Намерени и възстановени са ${imported} стари оферти от предишната версия!`);
+  } else if (!silent) {
+    alert('Няма намерени допълнителни стари оферти в паметта на този браузър.');
+  }
 }
 
 function getCurrentContractSnapshot() {
@@ -1762,14 +2153,16 @@ function saveCurrentOffer(withContract = false) {
   lastSavedOfferId = id;
 
   const banner = document.getElementById('save-confirm-banner');
-  banner.classList.add('show');
-  banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  if (banner) {
+    banner.classList.add('show');
+    banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
   renderSavedOffersList(id);
 }
 
 function saveContractToArchive() {
   saveCurrentOffer(true);
-  alert('✅ Договорът и офертата са запазени електронно в архива („3. Цени и Архив“ → „Запазени оферти“).');
+  alert('✅ Договорът и офертата са запазени електронно в архива („4. Цени и Архив“ → „Запазени оферти“).');
 }
 
 function downloadJsonFile(filename, dataObj) {
@@ -1784,10 +2177,9 @@ function downloadJsonFile(filename, dataObj) {
 function downloadCurrentOfferFile() {
   saveDraftState();
   const safeClient = (state.clientName || 'Klient').replace(/[^a-zA-Z0-9а-яА-Я_-]+/g, '_');
-  const fname = `FixBuild_${state.offerNumber}_${safeClient}.json`;
-  downloadJsonFile(fname, {
+  downloadJsonFile(`FixBuild_${state.offerNumber}_${safeClient}.json`, {
     app: 'FixBuild',
-    version: '4.4',
+    version: '4.4.1',
     exportedAt: new Date().toISOString(),
     state,
     contract: getCurrentContractSnapshot()
@@ -1805,10 +2197,12 @@ function loadSavedOffer(id, openContract = false) {
   const rec = getSavedOffers().find(x => x.id === id);
   if (!rec || !rec.state) return;
   state = JSON.parse(JSON.stringify(rec.state));
+  state.rooms.forEach(r => { if (!r.dims) r.dims = defaultDims(); });
   state.hidden = Object.assign(createEmptyDraft().hidden, state.hidden || {});
   state.opts = Object.assign(createEmptyDraft().opts, state.opts || {});
   activeRoomId = state.rooms[0]?.id || null;
   hydrateInputsFromState();
+  hydrateRoomDimensions();
 
   if (rec.contract) {
     document.getElementById('ctr-client-name').value = rec.contract.clientName || '';
@@ -1824,12 +2218,7 @@ function loadSavedOffer(id, openContract = false) {
     selectPaymentScheme(rec.contract.scheme || 1);
   }
   recalcAll();
-  if (openContract) {
-    switchTab('tab-offer');
-    setDocSubView('contract');
-  } else {
-    switchTab('tab-calc');
-  }
+  switchTab(openContract ? 'tab-contract' : 'tab-calc');
 }
 
 function deleteSavedOffer(id) {
@@ -1847,9 +2236,11 @@ function importOfferFromFile(evt) {
       const data = JSON.parse(reader.result);
       const st = data.state || (data.rooms ? data : null);
       if (!st || !Array.isArray(st.rooms)) return alert('Невалиден файл за оферта.');
+      st.rooms.forEach(r => { if (!r.dims) r.dims = defaultDims(); });
       state = st;
       activeRoomId = state.rooms[0]?.id || null;
       hydrateInputsFromState();
+      hydrateRoomDimensions();
       recalcAll();
       alert('✅ Офертата е заредена успешно от файла!');
       switchTab('tab-calc');
@@ -1865,7 +2256,7 @@ function renderSavedOffersList(highlightId = null) {
   const list = getSavedOffers();
   const box = document.getElementById('saved-offers-list');
   if (!list.length) {
-    box.innerHTML = `<div style="padding:14px;text-align:center;color:var(--muted);background:var(--bg);border-radius:10px;">Все още няма запазени оферти. Натисни „💾 Запази оферта“ в таб „2. Оферта и Договор“.</div>`;
+    box.innerHTML = `<div style="padding:14px;text-align:center;color:var(--muted);background:var(--bg);border-radius:10px;">Все още няма запазени оферти. Натисни „💾 Запази оферта“ в таб „2. Оферта“.</div>`;
     return;
   }
   box.innerHTML = list.map(o => {
@@ -1896,6 +2287,7 @@ function newBlankOffer() {
   state = createEmptyDraft();
   activeRoomId = state.rooms[0].id;
   hydrateInputsFromState();
+  hydrateRoomDimensions();
   recalcAll();
 }
 
@@ -1916,9 +2308,9 @@ async function updatePricesFromOnline() {
     populateCategoryFilter();
     renderCatalogPicker();
     renderPriceEditor();
-    msg.innerHTML = `<span style="color:#4ade80;">✅ Обновено успешно до v${escHtml(db.version || '4.4')} (${db.services.length} услуги, ${db.materials.length} материала)!</span>`;
+    msg.innerHTML = `<span style="color:#4ade80;">✅ Обновено успешно до v${escHtml(db.version || '4.4.1')} (${db.services.length} услуги, ${db.materials.length} материала)!</span>`;
   } catch (e) {
-    msg.innerHTML = `<span style="color:#f87171;">❌ Неуспешно обновяване: ${escHtml(e.message)}. Провери интернет връзката или качения prices.json.</span>`;
+    msg.innerHTML = `<span style="color:#f87171;">❌ Неуспешно обновяване: ${escHtml(e.message)}.</span>`;
   }
 }
 
@@ -2007,15 +2399,17 @@ function updateDBCounters() {
   document.getElementById('cnt-mat').textContent = db.materials.length;
   document.getElementById('db-srv-count').textContent = db.services.length;
   document.getElementById('db-mat-count').textContent = db.materials.length;
-  document.getElementById('db-version-info').textContent = 'v' + (db.version || '4.4');
+  document.getElementById('db-version-info').textContent = 'v' + (db.version || '4.4.1');
 }
 
 // ================= INIT =================
 window.addEventListener('DOMContentLoaded', () => {
   refreshCompanyHeader();
+  scanLegacyStorage(true);
   updateDBCounters();
   updateSavedBadge();
   hydrateInputsFromState();
+  hydrateRoomDimensions();
   populateCategoryFilter();
   renderCatalogPicker();
   recalcAll();

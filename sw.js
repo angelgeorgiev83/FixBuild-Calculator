@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fixbuild-v4.4-cache';
+const CACHE_NAME = 'fixbuild-v4.4.1-cache';
 const ASSETS = [
   './',
   './index.html',
@@ -24,7 +24,6 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  // Always try network first for prices.json so 1-click updates work smoothly
   if (event.request.url.includes('prices.json')) {
     event.respondWith(
       fetch(event.request)
