@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fixbuild-v4.4.7-cache';
+const CACHE_NAME = 'fixbuild-v4.4.9-cache';
 const ASSETS = [
   './',
   './index.html',
@@ -11,35 +11,53 @@ const ASSETS = [
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS).catch(() => {}))
+    caches.open(CACHE_NAME).then(cache =>
+      Promise.all(
+        ASSETS.map(url =>
+          fetch(new Request(url, { cache: 'no-store' }))
+            .then(res => (res && res.ok ? cache.put(url, res) : null))
+            .catch(() => null)
+        )
+      )
+    )
   );
 });
 
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
+    caches.keys()
+      .then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))))
+      .then(() => self.clients.claim())
   );
 });
 
 self.addEventListener('fetch', event => {
   const req = event.request;
-  const isNavOrData = req.mode === 'navigate' ||
-    req.url.includes('index.html') ||
-    req.url.includes('prices.json');
+  if (req.method !== 'GET') return;
 
-  if (isNavOrData) {
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
+
+  const isNav = req.mode === 'navigate' ||
+    url.pathname.endsWith('/') ||
+    url.pathname.endsWith('/index.html');
+  const isPrices = url.pathname.endsWith('/prices.json');
+
+  if (isNav || isPrices) {
     event.respondWith(
-      fetch(req, { cache: 'no-cache' })
+      fetch(req.url, { cache: 'no-store' })
         .then(res => {
           if (res && res.ok) {
             const clone = res.clone();
-            caches.open(CACHE_NAME).then(c => c.put(req, clone));
+            const cacheKey = isNav ? './index.html' : './prices.json';
+            caches.open(CACHE_NAME).then(c => c.put(cacheKey, clone));
           }
           return res;
         })
-        .catch(() => caches.match(req))
+        .catch(() => {
+          const fallbackKey = isNav ? './index.html' : './prices.json';
+          return caches.match(fallbackKey).then(r => r || caches.match(req));
+        })
     );
     return;
   }
