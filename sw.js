@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fixbuild-v4.4.6-cache';
+const CACHE_NAME = 'fixbuild-v4.4.7-cache';
 const ASSETS = [
   './',
   './index.html',
@@ -24,19 +24,27 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  if (event.request.url.includes('prices.json')) {
+  const req = event.request;
+  const isNavOrData = req.mode === 'navigate' ||
+    req.url.includes('index.html') ||
+    req.url.includes('prices.json');
+
+  if (isNavOrData) {
     event.respondWith(
-      fetch(event.request)
+      fetch(req, { cache: 'no-cache' })
         .then(res => {
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
+          if (res && res.ok) {
+            const clone = res.clone();
+            caches.open(CACHE_NAME).then(c => c.put(req, clone));
+          }
           return res;
         })
-        .catch(() => caches.match(event.request))
+        .catch(() => caches.match(req))
     );
     return;
   }
+
   event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request))
+    caches.match(req).then(cached => cached || fetch(req))
   );
 });
