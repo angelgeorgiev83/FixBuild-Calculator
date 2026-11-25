@@ -1,26 +1,21 @@
 {
-  "name": "ФИКСБИЛД ГРУП – Оферти",
-  "short_name": "Оферти",
-  "description": "Калкулатор за оферти, труд и материали с фира в евро (€)",
+  "name": "FixBuild v4.4 — Калкулатор за оферти и договори",
+  "short_name": "FixBuild",
+  "description": "Калкулатор за строително-ремонтни дейности, оферти и договори в евро (€) — ФИКСБИЛД ГРУП ЕООД",
   "start_url": "./index.html",
-  "scope": "./",
   "display": "standalone",
-  "orientation": "portrait-primary",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
-  "lang": "bg",
   "icons": [
     {
-      "src": "./icon-192.png",
+      "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
-      "src": "./icon-512.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ]
 }

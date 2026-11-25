@@ -1,55 +1,43 @@
-const CACHE_NAME = 'fixbuild-pwa-v8';
+const CACHE_NAME = 'fixbuild-v4.4-cache';
 const ASSETS = [
   './',
   './index.html',
+  './prices.json',
   './manifest.json',
   './icon-192.png',
   './icon-512.png'
 ];
 
-self.addEventListener('install', function(event) {
+self.addEventListener('install', event => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then(function(cache) {
-      return cache.addAll(ASSETS).then(function() {
-        return cache.add('./prices.json').catch(function() {});
-      });
-    }).then(function() {
-      return self.skipWaiting();
-    })
+    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS).catch(() => {}))
   );
 });
 
-self.addEventListener('activate', function(event) {
+self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(function(keys) {
-      return Promise.all(
-        keys.filter(function(k) { return k !== CACHE_NAME; })
-            .map(function(k) { return caches.delete(k); })
-      );
-    }).then(function() {
-      return self.clients.claim();
-    })
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+    ).then(() => self.clients.claim())
   );
 });
 
-self.addEventListener('fetch', function(event) {
-  if (event.request.method !== 'GET') return;
-  var url = new URL(event.request.url);
-  if (url.origin !== self.location.origin) return;
-
+self.addEventListener('fetch', event => {
+  // Always try network first for prices.json so 1-click updates work smoothly
+  if (event.request.url.includes('prices.json')) {
+    event.respondWith(
+      fetch(event.request)
+        .then(res => {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
+          return res;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
   event.respondWith(
-    fetch(event.request).then(function(networkResponse) {
-      if (networkResponse && networkResponse.status === 200) {
-        var copy = networkResponse.clone();
-        caches.open(CACHE_NAME).then(function(cache) {
-          cache.put(event.request, copy);
-        });
-      }
-      return networkResponse;
-    }).catch(function() {
-      return caches.match(event.request).then(function(cached) {
-        return cached || caches.match('./index.html');
-      });
-    })
+    caches.match(event.request).then(cached => cached || fetch(event.request))
   );
 });
