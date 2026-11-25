@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fixbuild-v4.4.9-cache';
+const CACHE_NAME = 'fixbuild-v4.5.0-cache';
 const ASSETS = [
   './',
   './index.html',
